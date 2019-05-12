@@ -8,6 +8,7 @@ namespace roslyn_uml
     {
         public List<ParameterDescription> Parameters { get; } = new List<ParameterDescription>();
         public List<InvocationDescription> InvokedMethods { get; } = new List<InvocationDescription>();
+
         public ConstructorDescription(string name)
             : base(MemberType.Constructor, name)
         {

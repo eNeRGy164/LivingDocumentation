@@ -16,8 +16,8 @@ namespace roslyn_uml
             
             await AnalyzeSolutionAsync(types, args[0]);
 
-            var aggregateRendere = new eShopOnContainers.AggregateRenderer(types);
-            aggregateRendere.Render();
+            var aggregateRenderer = new eShopOnContainers.AggregateRenderer(types);
+            aggregateRenderer.Render();
 
             var commandHandlerRenderer = new eShopOnContainers.CommandHandlerRenderer(types);
             commandHandlerRenderer.Render();
@@ -26,7 +26,7 @@ namespace roslyn_uml
             eventHandlerRenderer.Render();
         }
 
-        private static async Task AnalyzeSolutionAsync(List<TypeDescription> types, string solutionFile)
+        private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)
         {
             var manager = new AnalyzerManager(solutionFile);
             var workspace = manager.GetWorkspace();
@@ -54,7 +54,7 @@ namespace roslyn_uml
                 {
                     var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
-                    var visitor = new SourceAnalyzer(semanticModel, ref types, referencedAssemblies);
+                    var visitor = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
                     visitor.Visit(syntaxTree.GetRoot());
                 }
             }

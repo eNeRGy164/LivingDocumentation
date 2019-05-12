@@ -2,7 +2,7 @@
 
 namespace roslyn_uml
 {
-    public interface IHaveAMethodBody
+    public interface IHaveAMethodBody : IHaveModifiers
     {
         string Name { get; }
         List<ParameterDescription> Parameters { get; }

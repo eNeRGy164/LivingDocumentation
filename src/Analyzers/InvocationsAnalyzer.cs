@@ -8,15 +8,15 @@ namespace roslyn_uml
 {
     internal class InvocationsAnalyzer : CSharpSyntaxWalker
     {
-        private readonly List<InvocationDescription> invocations;
-        private readonly IReadOnlyList<AssemblyIdentity> referencedAssemblies;
         private readonly SemanticModel semanticModel;
+        private readonly IList<InvocationDescription> invocations;
+        private readonly IReadOnlyList<AssemblyIdentity> referencedAssemblies;
 
-        public InvocationsAnalyzer(in SemanticModel semanticModel, IReadOnlyList<AssemblyIdentity> referencedAssemblies, List<InvocationDescription> invocations)
+        public InvocationsAnalyzer(in SemanticModel semanticModel, IList<InvocationDescription> invocations, IReadOnlyList<AssemblyIdentity> referencedAssemblies)
         {
+            this.semanticModel = semanticModel;
             this.invocations = invocations;
             this.referencedAssemblies = referencedAssemblies;
-            this.semanticModel = semanticModel;
         }
 
         public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
@@ -51,12 +51,15 @@ namespace roslyn_uml
                     invocation.Arguments.Add(argumentDescription);
                 }
             }
+
+            base.VisitObjectCreationExpression(node);
         }
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (semanticModel.GetConstantValue(node).HasValue && (node.Expression as IdentifierNameSyntax)?.Identifier.ValueText == "nameof")
+            if (semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof"))
             {
+                // nameof is compiler sugar, and is actually a method we are not interrested in
                 return;
             }
 
@@ -93,6 +96,8 @@ namespace roslyn_uml
                 var argumentDescription = new ArgumentDescription(semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
                 invocation.Arguments.Add(argumentDescription);
             }
+
+            base.VisitInvocationExpression(node);
         }
     }
 }

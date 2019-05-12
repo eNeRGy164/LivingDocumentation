@@ -8,44 +8,24 @@ namespace roslyn_uml
 {
     internal class SourceAnalyzer : CSharpSyntaxWalker
     {
-        private readonly List<TypeDescription> types;
-        private readonly IReadOnlyList<AssemblyIdentity> referencedAssemblies;
         private readonly SemanticModel semanticModel;
+        private readonly IList<TypeDescription> types;
+        private readonly IReadOnlyList<AssemblyIdentity> referencedAssemblies;
+
         private TypeDescription currentType = null;
 
-        public SourceAnalyzer(in SemanticModel semanticModel, ref List<TypeDescription> types, IReadOnlyList<AssemblyIdentity> referencedAssemblies)
+        public SourceAnalyzer(in SemanticModel semanticModel, IList<TypeDescription> types, IReadOnlyList<AssemblyIdentity> referencedAssemblies)
         {
             this.types = types;
-            this.referencedAssemblies = referencedAssemblies;
             this.semanticModel = semanticModel;
+            this.referencedAssemblies = referencedAssemblies;
         }
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            ExtractTypeDeclaration(TypeType.Class, node);
+            ExtractBaseTypeDeclaration(TypeType.Class, node);
 
             base.VisitClassDeclaration(node);
-        }
-
-        public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
-        {
-            var constructorDescription = new ConstructorDescription(node.Identifier.ToString());
-            this.currentType.AddMember(constructorDescription);
-
-            constructorDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
-
-            foreach (var parameter in node.ParameterList.Parameters)
-            {
-                var parameterDescription = new ParameterDescription(semanticModel.GetTypeDisplayString(parameter.Type), parameter.Identifier.ToString());
-                constructorDescription.Parameters.Add(parameterDescription);
-
-                parameterDescription.HasDefaultValue = parameter.Default != null;
-            }
-            
-            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, referencedAssemblies, constructorDescription.InvokedMethods);
-            invocationAnalyzer.Visit(node.Body);
-
-            base.VisitConstructorDeclaration(node);
         }
 
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
@@ -57,14 +37,14 @@ namespace roslyn_uml
 
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            ExtractTypeDeclaration(TypeType.Struct, node);
+            ExtractBaseTypeDeclaration(TypeType.Struct, node);
 
             base.VisitStructDeclaration(node);
         }
 
         public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            ExtractTypeDeclaration(TypeType.Interface, node);
+            ExtractBaseTypeDeclaration(TypeType.Interface, node);
 
             base.VisitInterfaceDeclaration(node);
         }
@@ -74,10 +54,10 @@ namespace roslyn_uml
             var fieldDescription = new FieldDescription(semanticModel.GetTypeDisplayString(node.Declaration.Type), node.Declaration.Variables.First().Identifier.ValueText);
             this.currentType.AddMember(fieldDescription);
 
-            fieldDescription.Initializer = node.Declaration.Variables.First().Initializer?.Value.ToString();
             fieldDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            fieldDescription.Initializer = node.Declaration.Variables.First().Initializer?.Value.ToString(); // Assumption: Field has only a single initializer
 
-            
+
             base.VisitFieldDeclaration(node);
         }
 
@@ -87,9 +67,19 @@ namespace roslyn_uml
             this.currentType.AddMember(propertyDescription);
 
             propertyDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
-            propertyDescription.IsOptional = node.Initializer != null;
+            propertyDescription.Initializer = node.Initializer?.Value.ToString();
 
             base.VisitPropertyDeclaration(node);
+        }
+
+        public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+        {
+            var constructorDescription = new ConstructorDescription(node.Identifier.ToString());
+            this.currentType.AddMember(constructorDescription);
+
+            ExtractBaseMethodDeclaration(node, constructorDescription);
+
+            base.VisitConstructorDeclaration(node);
         }
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
@@ -97,18 +87,7 @@ namespace roslyn_uml
             var methodDescription = new MethodDescription(semanticModel.GetTypeInfo(node.ReturnType).Type.ToDisplayString(), node.Identifier.ToString());
             this.currentType.AddMember(methodDescription);
 
-            methodDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
-
-            foreach (var parameter in node.ParameterList.Parameters)
-            {
-                var parameterDescription = new ParameterDescription(semanticModel.GetTypeDisplayString(parameter.Type), parameter.Identifier.ToString());
-                methodDescription.Parameters.Add(parameterDescription);
-
-                parameterDescription.HasDefaultValue = parameter.Default != null;
-            }
-
-            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, referencedAssemblies, methodDescription.InvokedMethods);
-            invocationAnalyzer.Visit(node.Body);
+            ExtractBaseMethodDeclaration(node, methodDescription);
 
             base.VisitMethodDeclaration(node);
         }
@@ -129,9 +108,20 @@ namespace roslyn_uml
             this.currentType.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
         }
 
-        private void ExtractTypeDeclaration(TypeType type, TypeDeclarationSyntax node)
+        private void ExtractBaseMethodDeclaration(BaseMethodDeclarationSyntax node, IHaveAMethodBody method)
         {
-            this.ExtractBaseTypeDeclaration(type, node);
+            method.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+
+            foreach (var parameter in node.ParameterList.Parameters)
+            {
+                var parameterDescription = new ParameterDescription(semanticModel.GetTypeDisplayString(parameter.Type), parameter.Identifier.ToString());
+                method.Parameters.Add(parameterDescription);
+
+                parameterDescription.HasDefaultValue = parameter.Default != null;
+            }
+
+            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, method.InvokedMethods, referencedAssemblies);
+            invocationAnalyzer.Visit(node.Body);
         }
     }
 }

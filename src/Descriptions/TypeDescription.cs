@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace roslyn_uml
 {
-
     [DebuggerDisplay("{Type} {Name} ({Namespace})")]
     public class TypeDescription : IHaveModifiers
     {

@@ -7,7 +7,7 @@ namespace roslyn_uml
         public string Name { get; }
         public MemberType MemberType { get; }
         public List<string> Modifiers { get; } = new List<string>();
-        public bool IsInherited { get; set; } = false;
+        public bool IsInherited { get; internal set; } = false;
 
         public MemberDescription(MemberType memberType, string name)
         {
@@ -19,7 +19,6 @@ namespace roslyn_uml
         public bool IsPublic => this.Modifiers.Contains("public");
         public bool IsInternal => this.Modifiers.Contains("internal");
         public bool IsProtected => this.Modifiers.Contains("protected");
-        public bool IsPrivate => this.Modifiers.Contains("private") || !this.IsPublic && !this.IsInternal && !this.IsProtected;
-
+        public bool IsPrivate => this.Modifiers.Contains("private") || !this.IsPublic && !this.IsInternal;
     }
 }

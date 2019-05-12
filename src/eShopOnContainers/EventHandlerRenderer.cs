@@ -7,9 +7,9 @@ namespace roslyn_uml.eShopOnContainers
 {
     public class EventHandlerRenderer
     {
-        private readonly List<TypeDescription> types;
+        private readonly IList<TypeDescription> types;
 
-        public EventHandlerRenderer(List<TypeDescription> types)
+        public EventHandlerRenderer(IList<TypeDescription> types)
         {
             this.types = types;
         }

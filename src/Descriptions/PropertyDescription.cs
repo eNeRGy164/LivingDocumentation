@@ -7,7 +7,8 @@ namespace roslyn_uml
     public class PropertyDescription : MemberDescription
     {
         public string Type { get; }
-        public bool IsOptional { get; internal set; }
+        public bool HasInitializer => this.Initializer != null;
+        public string Initializer { get; internal set; }
 
         public PropertyDescription(string type, string name)
             : base(MemberType.Property, name)

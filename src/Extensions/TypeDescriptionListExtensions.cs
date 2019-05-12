@@ -7,24 +7,23 @@ namespace roslyn_uml
 {
     public static class TypeDescriptionListExtensions
     {
-        public static TypeDescription FirstOrDefault(this List<TypeDescription> types, string typeName)
+        public static TypeDescription FirstOrDefault(this IList<TypeDescription> types, string typeName)
         {
             return types.FirstOrDefault(t => string.Equals(t.FullName, typeName));
         }
 
-        public static List<InvocationDescription> GetInvocationConsequences(this List<TypeDescription> types, InvocationDescription invocation)
+        public static IList<InvocationDescription> GetInvocationConsequences(this IList<TypeDescription> types, InvocationDescription invocation)
         {
             var consequences = types
                 .Where(t => string.Equals(t.FullName, invocation.ContainingType))
                 .SelectMany(t => t.Methods.Cast<IHaveAMethodBody>().Concat(t.Constructors))
                 .Where(m => string.Equals(m.Name, invocation.Name) && MatchParameters(invocation, m))
                 .SelectMany(m => m.InvokedMethods)
-                .SelectMany(im => types.GetInvocationConsequences(im));
+                .SelectMany(im => types.GetInvocationConsequences(im))
+                .Prepend(invocation)
+                .ToList();
 
-            var result = new List<InvocationDescription> { invocation };
-            result.AddRange(consequences);
-
-            return result;
+            return consequences;
         }
 
         private static bool MatchParameters(InvocationDescription invocation, IHaveAMethodBody method)

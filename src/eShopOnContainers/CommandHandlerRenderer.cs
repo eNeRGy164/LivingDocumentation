@@ -7,9 +7,9 @@ namespace roslyn_uml.eShopOnContainers
 {
     public class CommandHandlerRenderer
     {
-        private readonly List<TypeDescription> types;
+        private readonly IList<TypeDescription> types;
 
-        public CommandHandlerRenderer(List<TypeDescription> types)
+        public CommandHandlerRenderer(IList<TypeDescription> types)
         {
             this.types = types;
         }

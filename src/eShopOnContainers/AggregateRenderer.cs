@@ -7,9 +7,9 @@ namespace roslyn_uml.eShopOnContainers
 {
     public class AggregateRenderer
     {
-        private readonly List<TypeDescription> types;
+        private readonly IList<TypeDescription> types;
 
-        public AggregateRenderer(List<TypeDescription> types)
+        public AggregateRenderer(IList<TypeDescription> types)
         {
             this.types = types;
         }
@@ -22,7 +22,7 @@ namespace roslyn_uml.eShopOnContainers
             {
                 var stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine("@startuml");
-                stringBuilder.AppendLine($"namespace {aggregate.Name} {{");
+                stringBuilder.AppendLine($"namespace {aggregate.Name} <<aggregate>>{{");
 
                 var rootBuilder = this.RenderClass(aggregate);
                 stringBuilder.Append(rootBuilder);
@@ -75,7 +75,7 @@ namespace roslyn_uml.eShopOnContainers
 
             foreach (var propertyDescription in type.Properties)
             {
-                var property = this.types.FirstOrDefault(t => t.FullName == propertyDescription.Type || (propertyDescription.Type.IsEnumerable() && propertyDescription.Type.GenericTypes().First() == t.FullName));
+                var property = this.types.FirstOrDefault(t => string.Equals(t.FullName, propertyDescription.Type) || (propertyDescription.Type.IsEnumerable() && string.Equals(t.FullName, propertyDescription.Type.GenericTypes().First())));
                 if (property != null)
                 {
                     var classBuilder = this.RenderClass(property);
