@@ -33,16 +33,21 @@ namespace roslyn_uml
             var assembliesInSolution = workspace.CurrentSolution.Projects.Select(p => p.AssemblyName).ToList();
 
             // Every project in the solution, except unit test projects
-            foreach (var project in workspace.CurrentSolution.Projects.Where(p => !p.Name.EndsWith("Tests")))
+            foreach (var project in workspace.CurrentSolution.Projects.OrderBy(p => p.Name))
             {
+                if (project.Documents.Any(a => string.Equals(a.Name, "Microsoft.NET.Test.Sdk.Program.cs")))
+                {
+                    // Skip test projects
+                    continue;
+                }
+
                 var compilation = await project.GetCompilationAsync();
                 var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
 
                 var diagnostics = compilation.GetDiagnostics();
                 if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"The following errors occured during compilation of solution '{solutionFile}'");
+                    Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
                     foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
                     {
                         Console.WriteLine("- " + diagnostic.ToString());
@@ -58,6 +63,8 @@ namespace roslyn_uml
                     visitor.Visit(syntaxTree.GetRoot());
                 }
             }
+
+            workspace.Dispose();
         }
     }
 }
