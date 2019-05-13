@@ -32,6 +32,14 @@ namespace roslyn_uml
         {
             ExtractBaseTypeDeclaration(TypeType.Enum, node);
 
+            foreach (var member in node.Members)
+            {
+                var memberDescription = new EnumMemberDescription(member.Identifier.ToString(), member.EqualsValue?.Value.ToString());
+                this.currentType.AddMember(memberDescription);
+
+                memberDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            }
+
             base.VisitEnumDeclaration(node);
         }
 
@@ -56,7 +64,6 @@ namespace roslyn_uml
 
             fieldDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
             fieldDescription.Initializer = node.Declaration.Variables.First().Initializer?.Value.ToString(); // Assumption: Field has only a single initializer
-
 
             base.VisitFieldDeclaration(node);
         }

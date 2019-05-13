@@ -5,6 +5,7 @@
         Field,
         Method,
         Property,
-        Constructor
+        Constructor,
+        EnumMember
     }
 }

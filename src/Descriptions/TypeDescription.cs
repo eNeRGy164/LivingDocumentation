@@ -33,6 +33,7 @@ namespace roslyn_uml
         public IReadOnlyList<PropertyDescription> Properties => this.Members.OfType<PropertyDescription>().ToList();
         public IReadOnlyList<MethodDescription> Methods => this.Members.OfType<MethodDescription>().ToList();
         public IReadOnlyList<FieldDescription> Fields => this.Members.OfType<FieldDescription>().ToList();
+        public IReadOnlyList<EnumMemberDescription> EnumMembers => this.Members.OfType<EnumMemberDescription>().ToList();
 
         public void AddMember(MemberDescription member)
         {
