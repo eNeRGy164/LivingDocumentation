@@ -14,15 +14,19 @@ namespace roslyn_uml.eShopOnContainers
             this.types = types;
         }
 
-        public void Render()
+        public IReadOnlyDictionary<string, string> Render()
         {
+            var files = new Dictionary<string, string>();
+
             var aggregates = this.types.Where(t => t.IsAggregateRoot()).ToList();
 
             foreach (var aggregate in aggregates)
             {
+                var aggregateName = aggregate.Name;
+
                 var stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine("@startuml");
-                stringBuilder.AppendLine($"namespace {aggregate.Name} <<aggregate>>{{");
+                stringBuilder.AppendLine($"namespace {aggregateName} <<aggregate>> {{");
 
                 var rootBuilder = this.RenderClass(aggregate);
                 stringBuilder.Append(rootBuilder);
@@ -30,8 +34,13 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("}");
                 stringBuilder.AppendLine("@enduml");
 
-                File.WriteAllText("aggregate." + aggregate.Name.ToLowerInvariant() + ".puml", stringBuilder.ToString());
+                var fileName = $"aggregate.{aggregateName.ToLowerInvariant()}.puml";
+                files.Add(aggregateName, fileName);
+
+                File.WriteAllText(fileName, stringBuilder.ToString());
             }
+
+            return files;
         }
 
         private StringBuilder RenderClass(TypeDescription type)

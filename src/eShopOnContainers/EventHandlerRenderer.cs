@@ -14,11 +14,16 @@ namespace roslyn_uml.eShopOnContainers
             this.types = types;
         }
 
-        public void Render()
+        public IReadOnlyDictionary<string, string> Render()
         {
+            var files = new Dictionary<string, string>();
+
             var eventHandlers = types.Where(t => t.IsDomainEventHandler()).ToList();
+
             foreach (var eventHandler in eventHandlers)
             {
+                var eventHandlerName = eventHandler.Name;
+
                 var message = eventHandler.GetDomainEventHandlerDeclaration().GenericTypes().First();
                 var messageType = types.FirstOrDefault(message);
 
@@ -70,7 +75,7 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("skinparam ArrowColor DodgerBlue");
                 stringBuilder.AppendLine("skinparam SequenceMessageAlignment ReverseDirection");
                 stringBuilder.AppendLine("queue Domain as DQ");
-                stringBuilder.AppendLine($"box {eventHandler.Name.FormatForDiagram()}");
+                stringBuilder.AppendLine($"box {eventHandlerName.FormatForDiagram()}");
                 stringBuilder.AppendLine($"participant Handle as H");
 
                 foreach (var aggregate in aggregates)
@@ -86,8 +91,13 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("|||");
                 stringBuilder.AppendLine("@enduml");
 
-                File.WriteAllText("eventhandler." + eventHandler.Name.ToLowerInvariant() + ".puml", stringBuilder.ToString());
+                var fileName = $"commandhandler.{eventHandlerName.ToLowerInvariant()}.puml";
+                files.Add(eventHandlerName, fileName);
+
+                File.WriteAllText(fileName, stringBuilder.ToString());
             }
+
+            return files;
         }
     }
 }
