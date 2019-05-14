@@ -44,7 +44,6 @@ namespace roslyn_uml
 
             if (node.Initializer != null)
             {
-
                 foreach (var expression in node.Initializer.Expressions)
                 {
                     var argumentDescription = new ArgumentDescription(semanticModel.GetTypeDisplayString(expression), expression.ToString());

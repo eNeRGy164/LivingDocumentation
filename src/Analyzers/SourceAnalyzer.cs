@@ -25,13 +25,17 @@ namespace roslyn_uml
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
+            if (ProcessEmbeddedType(node)) return;
+
             ExtractBaseTypeDeclaration(TypeType.Class, node);
-            
+
             base.VisitClassDeclaration(node);
         }
 
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
+            if (ProcessEmbeddedType(node)) return;
+
             ExtractBaseTypeDeclaration(TypeType.Enum, node);
 
             foreach (var member in node.Members)
@@ -47,6 +51,8 @@ namespace roslyn_uml
 
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
+            if (ProcessEmbeddedType(node)) return;
+
             ExtractBaseTypeDeclaration(TypeType.Struct, node);
 
             base.VisitStructDeclaration(node);
@@ -54,6 +60,8 @@ namespace roslyn_uml
 
         public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
+            if (ProcessEmbeddedType(node)) return;
+
             ExtractBaseTypeDeclaration(TypeType.Interface, node);
 
             base.VisitInterfaceDeclaration(node);
@@ -116,6 +124,19 @@ namespace roslyn_uml
 
             this.currentType.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
             this.currentType.Documentation = ExtractDocumentation(node);
+        }
+
+        private bool ProcessEmbeddedType(SyntaxNode node)
+        {
+            if (this.currentType == null || !node.Parent.IsKind(SyntaxKind.ClassDeclaration))
+            {
+                return false;
+            }
+
+            var embeddedAnalyzer = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
+            embeddedAnalyzer.Visit(node);
+
+            return true;
         }
 
         private string ExtractDocumentation(BaseTypeDeclarationSyntax node)
