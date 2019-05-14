@@ -92,7 +92,7 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("@enduml");
 
                 var fileName = $"commandhandler.{eventHandlerName.ToLowerInvariant()}.puml";
-                files.Add(eventHandlerName, fileName);
+                files.Add(eventHandler.FullName, fileName);
 
                 File.WriteAllText(fileName, stringBuilder.ToString());
             }

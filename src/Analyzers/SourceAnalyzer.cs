@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,7 +26,7 @@ namespace roslyn_uml
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             ExtractBaseTypeDeclaration(TypeType.Class, node);
-
+            
             base.VisitClassDeclaration(node);
         }
 
@@ -113,6 +115,23 @@ namespace roslyn_uml
             }
 
             this.currentType.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            this.currentType.Documentation = ExtractDocumentation(node);
+        }
+
+        private string ExtractDocumentation(BaseTypeDeclarationSyntax node)
+        {
+            var documentationCommentXml = semanticModel.GetDeclaredSymbol(node).GetDocumentationCommentXml();
+
+            if (string.IsNullOrWhiteSpace(documentationCommentXml) || documentationCommentXml.StartsWith("<!--", StringComparison.Ordinal))
+            {
+                // No documenation or unparseable documentation
+                return null;
+            }
+
+            var element = XElement.Parse(documentationCommentXml);
+            var summary = element.Element("summary");
+
+            return summary?.Value.Trim();
         }
 
         private void ExtractBaseMethodDeclaration(BaseMethodDeclarationSyntax node, IHaveAMethodBody method)

@@ -35,7 +35,7 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("@enduml");
 
                 var fileName = $"aggregate.{aggregateName.ToLowerInvariant()}.puml";
-                files.Add(aggregateName, fileName);
+                files.Add(aggregate.FullName, fileName);
 
                 File.WriteAllText(fileName, stringBuilder.ToString());
             }

@@ -7,7 +7,7 @@ namespace roslyn_uml
 {
     public static class TypeDescriptionListExtensions
     {
-        public static TypeDescription FirstOrDefault(this IList<TypeDescription> types, string typeName)
+        public static TypeDescription FirstOrDefault(this IEnumerable<TypeDescription> types, string typeName)
         {
             return types.FirstOrDefault(t => string.Equals(t.FullName, typeName));
         }

@@ -22,7 +22,7 @@ namespace roslyn_uml
 
             var eventHandlerFiles = new eShopOnContainers.EventHandlerRenderer(types).Render();
 
-            var asciiDocRenderer = new eShopOnContainers.AsciiDocRenderer(aggregateFiles, commandHandlerFiles, eventHandlerFiles);
+            var asciiDocRenderer = new eShopOnContainers.AsciiDocRenderer(types, aggregateFiles, commandHandlerFiles, eventHandlerFiles);
             asciiDocRenderer.Render();
         }
 
