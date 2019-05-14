@@ -38,14 +38,6 @@ namespace roslyn_uml
 
             ExtractBaseTypeDeclaration(TypeType.Enum, node);
 
-            foreach (var member in node.Members)
-            {
-                var memberDescription = new EnumMemberDescription(member.Identifier.ToString(), member.EqualsValue?.Value.ToString());
-                this.currentType.AddMember(memberDescription);
-
-                memberDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
-            }
-
             base.VisitEnumDeclaration(node);
         }
 
@@ -87,6 +79,14 @@ namespace roslyn_uml
             propertyDescription.Initializer = node.Initializer?.Value.ToString();
 
             base.VisitPropertyDeclaration(node);
+        }
+
+        public override void VisitEnumMemberDeclaration(EnumMemberDeclarationSyntax node)
+        {
+            var enumMemberDescription = new EnumMemberDescription(node.Identifier.ToString(), node.EqualsValue?.Value.ToString());
+            this.currentType.AddMember(enumMemberDescription);
+
+            base.VisitEnumMemberDeclaration(node);
         }
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
