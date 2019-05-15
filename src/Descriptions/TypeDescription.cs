@@ -25,6 +25,7 @@ namespace roslyn_uml
         public bool IsProtected => this.Modifiers.Contains("protected");
         public bool IsPrivate => !this.IsPublic && !this.IsInternal;
         public bool IsAbstract => this.Modifiers.Contains("abstract");
+        public List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
         public List<string> BaseTypes { get; } = new List<string>();
         private List<MemberDescription> AllMembers { get; } = new List<MemberDescription>();
         private IEnumerable<MemberDescription> Members => this.AllMembers.Where(m => !m.IsInherited);

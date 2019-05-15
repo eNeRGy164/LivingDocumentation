@@ -124,6 +124,11 @@ namespace roslyn_uml
 
             this.currentType.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
             this.currentType.Documentation = ExtractDocumentation(node);
+
+            if (node.AttributeLists != null)
+            {
+                ExtractAttributes(node);
+            }
         }
 
         private bool ProcessEmbeddedType(SyntaxNode node)
@@ -137,6 +142,37 @@ namespace roslyn_uml
             embeddedAnalyzer.Visit(node);
 
             return true;
+        }
+
+        private void ExtractAttributes(BaseTypeDeclarationSyntax node)
+        {
+            foreach (var attribute in node.AttributeLists.SelectMany(a => a.Attributes))
+            {
+                var attributeDescription = new AttributeDescription(semanticModel.GetTypeDisplayString(attribute), attribute.Name.ToString());
+                this.currentType.Attributes.Add(attributeDescription);
+
+                if (attribute.ArgumentList != null)
+                {
+                    foreach (var argument in attribute.ArgumentList.Arguments)
+                    {
+                        string value = null;
+
+                        switch (argument.Expression)
+                        {
+                            case LiteralExpressionSyntax literalExpression:
+                                value = literalExpression.Token.ValueText;
+                                break;
+
+                            default:
+                                value = argument.Expression?.ToString();
+                                break;
+                        }
+
+                        var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression?.ToString(), semanticModel.GetTypeDisplayString(argument.Expression), value);
+                        attributeDescription.Arguments.Add(argumentDescription);
+                    }
+                }
+            }
         }
 
         private string ExtractDocumentation(BaseTypeDeclarationSyntax node)

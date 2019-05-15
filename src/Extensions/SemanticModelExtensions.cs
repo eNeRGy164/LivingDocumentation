@@ -6,20 +6,20 @@ namespace roslyn_uml
 {
     public static class SemanticModelExtensions
     {
-        public static string GetTypeDisplayString(this SemanticModel semanticModel, TypeSyntax typeSyntax)
+        public static string GetTypeDisplayString(this SemanticModel semanticModel, SyntaxNode node)
         {
-            return semanticModel.GetTypeInfo(typeSyntax).Type.ToDisplayString();
+            return semanticModel.GetTypeInfo(node).Type.ToDisplayString();
         }
 
-        public static string GetTypeDisplayString(this SemanticModel semanticModel, ExpressionSyntax expressionSyntax)
+        public static string GetTypeDisplayString(this SemanticModel semanticModel, ExpressionSyntax expression)
         {
-            var type = semanticModel.GetTypeInfo(expressionSyntax).Type?.ToDisplayString();
+            var type = semanticModel.GetTypeInfo(expression).Type?.ToDisplayString();
             if (type != null)
             {
                 return type;
             }
 
-            return semanticModel.GetTypeInfo(expressionSyntax).ConvertedType.ToDisplayString();
+            return semanticModel.GetTypeInfo(expression).ConvertedType.ToDisplayString();
         }
     }
 }
