@@ -52,6 +52,21 @@ namespace roslyn_uml.eShopOnContainers
             return type.GetDomainEventHandlerDeclaration() != null;
         }
 
+        public static bool IsCommand(this TypeDescription type)
+        {
+            return type.BaseTypes.Any(bt => bt.StartsWith("MediatR.IRequest<", StringComparison.Ordinal));
+        }
+
+        public static bool IsDomainEvent(this TypeDescription type)
+        {
+            return type.BaseTypes.Contains("MediatR.INotification");
+        }
+
+        public static bool IsIntegrationEvent(this TypeDescription type)
+        {
+            return type.BaseTypes.Contains("Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Events.IntegrationEvent");
+        }
+
         public static string GetCommandHandlerDeclaration(this TypeDescription type)
         {
             return type.BaseTypes.FirstOrDefault(bt => bt.StartsWith("MediatR.IRequestHandler", StringComparison.Ordinal));

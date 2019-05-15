@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using roslyn_uml;
 
 namespace roslyn_uml.eShopOnContainers
@@ -14,6 +15,7 @@ namespace roslyn_uml.eShopOnContainers
         private readonly IReadOnlyDictionary<string, string> aggregateFiles;
         private readonly IReadOnlyDictionary<string, string> commandHandlerFiles;
         private readonly IReadOnlyDictionary<string, string> eventHandlerFiles;
+        private static readonly Regex replaceTypeSuffix = new Regex("(?:(?:Command|(?:Domain|Integration)Event))(?:Handler)?$", RegexOptions.CultureInvariant);
 
         public AsciiDocRenderer(IReadOnlyList<TypeDescription> types, IReadOnlyDictionary<string, string> aggregateFiles, IReadOnlyDictionary<string, string> commandHandlerFiles, IReadOnlyDictionary<string, string> eventHandlerFiles)
         {
@@ -30,8 +32,11 @@ namespace roslyn_uml.eShopOnContainers
             RenderFileHeader(stringBuilder);
 
             RenderAggregates(stringBuilder);
+            RenderCommands(stringBuilder);
             RenderCommandHandlers(stringBuilder);
-            RenderEventHandlers(stringBuilder);
+            RenderDomainEvents(stringBuilder);
+            RenderDomainEventHandlers(stringBuilder);
+            RenderIntegrationEvents(stringBuilder);
 
             File.WriteAllText("documentation.generated.adoc", stringBuilder.ToString());
         }
@@ -46,19 +51,55 @@ namespace roslyn_uml.eShopOnContainers
             foreach (var (type, path) in this.aggregateFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"// tag::aggregate-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"// tag::aggregate-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
                 stringBuilder.AppendLine($"=== {type.Name}");
                 stringBuilder.AppendLine($"The \"`{type.Name.ToLower()}`\" aggregate.");
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($".{FormatTechnicalName(type.Name)}");
-                stringBuilder.AppendLine($"[plantuml, aggregate.{type.Name.ToLowerInvariant()}, png]");
+                stringBuilder.AppendLine($"[plantuml, aggregate.{StripTypeSuffix(type.Name).ToLowerInvariant()}, png]");
                 stringBuilder.AppendLine("....");
                 stringBuilder.AppendLine($"include::{path}[]");
                 stringBuilder.AppendLine("....");
-                stringBuilder.AppendLine($"// end::aggregate-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"// end::aggregate-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
             }
 
             stringBuilder.AppendLine("// end::aggregates[]");
+        }
+
+        private void RenderCommands(StringBuilder stringBuilder)
+        {
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("// tag::commands[]");
+            stringBuilder.AppendLine("== Commands");
+            stringBuilder.AppendLine("Commands in the eShop application.");
+
+            foreach (var type in this.types.Where(t => t.IsCommand() && !t.FullName.IsGeneric()).OrderBy(t => t.Name))
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
+                stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" command.");
+                stringBuilder.AppendLine();
+
+                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                {
+                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine();
+                }
+
+                stringBuilder.AppendLine($".{type.Name.ToSentenceCase()} Fields");
+                stringBuilder.AppendLine("[%header%,width=\"75%\",cols=\"2h,3d\"]");
+                stringBuilder.AppendLine("|===");
+                stringBuilder.AppendLine("|Name|Type");
+
+                foreach (var property in type.Properties)
+                {
+                    stringBuilder.AppendLine($"|{property.Name}|{property.Type.ForDiagram()}");
+                }
+
+                stringBuilder.AppendLine("|===");
+            }
+
+            stringBuilder.AppendLine("// end::commands[]");
         }
 
         private void RenderCommandHandlers(StringBuilder stringBuilder)
@@ -71,32 +112,75 @@ namespace roslyn_uml.eShopOnContainers
             foreach (var (type, path) in this.commandHandlerFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"// tag::commandhandler-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"// tag::commandhandler-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
                 stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
                 stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" command handler.");
+
+                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                {
+                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine();
+                }
+
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($".{FormatTechnicalName(type.Name)}");
-                stringBuilder.AppendLine($"[plantuml, commandhandler.{type.Name.ToLowerInvariant()}, png]");
+                stringBuilder.AppendLine($"[plantuml, commandhandler.{StripTypeSuffix(type.Name).ToLowerInvariant()}, png]");
                 stringBuilder.AppendLine("....");
                 stringBuilder.AppendLine($"include::{path}[]");
                 stringBuilder.AppendLine("....");
-                stringBuilder.AppendLine($"// end::commandhandler-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"// end::commandhandler-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
             }
 
             stringBuilder.AppendLine("// end::commandhandlers[]");
         }
 
-        private void RenderEventHandlers(StringBuilder stringBuilder)
+        private void RenderDomainEvents(StringBuilder stringBuilder)
         {
             stringBuilder.AppendLine();
-            stringBuilder.AppendLine("// tag::eventhandlers[]");
-            stringBuilder.AppendLine("== Event Handlers");
-            stringBuilder.AppendLine("Event handlers in the eShop application.");
+            stringBuilder.AppendLine("// tag::domainevents[]");
+            stringBuilder.AppendLine("== Domain Events");
+            stringBuilder.AppendLine("Domain events in the eShop application.");
+
+            foreach (var type in this.types.Where(t => t.IsDomainEvent()).OrderBy(t => t.Name))
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
+                stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" domain event.");
+                stringBuilder.AppendLine();
+
+                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                {
+                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine();
+                }
+
+                stringBuilder.AppendLine($".{type.Name.ToSentenceCase()} Fields");
+                stringBuilder.AppendLine("[%header%,width=\"75%\",cols=\"2h,3d\"]");
+                stringBuilder.AppendLine("|===");
+                stringBuilder.AppendLine("|Name|Type");
+
+                foreach (var property in type.Properties)
+                {
+                    stringBuilder.AppendLine($"|{property.Name}|{property.Type.ForDiagram()}");
+                }
+
+                stringBuilder.AppendLine("|===");
+            }
+
+            stringBuilder.AppendLine("// end::domainevents[]");
+        }
+
+        private void RenderDomainEventHandlers(StringBuilder stringBuilder)
+        {
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("// tag::domaineventhandlers[]");
+            stringBuilder.AppendLine("== Domain Event Handlers");
+            stringBuilder.AppendLine("Domain event handlers in the eShop application.");
 
             foreach (var (type, path) in this.eventHandlerFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"// tag::eventhandler-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"// tag::domaineventhandler-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
                 stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
                 stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" event handler.");
 
@@ -108,14 +192,49 @@ namespace roslyn_uml.eShopOnContainers
 
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($".{FormatTechnicalName(type.Name)}");
-                stringBuilder.AppendLine($"[plantuml, eventhandler.{type.Name.ToLowerInvariant()}, png]");
+                stringBuilder.AppendLine($"[plantuml, domaineventhandler.{StripTypeSuffix(type.Name).ToLowerInvariant()}, png]");
                 stringBuilder.AppendLine("....");
                 stringBuilder.AppendLine($"include::{path}[]");
                 stringBuilder.AppendLine("....");
-                stringBuilder.AppendLine($"// end::eventhandler-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"// end::domaineventhandler-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
             }
 
-            stringBuilder.AppendLine("// end::eventhandlers[]");
+            stringBuilder.AppendLine("// end::domaineventhandlers[]");
+        }
+        private void RenderIntegrationEvents(StringBuilder stringBuilder)
+        {
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("// tag::integrationevents[]");
+            stringBuilder.AppendLine("== Integration Events");
+            stringBuilder.AppendLine("Integration events in the eShop application.");
+
+            foreach (var type in this.types.Where(t => t.IsIntegrationEvent() && t.FullName.StartsWith("Ordering.API", StringComparison.Ordinal)).OrderBy(t => t.Name))
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
+                stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" integration event.");
+                stringBuilder.AppendLine();
+
+                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                {
+                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine();
+                }
+
+                stringBuilder.AppendLine($".{type.Name.ToSentenceCase()} Fields");
+                stringBuilder.AppendLine("[%header%,width=\"75%\",cols=\"2h,3d\"]");
+                stringBuilder.AppendLine("|===");
+                stringBuilder.AppendLine("|Name|Type");
+
+                foreach (var property in type.Properties)
+                {
+                    stringBuilder.AppendLine($"|{property.Name}|{property.Type.ForDiagram()}");
+                }
+
+                stringBuilder.AppendLine("|===");
+            }
+
+            stringBuilder.AppendLine("// end::integrationevents[]");
         }
 
         private static void RenderFileHeader(StringBuilder stringBuilder)
@@ -134,12 +253,14 @@ namespace roslyn_uml.eShopOnContainers
             stringBuilder.AppendLine();
         }
 
-        private static string FormatTechnicalName(string topic)
+        private static string StripTypeSuffix(string name)
         {
-            topic = topic.Replace("CommandHandler", "", StringComparison.Ordinal);
-            topic = topic.Replace("DomainEventHandler", "", StringComparison.Ordinal);
+            return replaceTypeSuffix.Replace(name, string.Empty);
+        }
 
-            return topic.ToSentenceCase();
+        private static string FormatTechnicalName(string name)
+        {
+            return StripTypeSuffix(name).ToSentenceCase();
         }
     }
 }
