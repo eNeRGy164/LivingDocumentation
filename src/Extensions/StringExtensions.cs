@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace roslyn_uml
 {
@@ -73,6 +74,30 @@ namespace roslyn_uml
             {
                 return type;
             }
+        }
+
+        public static string ToSentenceCase(this string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
+
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.Append(char.ToUpper(input[0]));
+
+            for (var i = 1; i < input.Length; i++)
+            {
+                if (char.IsUpper(input[i]) || char.IsDigit(input[i]))
+                {
+                    stringBuilder.Append(' ');
+                }
+
+                stringBuilder.Append(input[i]);
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }
