@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -56,6 +57,13 @@ namespace roslyn_uml
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
+            if (semanticModel.GetTypeInfo(node).Type.Kind == SymbolKind.ErrorType)
+            {
+                Console.WriteLine("WARN: Could not resolve type of invocation of the following block:");
+                Console.WriteLine(node.ToFullString());
+                return;
+            }
+
             if (semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof"))
             {
                 // nameof is compiler sugar, and is actually a method we are not interrested in
