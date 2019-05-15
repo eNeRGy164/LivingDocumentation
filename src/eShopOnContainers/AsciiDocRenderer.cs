@@ -43,22 +43,19 @@ namespace roslyn_uml.eShopOnContainers
             stringBuilder.AppendLine("== Aggregates");
             stringBuilder.AppendLine("Aggregates in the eShop application.");
 
-            foreach (var (fullName, path) in this.aggregateFiles.OrderBy(f => f.Key))
+            foreach (var (type, path) in this.aggregateFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
-                var type = this.types.FirstOrDefault(fullName);
-                var name = type.Name;
-
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"// tag::aggregate-{name.ToLower()}[]");
-                stringBuilder.AppendLine($"=== {name}");
-                stringBuilder.AppendLine($"The \"`{name.ToLower()}`\" aggregate.");
+                stringBuilder.AppendLine($"// tag::aggregate-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"=== {type.Name}");
+                stringBuilder.AppendLine($"The \"`{type.Name.ToLower()}`\" aggregate.");
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($".{FormatTechnicalName(name)}");
-                stringBuilder.AppendLine($"[plantuml, aggregate.{name.ToLowerInvariant()}, png]");
+                stringBuilder.AppendLine($".{FormatTechnicalName(type.Name)}");
+                stringBuilder.AppendLine($"[plantuml, aggregate.{type.Name.ToLowerInvariant()}, png]");
                 stringBuilder.AppendLine("....");
                 stringBuilder.AppendLine($"include::{path}[]");
                 stringBuilder.AppendLine("....");
-                stringBuilder.AppendLine($"// end::aggregate-{name.ToLower()}[]");
+                stringBuilder.AppendLine($"// end::aggregate-{type.Name.ToLower()}[]");
             }
 
             stringBuilder.AppendLine("// end::aggregates[]");
@@ -71,22 +68,19 @@ namespace roslyn_uml.eShopOnContainers
             stringBuilder.AppendLine("== Command Handlers");
             stringBuilder.AppendLine("Command handlers in the eShop application.");
 
-            foreach (var (fullName, path) in this.commandHandlerFiles.OrderBy(f => f.Key))
+            foreach (var (type, path) in this.commandHandlerFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
-                var type = this.types.FirstOrDefault(fullName);
-                var name = type.Name;
-
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"// tag::commandhandler-{name.ToLower()}[]");
-                stringBuilder.AppendLine($"=== {FormatTechnicalName(name)}");
-                stringBuilder.AppendLine($"The \"`{FormatTechnicalName(name).ToLower()}`\" command handler.");
+                stringBuilder.AppendLine($"// tag::commandhandler-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
+                stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" command handler.");
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($".{FormatTechnicalName(name)}");
-                stringBuilder.AppendLine($"[plantuml, commandhandler.{name.ToLowerInvariant()}, png]");
+                stringBuilder.AppendLine($".{FormatTechnicalName(type.Name)}");
+                stringBuilder.AppendLine($"[plantuml, commandhandler.{type.Name.ToLowerInvariant()}, png]");
                 stringBuilder.AppendLine("....");
                 stringBuilder.AppendLine($"include::{path}[]");
                 stringBuilder.AppendLine("....");
-                stringBuilder.AppendLine($"// end::commandhandler-{name.ToLower()}[]");
+                stringBuilder.AppendLine($"// end::commandhandler-{type.Name.ToLower()}[]");
             }
 
             stringBuilder.AppendLine("// end::commandhandlers[]");
@@ -99,15 +93,12 @@ namespace roslyn_uml.eShopOnContainers
             stringBuilder.AppendLine("== Event Handlers");
             stringBuilder.AppendLine("Event handlers in the eShop application.");
 
-            foreach (var (fullName, path) in this.eventHandlerFiles.OrderBy(f => f.Key))
+            foreach (var (type, path) in this.eventHandlerFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
-                var type = this.types.FirstOrDefault(fullName);
-                var name = type.Name;
-
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"// tag::eventhandler-{name.ToLower()}[]");
-                stringBuilder.AppendLine($"=== {FormatTechnicalName(name)}");
-                stringBuilder.AppendLine($"The \"`{FormatTechnicalName(name).ToLower()}`\" event handler.");
+                stringBuilder.AppendLine($"// tag::eventhandler-{type.Name.ToLower()}[]");
+                stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
+                stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" event handler.");
 
                 if (!string.IsNullOrWhiteSpace(type.Documentation))
                 {
@@ -116,12 +107,12 @@ namespace roslyn_uml.eShopOnContainers
                 }
 
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($".{FormatTechnicalName(name)}");
-                stringBuilder.AppendLine($"[plantuml, eventhandler.{name.ToLowerInvariant()}, png]");
+                stringBuilder.AppendLine($".{FormatTechnicalName(type.Name)}");
+                stringBuilder.AppendLine($"[plantuml, eventhandler.{type.Name.ToLowerInvariant()}, png]");
                 stringBuilder.AppendLine("....");
                 stringBuilder.AppendLine($"include::{path}[]");
                 stringBuilder.AppendLine("....");
-                stringBuilder.AppendLine($"// end::eventhandler-{name.ToLower()}[]");
+                stringBuilder.AppendLine($"// end::eventhandler-{type.Name.ToLower()}[]");
             }
 
             stringBuilder.AppendLine("// end::eventhandlers[]");
