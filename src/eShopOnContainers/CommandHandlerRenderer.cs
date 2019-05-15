@@ -69,7 +69,7 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("skinparam ArrowColor DodgerBlue");
                 stringBuilder.AppendLine("skinparam SequenceMessageAlignment ReverseDirection");
                 stringBuilder.AppendLine("queue Queue as Q");
-                stringBuilder.AppendLine($"box {commandHandlerName.FormatForDiagram()}");
+                stringBuilder.AppendLine($"box \"{commandHandlerName.FormatForDiagram()}\"");
                 stringBuilder.AppendLine($"participant Handle as H");
 
                 foreach (var aggregate in aggregates)
