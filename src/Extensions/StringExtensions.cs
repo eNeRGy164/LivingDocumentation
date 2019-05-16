@@ -41,7 +41,7 @@ namespace roslyn_uml
 
                 foreach (var part in typeParts)
                 {
-                    if (part.IndexOf('>') > -1)
+                    if (part.IndexOf('>') > -1 && types.Count > 0 && types.Last().Count(c => c == '<') > types.Last().Count(c => c == '>'))
                     {
                         types[types.Count - 1] = types[types.Count - 1] + "," + part;
                     } else

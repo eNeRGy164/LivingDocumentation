@@ -19,7 +19,7 @@ namespace roslyn_uml
                 return type;
             }
 
-            return semanticModel.GetTypeInfo(expression).ConvertedType.ToDisplayString();
+            return semanticModel.GetTypeInfo(expression).ConvertedType?.ToDisplayString();
         }
     }
 }

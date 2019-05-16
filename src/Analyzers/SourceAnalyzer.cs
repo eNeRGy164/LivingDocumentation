@@ -203,8 +203,8 @@ namespace roslyn_uml
                 parameterDescription.HasDefaultValue = parameter.Default != null;
             }
 
-            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, method.InvokedMethods, referencedAssemblies);
-            invocationAnalyzer.Visit(node.Body);
+            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, method.InvokedMethods);
+            invocationAnalyzer.Visit((SyntaxNode)node.Body ?? node.ExpressionBody);
         }
     }
 }

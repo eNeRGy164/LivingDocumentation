@@ -11,24 +11,15 @@ namespace roslyn_uml
     {
         private readonly SemanticModel semanticModel;
         private readonly IList<InvocationDescription> invocations;
-        private readonly IReadOnlyList<AssemblyIdentity> referencedAssemblies;
 
-        public InvocationsAnalyzer(in SemanticModel semanticModel, IList<InvocationDescription> invocations, IReadOnlyList<AssemblyIdentity> referencedAssemblies)
+        public InvocationsAnalyzer(in SemanticModel semanticModel, IList<InvocationDescription> invocations)
         {
             this.semanticModel = semanticModel;
             this.invocations = invocations;
-            this.referencedAssemblies = referencedAssemblies;
         }
 
         public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
-            var containingAssembly = semanticModel.GetSymbolInfo(node).Symbol?.ContainingAssembly;
-            if (containingAssembly != null && this.referencedAssemblies.Contains(containingAssembly.Identity))
-            {
-                // External code, not interresting for internal code analysis
-                return;
-            }
-
             string containingType = semanticModel.GetTypeDisplayString(node);
 
             var invocation = new InvocationDescription(containingType, node.Type.ToString());
@@ -67,13 +58,6 @@ namespace roslyn_uml
             if (semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof"))
             {
                 // nameof is compiler sugar, and is actually a method we are not interrested in
-                return;
-            }
-
-            var containingAssembly = semanticModel.GetSymbolInfo(node.Expression).Symbol?.ContainingAssembly;
-            if (containingAssembly != null && this.referencedAssemblies.Contains(containingAssembly.Identity))
-            {
-                // External code, not interresting for internal code analysis
                 return;
             }
 

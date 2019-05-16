@@ -12,7 +12,7 @@ namespace roslyn_uml
             return types.FirstOrDefault(t => string.Equals(t.FullName, typeName));
         }
 
-        public static IList<InvocationDescription> GetInvocationConsequences(this IList<TypeDescription> types, InvocationDescription invocation)
+        public static IReadOnlyList<InvocationDescription> GetInvocationConsequences(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
             var consequences = types
                 .Where(t => string.Equals(t.FullName, invocation.ContainingType))
