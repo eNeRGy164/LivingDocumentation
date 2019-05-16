@@ -66,6 +66,7 @@ namespace roslyn_uml
 
             fieldDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
             fieldDescription.Initializer = node.Declaration.Variables.First().Initializer?.Value.ToString(); // Assumption: Field has only a single initializer
+            fieldDescription.Documentation = ExtractDocumentation(node);
 
             base.VisitFieldDeclaration(node);
         }
@@ -77,6 +78,7 @@ namespace roslyn_uml
 
             propertyDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
             propertyDescription.Initializer = node.Initializer?.Value.ToString();
+            propertyDescription.Documentation = ExtractDocumentation(node);
 
             base.VisitPropertyDeclaration(node);
         }
@@ -85,6 +87,8 @@ namespace roslyn_uml
         {
             var enumMemberDescription = new EnumMemberDescription(node.Identifier.ToString(), node.EqualsValue?.Value.ToString());
             this.currentType.AddMember(enumMemberDescription);
+
+            enumMemberDescription.Documentation = ExtractDocumentation(node);
 
             base.VisitEnumMemberDeclaration(node);
         }
@@ -175,9 +179,9 @@ namespace roslyn_uml
             }
         }
 
-        private string ExtractDocumentation(BaseTypeDeclarationSyntax node)
+        private string ExtractDocumentation(SyntaxNode node)
         {
-            var documentationCommentXml = semanticModel.GetDeclaredSymbol(node).GetDocumentationCommentXml();
+            var documentationCommentXml = semanticModel.GetDeclaredSymbol(node)?.GetDocumentationCommentXml();
 
             if (string.IsNullOrWhiteSpace(documentationCommentXml) || documentationCommentXml.StartsWith("<!--", StringComparison.Ordinal))
             {

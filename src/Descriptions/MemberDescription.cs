@@ -8,6 +8,7 @@ namespace roslyn_uml
         public MemberType MemberType { get; }
         public List<string> Modifiers { get; } = new List<string>();
         public bool IsInherited { get; internal set; } = false;
+        public string Documentation { get; internal set; }
 
         public MemberDescription(MemberType memberType, string name)
         {
