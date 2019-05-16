@@ -128,22 +128,22 @@ namespace roslyn_uml.eShopOnContainers
 
         public static bool IsAggregateRoot(this TypeDescription type)
         {
-            return type.Type == TypeType.Class && type.BaseTypes.Contains("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.IAggregateRoot");
+            return type != null && type.Type == TypeType.Class && type.BaseTypes.Contains("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.IAggregateRoot");
         }
 
         public static bool IsEnumeration(this TypeDescription type)
         {
-            return type.Type == TypeType.Class && type.BaseTypes.Contains("Microsoft.eShopOnContainers.Services.Ordering.Domain.SeedWork.Enumeration");
+            return type != null && type.Type == TypeType.Class && type.BaseTypes.Contains("Microsoft.eShopOnContainers.Services.Ordering.Domain.SeedWork.Enumeration");
         }
 
         public static bool IsValueObject(this TypeDescription type)
         {
-            return type.Type == TypeType.Class && type.BaseTypes.Contains("Microsoft.eShopOnContainers.Services.Ordering.Domain.SeedWork.ValueObject");
+            return type != null && type.Type == TypeType.Class && type.BaseTypes.Contains("Microsoft.eShopOnContainers.Services.Ordering.Domain.SeedWork.ValueObject");
         }
 
         public static bool IsEntity(this TypeDescription type)
         {
-            return !type.IsAggregateRoot() && type.Type == TypeType.Class && type.BaseTypes.Contains("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.Entity");
+            return type != null && !type.IsAggregateRoot() && type.Type == TypeType.Class && type.BaseTypes.Contains("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.Entity");
         }
     }
 }
