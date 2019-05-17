@@ -9,6 +9,7 @@ namespace roslyn_uml
         public string ReturnType { get; }
         public List<ParameterDescription> Parameters { get; } = new List<ParameterDescription>();
         public List<InvocationDescription> InvokedMethods { get; } = new List<InvocationDescription>();
+        public List<Statement> Statements { get; } = new List<Statement>();
 
         public MethodDescription(string returnType, string name)
                 : base(MemberType.Method, name)

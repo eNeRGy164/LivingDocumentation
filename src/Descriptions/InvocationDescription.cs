@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace roslyn_uml
 {
     [DebuggerDisplay("Invocation {Name} {ContainingType}")]
-    public class InvocationDescription
+    public class InvocationDescription : Statement
     {
         public string ContainingType { get; }
         public string Name { get; }

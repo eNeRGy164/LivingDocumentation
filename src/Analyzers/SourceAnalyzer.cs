@@ -207,8 +207,27 @@ namespace roslyn_uml
                 parameterDescription.HasDefaultValue = parameter.Default != null;
             }
 
-            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, method.InvokedMethods);
+            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, method.Statements);
             invocationAnalyzer.Visit((SyntaxNode)node.Body ?? node.ExpressionBody);
+
+            method.InvokedMethods.AddRange(TraverseInvocations(method.Statements));
+        }
+
+        private IReadOnlyList<InvocationDescription> TraverseInvocations(IEnumerable<Statement> statements)
+        {
+            var invocations = new List<InvocationDescription>();
+
+            foreach (var statement in statements)
+            {
+                if (statement is InvocationDescription invocation)
+                {
+                    invocations.Add(invocation);
+                }
+
+                invocations.AddRange(TraverseInvocations(statement.Statements));
+            }
+
+            return invocations;
         }
     }
 }

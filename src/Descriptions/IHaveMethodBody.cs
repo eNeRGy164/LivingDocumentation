@@ -7,5 +7,6 @@ namespace roslyn_uml
         string Name { get; }
         List<ParameterDescription> Parameters { get; }
         List<InvocationDescription> InvokedMethods { get; }
+        List<Statement> Statements { get; }
     }
 }

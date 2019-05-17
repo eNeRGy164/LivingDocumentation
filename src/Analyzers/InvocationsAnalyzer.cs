@@ -10,12 +10,12 @@ namespace roslyn_uml
     internal class InvocationsAnalyzer : CSharpSyntaxWalker
     {
         private readonly SemanticModel semanticModel;
-        private readonly IList<InvocationDescription> invocations;
+        private readonly IList<Statement> statements;
 
-        public InvocationsAnalyzer(in SemanticModel semanticModel, IList<InvocationDescription> invocations)
+        public InvocationsAnalyzer(in SemanticModel semanticModel, IList<Statement> statements)
         {
             this.semanticModel = semanticModel;
-            this.invocations = invocations;
+            this.statements = statements;
         }
 
         public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
@@ -23,7 +23,7 @@ namespace roslyn_uml
             string containingType = semanticModel.GetTypeDisplayString(node);
 
             var invocation = new InvocationDescription(containingType, node.Type.ToString());
-            invocations.Add(invocation);
+            statements.Add(invocation);
 
             if (node.ArgumentList != null)
             {
@@ -44,6 +44,12 @@ namespace roslyn_uml
             }
 
             base.VisitObjectCreationExpression(node);
+        }
+
+        public override void VisitSwitchStatement(SwitchStatementSyntax node)
+        {
+            var branchingAnalyzer = new BranchingAnalyzer(semanticModel, statements);
+            branchingAnalyzer.Visit(node);
         }
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -80,7 +86,7 @@ namespace roslyn_uml
             }
 
             var invocation = new InvocationDescription(containingType, methodName);
-            invocations.Add(invocation);
+            statements.Add(invocation);
 
             foreach (var argument in node.ArgumentList.Arguments)
             {
