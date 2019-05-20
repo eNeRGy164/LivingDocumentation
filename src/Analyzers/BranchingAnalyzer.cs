@@ -38,11 +38,11 @@ namespace roslyn_uml
                 ifStatement.Sections.Add(section);
 
                 var elseInvocationAnalyzer = new InvocationsAnalyzer(semanticModel, section.Statements);
-                elseInvocationAnalyzer.Visit(node.Else);
+                elseInvocationAnalyzer.Visit(elseNode.Statement);
 
-                if (node.Else.Statement.IsKind(SyntaxKind.IfStatement))
+                if (elseNode.Statement.IsKind(SyntaxKind.IfStatement))
                 {
-                    var elseIfNode = (IfStatementSyntax)node.Else.Statement;
+                    var elseIfNode = (IfStatementSyntax)elseNode.Statement;
                     section.Condition = elseIfNode.Condition.ToString();
 
                     elseNode = elseIfNode.Else;
