@@ -20,16 +20,40 @@ namespace roslyn_uml
 
         public override void VisitIfStatement(IfStatementSyntax node)
         {
-            // todo
+            var ifStatement = new If();
+            statements.Add(ifStatement);
+
+            var ifSection = new IfElseSection();
+            ifStatement.Sections.Add(ifSection);
+
+            ifSection.Condition = node.Condition.ToString();
+
+            var ifInvocationAnalyzer = new InvocationsAnalyzer(semanticModel, ifSection.Statements);
+            ifInvocationAnalyzer.Visit(node.Statement);
+
+            var elseNode = node.Else;
+            while (elseNode != null)
+            {
+                var section = new IfElseSection();
+                ifStatement.Sections.Add(section);
+
+                var elseInvocationAnalyzer = new InvocationsAnalyzer(semanticModel, section.Statements);
+                elseInvocationAnalyzer.Visit(node.Else);
+
+                if (node.Else.Statement.IsKind(SyntaxKind.IfStatement))
+                {
+                    var elseIfNode = (IfStatementSyntax)node.Else.Statement;
+                    section.Condition = elseIfNode.Condition.ToString();
+
+                    elseNode = elseIfNode.Else;
+                }
+                else
+                {
+                    elseNode = null;
+                }
+            }
 
             base.VisitIfStatement(node);
-        }
-
-        public override void VisitElseClause(ElseClauseSyntax node)
-        {
-            // todo
-
-            base.VisitElseClause(node);
         }
 
         public override void VisitSwitchStatement(SwitchStatementSyntax node)
@@ -38,7 +62,6 @@ namespace roslyn_uml
             statements.Add(switchStatement);
 
             switchStatement.Expression = node.Expression.ToString();
-            
 
             foreach (var section in node.Sections)
             {

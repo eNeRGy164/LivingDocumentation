@@ -52,6 +52,12 @@ namespace roslyn_uml
             branchingAnalyzer.Visit(node);
         }
 
+        public override void VisitIfStatement(IfStatementSyntax node)
+        {
+            var branchingAnalyzer = new BranchingAnalyzer(semanticModel, statements);
+            branchingAnalyzer.Visit(node);
+        }
+
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             if (semanticModel.GetTypeInfo(node).Type.Kind == SymbolKind.ErrorType)
