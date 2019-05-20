@@ -12,21 +12,41 @@ namespace roslyn_uml.eShopOnContainers
         const string Command = "Command";
         const string CommandHandler = "CommandHandler";
 
-        public static string FormatForDiagram(this string name)
+        public static string ArrowColor(this string name)
         {
             if (name.EndsWith(IntegrationEvent))
             {
-                return "//<<IntegrationEvent>>//\\n" + name.Substring(0, name.Length - IntegrationEvent.Length);
+                return "[#Green]";
             }
 
             if (name.EndsWith(DomainEvent))
             {
-                return "//<<DomainEvent>>//\\n" + name.Substring(0, name.Length - DomainEvent.Length);
+                return "[#OrangeRed]";
             }
 
             if (name.EndsWith(Command))
             {
-                return "//<<Command>>//\\n" + name.Substring(0, name.Length - Command.Length);
+                return "[#DodgerBlue]";
+            }
+
+            return string.Empty;
+        }
+
+        public static string FormatForDiagram(this string name)
+        {
+            if (name.EndsWith(IntegrationEvent))
+            {
+                return name.Substring(0, name.Length - IntegrationEvent.Length);
+            }
+
+            if (name.EndsWith(DomainEvent))
+            {
+                return name.Substring(0, name.Length - DomainEvent.Length);
+            }
+
+            if (name.EndsWith(Command))
+            {
+                return name.Substring(0, name.Length - Command.Length);
             }
 
             if (name.EndsWith(DomainEventHandler))

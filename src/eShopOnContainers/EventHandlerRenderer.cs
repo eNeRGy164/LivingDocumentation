@@ -30,37 +30,13 @@ namespace roslyn_uml.eShopOnContainers
                 var aggregates = new List<string>();
                 var flowBuilder = new StringBuilder();
 
-                flowBuilder.AppendLine("DQ->H ++:" + messageType.Name.FormatForDiagram());
+                flowBuilder.AppendLine($"DQ-{messageType.Name.ArrowColor()}>H ++:{messageType.Name.FormatForDiagram()}");
 
                 var handlingMethod = eventHandler.HandlingMethod(message);
 
-                foreach (var invokedMethod in handlingMethod.InvokedMethods)
+                foreach (var statement in handlingMethod.Statements)
                 {
-                    foreach (var call in types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
-                    {
-                        var eventType = types.FirstOrDefault(call.Arguments.First().Type);
-                        flowBuilder.AppendLine($"H->DQ:{eventType.Name.FormatForDiagram()}");
-                    }
-
-                    var containingType = types.FirstOrDefault(invokedMethod.ContainingType);
-                    if (containingType.IsAggregateRoot())
-                    {
-                        if (!aggregates.Contains(containingType.Name))
-                        {
-                            aggregates.Add(containingType.Name);
-                            flowBuilder.AppendLine($"H->{containingType.Name} ++:{invokedMethod.Name.FormatForDiagram()}");
-                        }
-                        else
-                        {
-                            flowBuilder.AppendLine($"H->{containingType.Name}:{invokedMethod.Name.FormatForDiagram()}");
-                        }
-
-                        foreach (var call in types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
-                        {
-                            var eventType = types.First(t => string.Equals(t.FullName, call.Arguments.First().Type));
-                            flowBuilder.AppendLine($"{containingType.Name}->DQ:{eventType.Name.FormatForDiagram()}");
-                        }
-                    }
+                    TraverseInvocation(aggregates, flowBuilder, statement);
                 }
 
                 flowBuilder.AppendLine("deactivate H");
@@ -72,7 +48,7 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("skinparam SequenceBoxBackgroundColor SeaShell");
                 stringBuilder.AppendLine("skinparam SequenceLifeLineBorderColor Black");
                 stringBuilder.AppendLine("skinparam SequenceLifeLineBorderThickness 2");
-                stringBuilder.AppendLine("skinparam ArrowColor DodgerBlue");
+                stringBuilder.AppendLine("skinparam ArrowColor Black");
                 stringBuilder.AppendLine("skinparam SequenceMessageAlignment ReverseDirection");
                 stringBuilder.AppendLine("queue Domain as DQ");
                 stringBuilder.AppendLine($"box \"{eventHandlerName.FormatForDiagram()}\"");
@@ -91,7 +67,7 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("|||");
                 stringBuilder.AppendLine("@enduml");
 
-                var fileName = $"commandhandler.{eventHandlerName.ToLowerInvariant()}.puml";
+                var fileName = $"eventhandler.{eventHandlerName.ToLowerInvariant()}.puml";
                 files.Add(eventHandler.FullName, fileName);
 
                 File.WriteAllText(fileName, stringBuilder.ToString());
@@ -99,5 +75,112 @@ namespace roslyn_uml.eShopOnContainers
 
             return files;
         }
+
+        private void TraverseInvocation(List<string> aggregates, StringBuilder stringBuilder, Statement statement)
+        {
+            switch (statement)
+            {
+                case Switch switchStatement:
+                    var switchBuilder = new StringBuilder();
+
+                    foreach (SwitchSection section in switchStatement.Sections)
+                    {
+                        var sectionBuilder = new StringBuilder();
+
+                        foreach (var invokedMethod in section.Statements.OfType<InvocationDescription>())
+                        {
+                            TraverseInvocation(aggregates, sectionBuilder, invokedMethod);
+                        }
+
+                        if (sectionBuilder.Length > 0)
+                        {
+                            var first = switchBuilder.Length == 0;
+                            if (first) switchBuilder.AppendLine("|||");
+                            switchBuilder.Append(first ? "alt " : "else ");
+                            switchBuilder.AppendJoin(',', section.Labels);
+                            switchBuilder.AppendLine();
+                            switchBuilder.AppendLine("|||");
+                            switchBuilder.Append(sectionBuilder);
+                            switchBuilder.AppendLine("|||");
+                        }
+                    }
+
+                    if (switchBuilder.Length > 0)
+                    {
+                        stringBuilder.Append(switchBuilder);
+                        stringBuilder.AppendLine("end");
+                        stringBuilder.AppendLine("|||");
+                    }
+                    break;
+
+                case If ifStatement:
+                    var ifBuilder = new StringBuilder();
+
+                    foreach (IfElseSection section in ifStatement.Sections)
+                    {
+                        var sectionBuilder = new StringBuilder();
+
+                        foreach (var invokedMethod in section.Statements.OfType<InvocationDescription>())
+                        {
+                            TraverseInvocation(aggregates, sectionBuilder, invokedMethod);
+                        }
+
+                        if (sectionBuilder.Length > 0)
+                        {
+                            var first = ifBuilder.Length == 0;
+                            if (first) ifBuilder.AppendLine("|||");
+                            ifBuilder.Append(first ? "alt " : "else ");
+                            ifBuilder.AppendLine(section.Condition ?? "");
+                            ifBuilder.AppendLine("|||");
+                            ifBuilder.Append(sectionBuilder);
+                            ifBuilder.AppendLine("|||");
+                        }
+                    }
+
+                    if (ifBuilder.Length > 0)
+                    {
+                        stringBuilder.Append(ifBuilder);
+                        stringBuilder.AppendLine("end");
+                        stringBuilder.AppendLine("|||");
+                    }
+                    break;
+
+                case InvocationDescription invokedMethod:
+                    {
+                        var containingType = types.FirstOrDefault(invokedMethod.ContainingType);
+                        if (containingType.IsAggregateRoot())
+                        {
+                            if (!aggregates.Contains(containingType.Name))
+                            {
+                                aggregates.Add(containingType.Name);
+                                var prefix = string.Empty;
+                                if (containingType.Name == invokedMethod.Name) prefix = "new ";
+                                stringBuilder.AppendLine($"H->{containingType.Name} ++:{prefix}{invokedMethod.Name.FormatForDiagram()}");
+                            }
+                            else
+                            {
+                                stringBuilder.AppendLine($"H->{containingType.Name}:{invokedMethod.Name.FormatForDiagram()}");
+                            }
+
+                            foreach (var call in types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
+                            {
+                                var eventType = types.First(t => string.Equals(t.FullName, call.Arguments.First().Type));
+                                stringBuilder.AppendLine($"{containingType.Name}-{eventType.Name.ArrowColor()}>DQ:{eventType.Name.FormatForDiagram()}");
+                            }
+                        }
+                        else
+                        {
+                            foreach (var call in types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
+                            {
+                                var eventType = types.FirstOrDefault(call.Arguments.First().Type);
+                                stringBuilder.AppendLine($"H-{eventType.Name.ArrowColor()}>DQ:{eventType.Name.FormatForDiagram()}");
+                            }
+                        }
+                    }
+
+                    break;
+            }
+        }
     }
+
 }

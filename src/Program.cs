@@ -17,13 +17,10 @@ namespace roslyn_uml
             await AnalyzeSolutionAsync(types, args[0]);
 
             var aggregateFiles = new eShopOnContainers.AggregateRenderer(types).Render();
-
             var commandHandlerFiles = new eShopOnContainers.CommandHandlerRenderer(types).Render();
-
             var eventHandlerFiles = new eShopOnContainers.EventHandlerRenderer(types).Render();
 
-            var asciiDocRenderer = new eShopOnContainers.AsciiDocRenderer(types, aggregateFiles, commandHandlerFiles, eventHandlerFiles);
-            asciiDocRenderer.Render();
+            new eShopOnContainers.AsciiDocRenderer(types, aggregateFiles, commandHandlerFiles, eventHandlerFiles).Render();
         }
 
         private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)
