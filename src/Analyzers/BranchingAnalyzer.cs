@@ -52,8 +52,6 @@ namespace roslyn_uml
                     elseNode = null;
                 }
             }
-
-            base.VisitIfStatement(node);
         }
 
         public override void VisitSwitchStatement(SwitchStatementSyntax node)
@@ -73,8 +71,6 @@ namespace roslyn_uml
                 var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, switchSection.Statements);
                 invocationAnalyzer.Visit(section);
             }
-
-            base.VisitSwitchStatement(node);
         }
 
         private static string Label(SwitchLabelSyntax label)
