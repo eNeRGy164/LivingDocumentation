@@ -48,6 +48,8 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("skinparam SequenceBoxBackgroundColor SeaShell");
                 stringBuilder.AppendLine("skinparam SequenceLifeLineBorderColor Black");
                 stringBuilder.AppendLine("skinparam SequenceLifeLineBorderThickness 2");
+                stringBuilder.AppendLine("skinparam BoxPadding 20");
+                stringBuilder.AppendLine("skinparam ParticipantPadding 20");
                 stringBuilder.AppendLine("skinparam ArrowColor Black");
                 stringBuilder.AppendLine("skinparam SequenceMessageAlignment ReverseDirection");
                 stringBuilder.AppendLine("queue Domain as DQ");
@@ -60,11 +62,16 @@ namespace roslyn_uml.eShopOnContainers
                 }
 
                 stringBuilder.AppendLine("end box");
-                stringBuilder.AppendLine("|||");
+                stringBuilder.AppendLine("||5||");
 
                 stringBuilder.Append(flowBuilder);
 
-                stringBuilder.AppendLine("|||");
+                foreach (var aggregate in aggregates)
+                {
+                    stringBuilder.AppendLine($"deactivate {aggregate}");
+                }
+
+                stringBuilder.AppendLine("||5||");
                 stringBuilder.AppendLine("@enduml");
 
                 var fileName = $"eventhandler.{eventHandlerName.ToLowerInvariant()}.puml";
@@ -95,13 +102,13 @@ namespace roslyn_uml.eShopOnContainers
                         if (sectionBuilder.Length > 0)
                         {
                             var first = switchBuilder.Length == 0;
-                            if (first) switchBuilder.AppendLine("|||");
+                            if (first) switchBuilder.AppendLine("||5||");
                             switchBuilder.Append(first ? "alt " : "else ");
                             switchBuilder.AppendJoin(',', section.Labels);
                             switchBuilder.AppendLine();
-                            switchBuilder.AppendLine("|||");
+                            switchBuilder.AppendLine("||5||");
                             switchBuilder.Append(sectionBuilder);
-                            switchBuilder.AppendLine("|||");
+                            switchBuilder.AppendLine("||5||");
                         }
                     }
 
@@ -109,7 +116,7 @@ namespace roslyn_uml.eShopOnContainers
                     {
                         stringBuilder.Append(switchBuilder);
                         stringBuilder.AppendLine("end");
-                        stringBuilder.AppendLine("|||");
+                        stringBuilder.AppendLine("||5||");
                     }
                     break;
 
@@ -128,12 +135,12 @@ namespace roslyn_uml.eShopOnContainers
                         if (sectionBuilder.Length > 0)
                         {
                             var first = ifBuilder.Length == 0;
-                            if (first) ifBuilder.AppendLine("|||");
-                            ifBuilder.Append(first ? "alt " : "else ");
-                            ifBuilder.AppendLine(section.Condition ?? "");
-                            ifBuilder.AppendLine("|||");
+                            if (first) ifBuilder.AppendLine("||5||");
+                            ifBuilder.Append(first ? "group if " : "else ");
+                            ifBuilder.AppendLine(string.IsNullOrEmpty(section.Condition) ? string.Empty : $" [{section.Condition}]");
+                            ifBuilder.AppendLine("||5||");
                             ifBuilder.Append(sectionBuilder);
-                            ifBuilder.AppendLine("|||");
+                            ifBuilder.AppendLine("||5||");
                         }
                     }
 
@@ -141,7 +148,7 @@ namespace roslyn_uml.eShopOnContainers
                     {
                         stringBuilder.Append(ifBuilder);
                         stringBuilder.AppendLine("end");
-                        stringBuilder.AppendLine("|||");
+                        stringBuilder.AppendLine("||5||");
                     }
                     break;
 
@@ -162,10 +169,9 @@ namespace roslyn_uml.eShopOnContainers
                                 stringBuilder.AppendLine($"H->{containingType.Name}:{invokedMethod.Name.FormatForDiagram()}");
                             }
 
-                            foreach (var call in types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
+                            foreach (var call in types.GetInvocationConsequenceStatements(invokedMethod).Where(s => s != invokedMethod))
                             {
-                                var eventType = types.First(t => string.Equals(t.FullName, call.Arguments.First().Type));
-                                stringBuilder.AppendLine($"{containingType.Name}-{eventType.Name.ArrowColor()}>DQ:{eventType.Name.FormatForDiagram()}");
+                                TraverseInvocation(aggregates, stringBuilder, call);
                             }
                         }
                         else

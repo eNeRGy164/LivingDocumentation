@@ -53,13 +53,13 @@ namespace roslyn_uml.eShopOnContainers
                                 if (sectionBuilder.Length > 0)
                                 {
                                     var first = switchBuilder.Length == 0;
-                                    if (first) switchBuilder.AppendLine("|||");
+                                    if (first) switchBuilder.AppendLine("||5||");
                                     switchBuilder.Append(first ? "alt " : "else ");
                                     switchBuilder.AppendJoin(',', section.Labels);
                                     switchBuilder.AppendLine();
-                                    switchBuilder.AppendLine("|||");
+                                    switchBuilder.AppendLine("||5||");
                                     switchBuilder.Append(sectionBuilder);
-                                    switchBuilder.AppendLine("|||");
+                                    switchBuilder.AppendLine("||5||");
                                 }
                             }
 
@@ -67,7 +67,7 @@ namespace roslyn_uml.eShopOnContainers
                             {
                                 flowBuilder.Append(switchBuilder);
                                 flowBuilder.AppendLine("end");
-                                flowBuilder.AppendLine("|||");
+                                flowBuilder.AppendLine("||5||");
                             }
                             break;
 
@@ -86,12 +86,12 @@ namespace roslyn_uml.eShopOnContainers
                                 if (sectionBuilder.Length > 0)
                                 {
                                     var first = ifBuilder.Length == 0;
-                                    if (first) ifBuilder.AppendLine("|||");
+                                    if (first) ifBuilder.AppendLine("||5||");
                                     ifBuilder.Append(first ? "alt " : "else ");
                                     ifBuilder.AppendLine(section.Condition ?? "");
-                                    ifBuilder.AppendLine("|||");
+                                    ifBuilder.AppendLine("||5||");
                                     ifBuilder.Append(sectionBuilder);
-                                    ifBuilder.AppendLine("|||");
+                                    ifBuilder.AppendLine("||5||");
                                 }
                             }
 
@@ -99,7 +99,7 @@ namespace roslyn_uml.eShopOnContainers
                             {
                                 flowBuilder.Append(ifBuilder);
                                 flowBuilder.AppendLine("end");
-                                flowBuilder.AppendLine("|||");
+                                flowBuilder.AppendLine("||5||");
                             }
                             break;
 
@@ -118,6 +118,8 @@ namespace roslyn_uml.eShopOnContainers
                 stringBuilder.AppendLine("skinparam SequenceBoxBackgroundColor SeaShell");
                 stringBuilder.AppendLine("skinparam SequenceLifeLineBorderColor Black");
                 stringBuilder.AppendLine("skinparam SequenceLifeLineBorderThickness 2");
+                stringBuilder.AppendLine("skinparam BoxPadding 20");
+                stringBuilder.AppendLine("skinparam ParticipantPadding 20");
                 stringBuilder.AppendLine("skinparam ArrowColor Black");
                 stringBuilder.AppendLine("skinparam SequenceMessageAlignment ReverseDirection");
                 stringBuilder.AppendLine("queue Queue as Q");
@@ -131,11 +133,16 @@ namespace roslyn_uml.eShopOnContainers
 
                 stringBuilder.AppendLine("end box");
                 stringBuilder.AppendLine("queue Domain as DQ");
-                stringBuilder.AppendLine("|||");
+                stringBuilder.AppendLine("||5||");
 
                 stringBuilder.Append(flowBuilder);
 
-                stringBuilder.AppendLine("|||");
+                foreach (var aggregate in aggregates)
+                {
+                    stringBuilder.AppendLine($"deactivate {aggregate}");
+                }
+
+                stringBuilder.AppendLine("||5||");
                 stringBuilder.AppendLine("@enduml");
 
                 var fileName = $"commandhandler.{commandHandlerName.ToLowerInvariant()}.puml";
@@ -147,26 +154,111 @@ namespace roslyn_uml.eShopOnContainers
             return files;
         }
 
-        private void TraverseInvocation(List<string> aggregates, StringBuilder stringBuilder, InvocationDescription invocation)
+        private void TraverseInvocation(List<string> aggregates, StringBuilder stringBuilder, Statement statement)
         {
-            var containingType = types.FirstOrDefault(invocation.ContainingType);
-            if (containingType.IsAggregateRoot())
+            switch (statement)
             {
-                if (!aggregates.Contains(containingType.Name))
-                {
-                    aggregates.Add(containingType.Name);
-                    stringBuilder.AppendLine($"H->{containingType.Name} ++:{invocation.Name.FormatForDiagram()}");
-                }
-                else
-                {
-                    stringBuilder.AppendLine($"H->{containingType.Name}:{invocation.Name.FormatForDiagram()}");
-                }
+                case Switch switchStatement:
+                    var switchBuilder = new StringBuilder();
 
-                foreach (var call in types.GetInvocationConsequences(invocation).Where(c => c.IsDomainEventCreation()))
-                {
-                    var eventType = types.FirstOrDefault(call.Arguments.First().Type);
-                    stringBuilder.AppendLine($"{containingType.Name}-{eventType.Name.ArrowColor()}>DQ:{eventType.Name.FormatForDiagram()}");
-                }
+                    foreach (SwitchSection section in switchStatement.Sections)
+                    {
+                        var sectionBuilder = new StringBuilder();
+
+                        foreach (var invokedMethod in section.Statements.OfType<InvocationDescription>())
+                        {
+                            TraverseInvocation(aggregates, sectionBuilder, invokedMethod);
+                        }
+
+                        if (sectionBuilder.Length > 0)
+                        {
+                            var first = switchBuilder.Length == 0;
+                            if (first) switchBuilder.AppendLine("||5||");
+                            switchBuilder.Append(first ? "alt " : "else ");
+                            switchBuilder.AppendJoin(',', section.Labels);
+                            switchBuilder.AppendLine();
+                            switchBuilder.AppendLine("||5||");
+                            switchBuilder.Append(sectionBuilder);
+                            switchBuilder.AppendLine("||5||");
+                        }
+                    }
+
+                    if (switchBuilder.Length > 0)
+                    {
+                        stringBuilder.Append(switchBuilder);
+                        stringBuilder.AppendLine("end");
+                        stringBuilder.AppendLine("||5||");
+                    }
+                    break;
+
+                case If ifStatement:
+                    var ifBuilder = new StringBuilder();
+
+                    foreach (IfElseSection section in ifStatement.Sections)
+                    {
+                        var sectionBuilder = new StringBuilder();
+
+                        foreach (var invokedMethod in section.Statements.OfType<InvocationDescription>())
+                        {
+                            TraverseInvocation(aggregates, sectionBuilder, invokedMethod);
+                        }
+
+                        if (sectionBuilder.Length > 0)
+                        {
+                            var first = ifBuilder.Length == 0;
+                            if (first) ifBuilder.AppendLine("||5||");
+                            ifBuilder.Append(first ? "group if " : "else ");
+                            ifBuilder.AppendLine(string.IsNullOrEmpty(section.Condition) ? string.Empty : $" [{section.Condition.Replace("\n", "\\n")}]");
+                            ifBuilder.AppendLine("||5||");
+                            ifBuilder.Append(sectionBuilder);
+                            ifBuilder.AppendLine("||5||");
+                        }
+                    }
+
+                    if (ifBuilder.Length > 0)
+                    {
+                        stringBuilder.Append(ifBuilder);
+                        stringBuilder.AppendLine("end");
+                        stringBuilder.AppendLine("||5||");
+                    }
+                    break;
+
+                case InvocationDescription invokedMethod:
+                    {
+                        var containingType = types.FirstOrDefault(invokedMethod.ContainingType);
+                        if (containingType.IsAggregateRoot())
+                        {
+                            if (!aggregates.Contains(containingType.Name))
+                            {
+                                aggregates.Add(containingType.Name);
+                                var prefix = string.Empty;
+                                if (containingType.Name == invokedMethod.Name) prefix = "new ";
+                                stringBuilder.AppendLine($"H->{containingType.Name} ++:{prefix}{invokedMethod.Name.FormatForDiagram()}");
+                            }
+                            else
+                            {
+                                if (types.GetInvokedMethod(invokedMethod).First().IsPublic)
+                                {
+                                    stringBuilder.AppendLine($"H->{containingType.Name}:{invokedMethod.Name.FormatForDiagram()}");
+                                }
+                            }
+
+                            foreach (var call in types.GetInvocationConsequenceStatements(invokedMethod).Where(s => s != invokedMethod))
+                            {
+                                TraverseInvocation(aggregates, stringBuilder, call);
+                            }
+                        }
+                        else
+                        {
+                            foreach (var call in types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
+                            {
+                                var eventType = types.FirstOrDefault(call.Arguments.First().Type);
+                                stringBuilder.AppendLine($"H-{eventType.Name.ArrowColor()}>DQ:{eventType.Name.FormatForDiagram()}");
+                            }
+                        }
+                    }
+
+                    break;
             }
         }
     }

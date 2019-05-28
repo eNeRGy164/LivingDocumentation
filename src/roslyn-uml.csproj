@@ -8,6 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Buildalyzer.Workspaces" Version="2.2.0" />
+    <PackageReference Include="Buildalyzer.Workspaces" Version="2.3.0" />
   </ItemGroup>
 </Project>

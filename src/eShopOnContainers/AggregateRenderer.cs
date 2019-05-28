@@ -26,6 +26,7 @@ namespace roslyn_uml.eShopOnContainers
 
                 var stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine("@startuml");
+                stringBuilder.AppendLine("skinparam MinClassWidth 160");
                 stringBuilder.AppendLine($"namespace {aggregateName} <<aggregate>> {{");
 
                 var rootBuilder = this.RenderClass(aggregate);

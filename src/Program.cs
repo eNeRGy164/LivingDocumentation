@@ -30,14 +30,11 @@ namespace roslyn_uml
             var assembliesInSolution = workspace.CurrentSolution.Projects.Select(p => p.AssemblyName).ToList();
 
             // Every project in the solution, except unit test projects
-            foreach (var project in workspace.CurrentSolution.Projects.OrderBy(p => p.Name))
-            {
-                if (project.Documents.Any(a => string.Equals(a.Name, "Microsoft.NET.Test.Sdk.Program.cs")))
-                {
-                    // Skip test projects
-                    continue;
-                }
+            var projects = workspace.CurrentSolution.Projects
+                .Where(p => !manager.Projects.First(mp => p.Id.Id == mp.Value.ProjectGuid).Value.ProjectFile.PackageReferences.Any(pr => pr.Name.Contains("Test")));
 
+            foreach (var project in projects)
+            {
                 var compilation = await project.GetCompilationAsync();
                 var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
 

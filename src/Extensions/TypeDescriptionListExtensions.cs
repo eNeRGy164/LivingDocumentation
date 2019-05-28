@@ -12,12 +12,18 @@ namespace roslyn_uml
             return types.FirstOrDefault(t => string.Equals(t.FullName, typeName));
         }
 
-        public static IReadOnlyList<InvocationDescription> GetInvocationConsequences(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
+        public static IReadOnlyList<IHaveAMethodBody> GetInvokedMethod(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
-            var consequences = types
+            return types
                 .Where(t => string.Equals(t.FullName, invocation.ContainingType))
                 .SelectMany(t => t.Methods.Cast<IHaveAMethodBody>().Concat(t.Constructors))
                 .Where(m => string.Equals(m.Name, invocation.Name) && MatchParameters(invocation, m))
+                .ToList();
+        }
+
+        public static IReadOnlyList<InvocationDescription> GetInvocationConsequences(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
+        {
+            var consequences = types.GetInvokedMethod(invocation)
                 .SelectMany(m => m.InvokedMethods)
                 .SelectMany(im => types.GetInvocationConsequences(im))
                 .Prepend(invocation)
@@ -28,10 +34,7 @@ namespace roslyn_uml
 
         public static IReadOnlyList<Statement> GetInvocationConsequenceStatements(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
-            var consequences = types
-                .Where(t => string.Equals(t.FullName, invocation.ContainingType))
-                .SelectMany(t => t.Methods.Cast<IHaveAMethodBody>().Concat(t.Constructors))
-                .Where(m => string.Equals(m.Name, invocation.Name) && MatchParameters(invocation, m))
+            var consequences = types.GetInvokedMethod(invocation)
                 .SelectMany(m => m.Statements)
                 .SelectMany(im => TraverseStatement(types, im))
                 .Prepend(invocation)
