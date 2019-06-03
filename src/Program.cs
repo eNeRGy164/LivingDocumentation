@@ -1,20 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
 using Microsoft.CodeAnalysis;
+using Newtonsoft.Json;
 
 namespace roslyn_uml
 {
-    class Program
+    public class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var types = new List<TypeDescription>();
             
             await AnalyzeSolutionAsync(types, args[0]);
+
+            // Write analysis 
+            var serializerSettings = new JsonSerializerSettings
+            {
+                DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
+                Formatting = Formatting.None,
+                ContractResolver = new SkipEmptyCollectionsContractResolver(),
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+
+            var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
+            await File.WriteAllTextAsync("analysis.json", result);
 
             var aggregateFiles = new eShopOnContainers.AggregateRenderer(types).Render();
             var commandHandlerFiles = new eShopOnContainers.CommandHandlerRenderer(types).Render();

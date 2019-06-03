@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace roslyn_uml
@@ -7,7 +8,9 @@ namespace roslyn_uml
     public class InvocationDescription : Statement
     {
         public string ContainingType { get; }
+
         public string Name { get; }
+
         public List<ArgumentDescription> Arguments { get; } = new List<ArgumentDescription>();
 
         public InvocationDescription(string containingType, string name)

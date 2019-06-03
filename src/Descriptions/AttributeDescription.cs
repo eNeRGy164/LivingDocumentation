@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace roslyn_uml
@@ -7,7 +8,9 @@ namespace roslyn_uml
     public class AttributeDescription
     {
         public string Type { get; }
+
         public string Name { get; }
+
         public List<AttributeArgumentDescription> Arguments { get; } = new List<AttributeArgumentDescription>();
 
         public AttributeDescription(string type, string name)

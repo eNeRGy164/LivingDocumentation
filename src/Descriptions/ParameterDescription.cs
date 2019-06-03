@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace roslyn_uml
@@ -6,7 +7,9 @@ namespace roslyn_uml
     public class ParameterDescription
     {
         public string Type { get; }
+
         public string Name { get; }
+
         public bool HasDefaultValue { get; internal set; }
 
         public ParameterDescription(string type, string name)

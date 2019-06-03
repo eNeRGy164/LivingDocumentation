@@ -1,11 +1,13 @@
-﻿namespace roslyn_uml
+﻿using System;
+
+namespace roslyn_uml
 {
     public enum MemberType
     {
-        Field,
-        Method,
-        Property,
-        Constructor,
-        EnumMember
+        Field = 0,
+        Method = 1,
+        Property = 2,
+        Constructor = 3,
+        EnumMember = 4
     }
 }

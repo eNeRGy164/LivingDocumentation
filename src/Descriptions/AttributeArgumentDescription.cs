@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace roslyn_uml
 {
@@ -6,7 +7,9 @@ namespace roslyn_uml
     public class AttributeArgumentDescription
     {
         public string Name { get; }
+
         public string Type { get; }
+
         public string Value { get; }
 
         public AttributeArgumentDescription(string name, string type, string value)

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace roslyn_uml
 {
@@ -6,6 +7,7 @@ namespace roslyn_uml
     public class ArgumentDescription
     {
         public string Type { get; }
+
         public string Text { get; }
 
         public ArgumentDescription(string type, string text)

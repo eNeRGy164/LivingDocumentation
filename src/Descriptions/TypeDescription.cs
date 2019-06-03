@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,31 +12,64 @@ namespace roslyn_uml
         public TypeDescription(TypeType type, string fullName)
         {
             this.Type = type;
-            this.FullName = fullName;
+            this.FullName = fullName ?? string.Empty;
         }
 
         public TypeType Type { get; }
+
         public string FullName { get; }
-        public string Name => this.FullName.Substring(Math.Max(0, this.FullName.LastIndexOf('.'))).Trim('.');
-        public string Namespace => this.FullName.Substring(0, this.FullName.LastIndexOf('.')).Trim('.');
-        public List<string> Modifiers { get; } = new List<string>();
-        public bool IsStatic => this.Modifiers.Contains("static");
-        public bool IsPublic => this.Modifiers.Contains("public");
-        public bool IsInternal => this.Modifiers.Contains("internal");
-        public bool IsProtected => this.Modifiers.Contains("protected");
-        public bool IsPrivate => !this.IsPublic && !this.IsInternal;
-        public bool IsAbstract => this.Modifiers.Contains("abstract");
-        public List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
-        public List<string> BaseTypes { get; } = new List<string>();
-        private List<MemberDescription> AllMembers { get; } = new List<MemberDescription>();
-        private IEnumerable<MemberDescription> Members => this.AllMembers.Where(m => !m.IsInherited);
-        private IEnumerable<MemberDescription> InheritedMembers => this.AllMembers.Where(m => m.IsInherited);
-        public IReadOnlyList<ConstructorDescription> Constructors => this.Members.OfType<ConstructorDescription>().ToList();
-        public IReadOnlyList<PropertyDescription> Properties => this.Members.OfType<PropertyDescription>().ToList();
-        public IReadOnlyList<MethodDescription> Methods => this.Members.OfType<MethodDescription>().ToList();
-        public IReadOnlyList<FieldDescription> Fields => this.Members.OfType<FieldDescription>().ToList();
-        public IReadOnlyList<EnumMemberDescription> EnumMembers => this.Members.OfType<EnumMemberDescription>().ToList();
+
         public string Documentation { get; internal set; }
+
+        public List<string> BaseTypes { get; } = new List<string>();
+
+        public List<string> Modifiers { get; } = new List<string>();
+
+        public List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
+
+        [JsonProperty]
+        private List<MemberDescription> AllMembers { get; } = new List<MemberDescription>();
+
+        [JsonIgnore]
+        public string Name => this.FullName.Substring(Math.Max(0, this.FullName.LastIndexOf('.'))).Trim('.');
+
+        [JsonIgnore]
+        public string Namespace => this.FullName.Substring(0, Math.Max(this.FullName.LastIndexOf('.'), 0)).Trim('.');
+
+        [JsonIgnore]
+        public bool IsStatic => this.Modifiers.Contains("static");
+
+        public bool IsPublic => this.Modifiers.Contains("public");
+
+        public bool IsInternal => this.Modifiers.Contains("internal");
+
+        public bool IsProtected => this.Modifiers.Contains("protected");
+
+        public bool IsPrivate => !this.IsPublic && !this.IsInternal;
+
+        [JsonIgnore]
+        public bool IsAbstract => this.Modifiers.Contains("abstract");
+
+        [JsonIgnore]
+        private IEnumerable<MemberDescription> Members => this.AllMembers.Where(m => !m.IsInherited);
+
+        [JsonIgnore]
+        private IEnumerable<MemberDescription> InheritedMembers => this.AllMembers.Where(m => m.IsInherited);
+
+        [JsonIgnore]
+        public IReadOnlyList<ConstructorDescription> Constructors => this.Members.OfType<ConstructorDescription>().ToList();
+
+        [JsonIgnore]
+        public IReadOnlyList<PropertyDescription> Properties => this.Members.OfType<PropertyDescription>().ToList();
+
+        [JsonIgnore]
+        public IReadOnlyList<MethodDescription> Methods => this.Members.OfType<MethodDescription>().ToList();
+
+        [JsonIgnore]
+        public IReadOnlyList<FieldDescription> Fields => this.Members.OfType<FieldDescription>().ToList();
+
+        [JsonIgnore]
+        public IReadOnlyList<EnumMemberDescription> EnumMembers => this.Members.OfType<EnumMemberDescription>().ToList();
 
         public void AddMember(MemberDescription member)
         {

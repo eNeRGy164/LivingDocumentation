@@ -1,13 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace roslyn_uml
 {
-    public abstract class MemberDescription : IHaveModifiers
+     public abstract class MemberDescription : IHaveModifiers
     {
-        public string Name { get; }
+        [JsonProperty(Order = 1)]
         public MemberType MemberType { get; }
+
+        [JsonProperty(Order = 2)]
+        public string Name { get; }
+        
         public List<string> Modifiers { get; } = new List<string>();
+
         public bool IsInherited { get; internal set; } = false;
+
         public string Documentation { get; internal set; }
 
         public MemberDescription(MemberType memberType, string name)
