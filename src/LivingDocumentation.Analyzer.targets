@@ -1,0 +1,6 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <livingdocumentation_analyzer_tools>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)/../tools/'))</livingdocumentation_analyzer_tools>
+        <livingdocumentation_analyzer>$([System.IO.Path]::GetFullPath('$(livingdocumentation_analyzer_tools)/netcoreapp2.0/LivingDocumentation.Analyzer.dll'))</livingdocumentation_analyzer>
+    </PropertyGroup>
+</Project>

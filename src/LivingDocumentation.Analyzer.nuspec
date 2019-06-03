@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<package>
+  <metadata>
+    <id>LivingDocumentation.Analyzer</id>
+    <title>LivingDocumentation analyzer tool</title>
+    <summary></summary>
+    <description>LivingDocumentation analyzer tool</description>
+    <version>0.1.2</version>
+    <authors>Michaël Hompus</authors>
+    <owners>michael-hompus</owners>
+    <licenseUrl>https://github.com/...</licenseUrl>
+    <projectUrl>https://github.com/...</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>First</releaseNotes>
+    <copyright>Copyright 2019, Michaël Hompus.</copyright>
+    <tags>LivingDocumentation Roslyn UML Analysis Documentation Generation</tags>
+  </metadata>
+  <files>
+    <file src="bin\Debug\netcoreapp2.0\publish\*.dll" target="tools\netcoreapp2.0"/>
+    <file src="bin\Debug\netcoreapp2.0\publish\*.json" target="tools\netcoreapp2.0"/>
+    <file src="LivingDocumentation.Analyzer.targets" target="buildCrossTargeting"/>
+    <file src="LivingDocumentation.Analyzer.targets" target="build"/>
+  </files>
+</package>
