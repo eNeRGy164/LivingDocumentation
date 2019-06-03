@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace roslyn_uml
 {
@@ -6,7 +7,6 @@ namespace roslyn_uml
     {
         string Name { get; }
         List<ParameterDescription> Parameters { get; }
-        List<InvocationDescription> InvokedMethods { get; }
         List<Statement> Statements { get; }
     }
 }

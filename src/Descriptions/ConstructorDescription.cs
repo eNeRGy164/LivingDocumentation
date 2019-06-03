@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace roslyn_uml
@@ -7,7 +8,7 @@ namespace roslyn_uml
     public class ConstructorDescription : MemberDescription, IHaveAMethodBody
     {
         public List<ParameterDescription> Parameters { get; } = new List<ParameterDescription>();
-        public List<InvocationDescription> InvokedMethods { get; } = new List<InvocationDescription>();
+
         public List<Statement> Statements { get; } = new List<Statement>();
 
         public ConstructorDescription(string name)

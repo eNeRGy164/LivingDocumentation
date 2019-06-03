@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -7,8 +8,9 @@ namespace roslyn_uml
     public class MethodDescription : MemberDescription, IHaveAMethodBody
     {
         public string ReturnType { get; }
+
         public List<ParameterDescription> Parameters { get; } = new List<ParameterDescription>();
-        public List<InvocationDescription> InvokedMethods { get; } = new List<InvocationDescription>();
+
         public List<Statement> Statements { get; } = new List<Statement>();
 
         public MethodDescription(string returnType, string name)

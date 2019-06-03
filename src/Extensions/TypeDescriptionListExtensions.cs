@@ -24,7 +24,7 @@ namespace roslyn_uml
         public static IReadOnlyList<InvocationDescription> GetInvocationConsequences(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
             var consequences = types.GetInvokedMethod(invocation)
-                .SelectMany(m => m.InvokedMethods)
+                .SelectMany(m => m.Statements.OfType<InvocationDescription>())
                 .SelectMany(im => types.GetInvocationConsequences(im))
                 .Prepend(invocation)
                 .ToList();
