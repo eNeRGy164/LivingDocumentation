@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace roslyn_uml
+namespace LivingDocumentation
 {
     public static class SemanticModelExtensions
     {

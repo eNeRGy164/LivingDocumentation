@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>LivingDocumentation.Analyzer</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>LivingDocumentation.Analyzer</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Buildalyzer.Workspaces" Version="2.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Json\LivingDocumentation.Json.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Statements\LivingDocumentation.Statements.csproj" />
+  </ItemGroup>
+</Project>

@@ -8,7 +8,7 @@ using Buildalyzer.Workspaces;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 
-namespace roslyn_uml
+namespace LivingDocumentation
 {
     public class Program
     {
@@ -30,12 +30,6 @@ namespace roslyn_uml
 
             var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
             await File.WriteAllTextAsync("analysis.json", result);
-
-            var aggregateFiles = new eShopOnContainers.AggregateRenderer(types).Render();
-            var commandHandlerFiles = new eShopOnContainers.CommandHandlerRenderer(types).Render();
-            var eventHandlerFiles = new eShopOnContainers.EventHandlerRenderer(types).Render();
-
-            new eShopOnContainers.AsciiDocRenderer(types, aggregateFiles, commandHandlerFiles, eventHandlerFiles).Render();
         }
 
         private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)

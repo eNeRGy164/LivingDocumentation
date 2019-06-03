@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace roslyn_uml
+namespace LivingDocumentation
 {
     internal class InvocationsAnalyzer : CSharpSyntaxWalker
     {

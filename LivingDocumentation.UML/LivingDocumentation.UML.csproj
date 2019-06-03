@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <RootNamespace>LivingDocumentation.Uml</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj" />
+  </ItemGroup>
+
+</Project>

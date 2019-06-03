@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Json\LivingDocumentation.Json.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Render\LivingDocumentation.RenderExtensions.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.UML\LivingDocumentation.UML.csproj" />
+  </ItemGroup>
+
+</Project>
