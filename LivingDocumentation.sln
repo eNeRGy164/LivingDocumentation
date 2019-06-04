@@ -3,23 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Analyzer", "src\LivingDocumentation.Analyzer.csproj", "{72E336A0-A9D8-494D-9332-CDE8341B247B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Analyzer", "src\LivingDocumentation.Analyzer\LivingDocumentation.Analyzer.csproj", "{72E336A0-A9D8-494D-9332-CDE8341B247B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.Abstractions", "LivingDocumentation.Abstractions\LivingDocumentation.Abstractions.csproj", "{A7C06FA8-E5FB-4FE6-BECA-1FCC0CBE27C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Abstractions", "src\LivingDocumentation.Abstractions\LivingDocumentation.Abstractions.csproj", "{A7C06FA8-E5FB-4FE6-BECA-1FCC0CBE27C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.Descriptions", "LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj", "{D33AC914-9906-4035-AD54-3A7385379742}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Descriptions", "src\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj", "{D33AC914-9906-4035-AD54-3A7385379742}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.Statements", "LivingDocumentation.Statements\LivingDocumentation.Statements.csproj", "{B20022C7-CD5D-4E81-BE07-17CF155E8CF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Statements", "src\LivingDocumentation.Statements\LivingDocumentation.Statements.csproj", "{B20022C7-CD5D-4E81-BE07-17CF155E8CF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.eShopOnContainers", "LivingDocumentation.eShopOnContainers\LivingDocumentation.eShopOnContainers.csproj", "{A28A9E7A-DB6F-4210-8069-CF6166500FA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.eShopOnContainers", "samples\LivingDocumentation.eShopOnContainers\LivingDocumentation.eShopOnContainers.csproj", "{A28A9E7A-DB6F-4210-8069-CF6166500FA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.UML", "LivingDocumentation.UML\LivingDocumentation.UML.csproj", "{570577AE-FD4B-4410-883E-49970BAD9C5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.UML", "src\LivingDocumentation.UML\LivingDocumentation.UML.csproj", "{570577AE-FD4B-4410-883E-49970BAD9C5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.RenderExtensions", "LivingDocumentation.Render\LivingDocumentation.RenderExtensions.csproj", "{BB537EEB-3EF5-4188-BCD0-548791845185}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.RenderExtensions", "src\LivingDocumentation.Render\LivingDocumentation.RenderExtensions.csproj", "{BB537EEB-3EF5-4188-BCD0-548791845185}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.Extensions", "LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj", "{43F54404-225C-4234-AFA9-A316A891884C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Extensions", "src\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj", "{43F54404-225C-4234-AFA9-A316A891884C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.Json", "LivingDocumentation.Json\LivingDocumentation.Json.csproj", "{4CC5B483-9205-47A4-82F8-189047316512}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Json", "src\LivingDocumentation.Json\LivingDocumentation.Json.csproj", "{4CC5B483-9205-47A4-82F8-189047316512}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{742D5E46-3BB3-4276-8049-1DFFB0E75A17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +70,17 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{72E336A0-A9D8-494D-9332-CDE8341B247B} = {2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}
+		{A7C06FA8-E5FB-4FE6-BECA-1FCC0CBE27C2} = {2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}
+		{D33AC914-9906-4035-AD54-3A7385379742} = {2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}
+		{B20022C7-CD5D-4E81-BE07-17CF155E8CF1} = {2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}
+		{A28A9E7A-DB6F-4210-8069-CF6166500FA0} = {742D5E46-3BB3-4276-8049-1DFFB0E75A17}
+		{570577AE-FD4B-4410-883E-49970BAD9C5D} = {2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}
+		{BB537EEB-3EF5-4188-BCD0-548791845185} = {2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}
+		{43F54404-225C-4234-AFA9-A316A891884C} = {2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}
+		{4CC5B483-9205-47A4-82F8-189047316512} = {2CCF1B57-05F0-4DF7-8B48-29D03CE052F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {298BF1F6-9407-40A1-91C0-F11BA01BD95B}
