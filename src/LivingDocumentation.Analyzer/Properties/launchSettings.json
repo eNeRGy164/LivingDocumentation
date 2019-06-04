@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "roslyn-uml": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\nlmhom\\documents\\eShopOnContainers\\eShopOnContainers-ServicesAndWebApps.sln\""
+    }
+  }
+}

@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    
+    <Version>0.1.0</Version>
+    <Authors>Michaël Hompus</Authors>
+    <Copyright>Copyright Michaël Hompus 2019</Copyright>
+    <PackageProjectUrl>https://github.com/eNeRGy164/LivingDocumentation</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/eNeRGy164/LivingDocumentation</RepositoryUrl>
+    <PackageTags>Living Documentation LivingDocumentation Roslyn UML Generation</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <NeutralLanguage>English (United States)</NeutralLanguage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj" />
+    <ProjectReference Include="..\..\src\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\LivingDocumentation.Json\LivingDocumentation.Json.csproj" />
+    <ProjectReference Include="..\..\src\LivingDocumentation.Render\LivingDocumentation.RenderExtensions.csproj" />
+    <ProjectReference Include="..\..\src\LivingDocumentation.UML\LivingDocumentation.UML.csproj" />
+  </ItemGroup>
+
+</Project>
