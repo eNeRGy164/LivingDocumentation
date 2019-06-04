@@ -1,8 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
+    <Version>0.1.0</Version>
+    <Authors>Michaël Hompus</Authors>
+    <Copyright>Copyright Michaël Hompus 2019</Copyright>
+    <PackageProjectUrl>https://github.com/eNeRGy164/LivingDocumentation</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/eNeRGy164/LivingDocumentation</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Living Documentation LivingDocumentation Roslyn UML Generation</PackageTags>
+    <NeutralLanguage>English (United States)</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>

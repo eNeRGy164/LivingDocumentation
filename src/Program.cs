@@ -52,7 +52,9 @@ namespace LivingDocumentation
             };
 
             var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
+
             await File.WriteAllTextAsync(options.OutputPath, result);
+            Console.WriteLine($"Living Documentation Analysis output generated {options.OutputPath}");
         }
 
         private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile, bool verboseOutput)
