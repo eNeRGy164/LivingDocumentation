@@ -15,6 +15,8 @@ namespace LivingDocumentation
     {
         private static ParserResult<Options> ParsedResults;
 
+        public static Options RuntimeOptions { get; private set; }
+
         public class Options
         {
             [Option("solution", Required = true, HelpText = "The solution to analyze.")]
@@ -39,9 +41,11 @@ namespace LivingDocumentation
 
         private static async Task RunApplicationAsync(Options options)
         {
+            RuntimeOptions = options;
+
             var types = new List<TypeDescription>();
 
-            await AnalyzeSolutionAsync(types, options.SolutionPath, options.VerboseOutput);
+            await AnalyzeSolutionAsync(types, options.SolutionPath);
 
             // Write analysis 
             var serializerSettings = new JsonSerializerSettings
@@ -57,7 +61,7 @@ namespace LivingDocumentation
             Console.WriteLine($"Living Documentation Analysis output generated {options.OutputPath}");
         }
 
-        private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile, bool verboseOutput)
+        private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)
         {
             var manager = new AnalyzerManager(solutionFile);
             var workspace = manager.GetWorkspace();
@@ -72,18 +76,18 @@ namespace LivingDocumentation
                 var compilation = await project.GetCompilationAsync();
                 var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
 
-                if (verboseOutput)
-                {
-                    var diagnostics = compilation.GetDiagnostics();
-                    if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+                    if (RuntimeOptions.VerboseOutput)
                     {
-                        Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
-                        foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
+                        var diagnostics = compilation.GetDiagnostics();
+                        if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
                         {
-                            Console.WriteLine("- " + diagnostic.ToString());
+                            Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
+                            foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
+                            {
+                                Console.WriteLine("- " + diagnostic.ToString());
+                            }
                         }
                     }
-                }
 
                 // Every file in the project
                 foreach (var syntaxTree in compilation.SyntaxTrees)
