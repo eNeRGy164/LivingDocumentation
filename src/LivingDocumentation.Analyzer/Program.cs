@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Buildalyzer;
-using Buildalyzer.Workspaces;
 using CommandLine;
+using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.MSBuild;
 using Newtonsoft.Json;
 
 namespace LivingDocumentation
@@ -66,18 +66,20 @@ namespace LivingDocumentation
 
         private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)
         {
-            var manager = new AnalyzerManager(solutionFile);
-            var workspace = manager.GetWorkspace();
-            var assembliesInSolution = workspace.CurrentSolution.Projects.Select(p => p.AssemblyName).ToList();
+            MSBuildLocator.RegisterDefaults();
 
-            // Every project in the solution, except unit test projects
-            var projects = workspace.CurrentSolution.Projects
-                .Where(p => !manager.Projects.First(mp => p.Id.Id == mp.Value.ProjectGuid).Value.ProjectFile.PackageReferences.Any(pr => pr.Name.Contains("Test")));
-
-            foreach (var project in projects)
+            using (var workspace = MSBuildWorkspace.Create())
             {
-                var compilation = await project.GetCompilationAsync();
-                var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
+                var solution = await workspace.OpenSolutionAsync(solutionFile);
+                var assembliesInSolution = solution.Projects.Select(p => p.AssemblyName).ToList();
+
+                // Every project in the solution, except unit test projects
+                var projects = workspace.CurrentSolution.Projects.Where(p => !p.Name.Contains("Test", StringComparison.OrdinalIgnoreCase));
+
+                foreach (var project in projects)
+                {
+                    var compilation = await project.GetCompilationAsync();
+                    var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
 
                     if (RuntimeOptions.VerboseOutput)
                     {
@@ -92,17 +94,16 @@ namespace LivingDocumentation
                         }
                     }
 
-                // Every file in the project
-                foreach (var syntaxTree in compilation.SyntaxTrees)
-                {
-                    var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
+                    // Every file in the project
+                    foreach (var syntaxTree in compilation.SyntaxTrees)
+                    {
+                        var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
-                    var visitor = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
-                    visitor.Visit(syntaxTree.GetRoot());
+                        var visitor = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
+                        visitor.Visit(syntaxTree.GetRoot());
+                    }
                 }
             }
-
-            workspace.Dispose();
         }
     }
 }
