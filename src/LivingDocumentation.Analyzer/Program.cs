@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,7 +46,9 @@ namespace LivingDocumentation
 
             var types = new List<TypeDescription>();
 
+            var stopwatch = Stopwatch.StartNew();
             await AnalyzeSolutionAsync(types, options.SolutionPath);
+            stopwatch.Stop();
 
             // Write analysis 
             var serializerSettings = new JsonSerializerSettings
@@ -58,7 +61,7 @@ namespace LivingDocumentation
             var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
 
             await File.WriteAllTextAsync(options.OutputPath, result);
-            Console.WriteLine($"Living Documentation Analysis output generated {options.OutputPath}");
+            Console.WriteLine($"Living Documentation Analysis output generated in {stopwatch.ElapsedMilliseconds}ms at {options.OutputPath}");
         }
 
         private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)
