@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace LivingDocumentation
 {
-    internal class SourceAnalyzer : CSharpSyntaxWalker
+    public class SourceAnalyzer : CSharpSyntaxWalker
     {
         private readonly SemanticModel semanticModel;
         private readonly IList<TypeDescription> types;
@@ -25,7 +25,7 @@ namespace LivingDocumentation
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if (ProcessEmbeddedType(node)) return;
+            if (ProcessedEmbeddedType(node)) return;
 
             ExtractBaseTypeDeclaration(TypeType.Class, node);
 
@@ -34,7 +34,7 @@ namespace LivingDocumentation
 
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            if (ProcessEmbeddedType(node)) return;
+            if (ProcessedEmbeddedType(node)) return;
 
             ExtractBaseTypeDeclaration(TypeType.Enum, node);
 
@@ -43,7 +43,7 @@ namespace LivingDocumentation
 
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            if (ProcessEmbeddedType(node)) return;
+            if (ProcessedEmbeddedType(node)) return;
 
             ExtractBaseTypeDeclaration(TypeType.Struct, node);
 
@@ -52,7 +52,7 @@ namespace LivingDocumentation
 
         public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            if (ProcessEmbeddedType(node)) return;
+            if (ProcessedEmbeddedType(node)) return;
 
             ExtractBaseTypeDeclaration(TypeType.Interface, node);
 
@@ -65,6 +65,8 @@ namespace LivingDocumentation
             this.currentType.AddMember(fieldDescription);
 
             fieldDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            this.EnsureMemberDefaultAccessModifier(fieldDescription);
+
             fieldDescription.Initializer = node.Declaration.Variables.First().Initializer?.Value.ToString(); // Assumption: Field has only a single initializer
             fieldDescription.Documentation = ExtractDocumentation(node);
 
@@ -77,6 +79,8 @@ namespace LivingDocumentation
             this.currentType.AddMember(propertyDescription);
 
             propertyDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            this.EnsureMemberDefaultAccessModifier(propertyDescription);
+
             propertyDescription.Initializer = node.Initializer?.Value.ToString();
             propertyDescription.Documentation = ExtractDocumentation(node);
 
@@ -88,6 +92,7 @@ namespace LivingDocumentation
             var enumMemberDescription = new EnumMemberDescription(node.Identifier.ToString(), node.EqualsValue?.Value.ToString());
             this.currentType.AddMember(enumMemberDescription);
 
+            enumMemberDescription.Modifiers.Add(Modifier.Public);
             enumMemberDescription.Documentation = ExtractDocumentation(node);
 
             base.VisitEnumMemberDeclaration(node);
@@ -127,6 +132,8 @@ namespace LivingDocumentation
             }
 
             this.currentType.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            this.EnsureTypeDefaultAccessModifier(node);
+
             this.currentType.Documentation = ExtractDocumentation(node);
 
             if (node.AttributeLists != null)
@@ -135,9 +142,38 @@ namespace LivingDocumentation
             }
         }
 
-        private bool ProcessEmbeddedType(SyntaxNode node)
+        private void EnsureTypeDefaultAccessModifier(BaseTypeDeclarationSyntax node)
         {
-            if (this.currentType == null || !node.Parent.IsKind(SyntaxKind.ClassDeclaration))
+            if (!node.Ancestors().Any(a => a.IsKind(SyntaxKind.ClassDeclaration) || a.IsKind(SyntaxKind.StructDeclaration)))
+            {
+                // Not nested, default is internal
+                if (!this.currentType.IsPublic() && !this.currentType.IsInternal())
+                {
+                    this.currentType.Modifiers.Add(Modifier.Internal);
+                }
+            }
+            else
+            {
+                // Nested, default is private
+                if (!this.currentType.IsPublic() && !this.currentType.IsInternal() && !this.currentType.IsPrivate() && !this.currentType.IsProtected())
+                {
+                    this.currentType.Modifiers.Add(Modifier.Private);
+                }
+            }
+        }
+
+        private void EnsureMemberDefaultAccessModifier(IHaveModifiers member)
+        {
+            // Default is private
+            if (!member.IsPublic() && !member.IsInternal() && !member.IsPrivate() && !member.IsProtected())
+            {
+                member.Modifiers.Add(Modifier.Private);
+            }
+        }
+
+        private bool ProcessedEmbeddedType(SyntaxNode node)
+        {
+            if (this.currentType == null || (!node.Parent.IsKind(SyntaxKind.ClassDeclaration) && !node.Parent.IsKind(SyntaxKind.StructDeclaration)))
             {
                 return false;
             }
@@ -198,6 +234,7 @@ namespace LivingDocumentation
         private void ExtractBaseMethodDeclaration(BaseMethodDeclarationSyntax node, IHaveAMethodBody method)
         {
             method.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            this.EnsureMemberDefaultAccessModifier(method);
 
             foreach (var parameter in node.ParameterList.Parameters)
             {

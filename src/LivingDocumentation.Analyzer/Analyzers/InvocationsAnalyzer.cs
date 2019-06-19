@@ -60,7 +60,7 @@ namespace LivingDocumentation
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (semanticModel.GetTypeInfo(node).Type.Kind == SymbolKind.ErrorType)
+            if (Program.RuntimeOptions.VerboseOutput && semanticModel.GetTypeInfo(node).Type.Kind == SymbolKind.ErrorType)
             {
                 Console.WriteLine("WARN: Could not resolve type of invocation of the following block:");
                 Console.WriteLine(node.ToFullString());

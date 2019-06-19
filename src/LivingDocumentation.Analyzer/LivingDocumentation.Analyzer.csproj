@@ -27,13 +27,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Buildalyzer.Workspaces" Version="2.3.0" />
     <PackageReference Include="CommandLineParser" Version="2.5.0" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.2.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj" />
     <ProjectReference Include="..\LivingDocumentation.Json\LivingDocumentation.Json.csproj" />
     <ProjectReference Include="..\LivingDocumentation.Statements\LivingDocumentation.Statements.csproj" />
   </ItemGroup>
