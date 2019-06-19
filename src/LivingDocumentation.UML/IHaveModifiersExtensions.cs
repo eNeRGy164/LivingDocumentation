@@ -4,17 +4,17 @@
     { 
         public static char ToUmlVisibility(this IHaveModifiers modifiers)
         {
-            if (modifiers.IsPublic)
+            if (modifiers.IsPublic())
             {
                 return '+';
             }
 
-            if (modifiers.IsInternal)
+            if (modifiers.IsInternal())
             {
                 return '~';
             }
 
-            if (modifiers.IsProtected)
+            if (modifiers.IsProtected())
             {
                 return '#';
             }

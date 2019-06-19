@@ -237,7 +237,7 @@ namespace LivingDocumentation.eShopOnContainers
                             }
                             else
                             {
-                                if (types.GetInvokedMethod(invokedMethod).First().IsPublic)
+                                if (types.GetInvokedMethod(invokedMethod).First().IsPublic())
                                 {
                                     stringBuilder.AppendLine($"H->{containingType.Name}:{invokedMethod.Name.FormatForDiagram()}");
                                 }

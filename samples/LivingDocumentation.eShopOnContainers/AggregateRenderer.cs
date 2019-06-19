@@ -48,7 +48,7 @@ namespace LivingDocumentation.eShopOnContainers
         {
             StringBuilder stringBuilder = new StringBuilder();
 
-            if (type.IsAbstract) stringBuilder.Append("abstract ");
+            if (type.IsAbstract()) stringBuilder.Append("abstract ");
             if (type.IsEnumeration())
             {
                 stringBuilder.Append("enum");
@@ -70,12 +70,12 @@ namespace LivingDocumentation.eShopOnContainers
             }
             else
             {
-                foreach (var property in type.Properties.Where(p => !p.IsPrivate))
+                foreach (var property in type.Properties.Where(p => !p.IsPrivate()))
                 {
                     property.RenderProperty(stringBuilder);
                 }
 
-                foreach (var method in type.Methods.Where(m => !m.IsPrivate))
+                foreach (var method in type.Methods.Where(m => !m.IsPrivate()))
                 {
                     method.RenderMethod(stringBuilder);
                 }

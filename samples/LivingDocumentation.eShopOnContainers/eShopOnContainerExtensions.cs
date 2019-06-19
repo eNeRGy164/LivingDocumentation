@@ -122,7 +122,7 @@ namespace LivingDocumentation.eShopOnContainers
 
         public static void RenderProperty(this PropertyDescription property, StringBuilder stringBuilder)
         {
-            if (property.IsStatic) stringBuilder.Append("{static} ");
+            if (property.IsStatic()) stringBuilder.Append("{static} ");
             stringBuilder.Append(property.ToUmlVisibility());
             stringBuilder.AppendLine(property.Name);
         }
@@ -139,7 +139,7 @@ namespace LivingDocumentation.eShopOnContainers
 
         public static void RenderMethod(this MethodDescription method, StringBuilder stringBuilder)
         {
-            if (method.IsStatic) stringBuilder.Append("{static} ");
+            if (method.IsStatic()) stringBuilder.Append("{static} ");
             stringBuilder.Append(method.ToUmlVisibility());
             stringBuilder.Append(method.Name);
             stringBuilder.Append('(');

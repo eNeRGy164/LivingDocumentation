@@ -37,20 +37,6 @@ namespace LivingDocumentation
         public string Namespace => this.FullName.Substring(0, Math.Max(this.FullName.LastIndexOf('.'), 0)).Trim('.');
 
         [JsonIgnore]
-        public bool IsStatic => this.Modifiers.Contains("static");
-
-        public bool IsPublic => this.Modifiers.Contains("public");
-
-        public bool IsInternal => this.Modifiers.Contains("internal");
-
-        public bool IsProtected => this.Modifiers.Contains("protected");
-
-        public bool IsPrivate => !this.IsPublic && !this.IsInternal;
-
-        [JsonIgnore]
-        public bool IsAbstract => this.Modifiers.Contains("abstract");
-
-        [JsonIgnore]
         private IEnumerable<MemberDescription> Members => this.AllMembers.Where(m => !m.IsInherited);
 
         [JsonIgnore]

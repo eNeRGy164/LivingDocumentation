@@ -12,4 +12,8 @@
     <NeutralLanguage>English (United States)</NeutralLanguage>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LivingDocumentation.Abstractions\LivingDocumentation.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
