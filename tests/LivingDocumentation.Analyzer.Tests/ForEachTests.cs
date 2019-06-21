@@ -8,53 +8,21 @@ using FluentAssertions;
 namespace LivingDocumentation.Analyzer.Tests
 {
     [TestClass]
-    public class StructModifierTests
+    public class ForEachTests
     {
         [TestMethod]
-        public void StructWithoutModifier_Should_HaveDefaultInternalModifier()
+        public void ForEach_Should_BeDetected()
         {
             // Assign
             var source = @"
-            struct Test
+            class Test
             {
-            }
-            ";
-
-            // Act
-            var types = VisitSyntaxTree(source);
-
-            // Assert
-            types[0].Modifiers.Should().HaveCount(1);
-            types[0].Modifiers.Should().Contain("internal");
-        }
-
-        [TestMethod]
-        public void PublicStruct_Should_HavePublicModifier()
-        {
-            // Assign
-            var source = @"
-            public struct Test
-            {
-            }
-            ";
-
-            // Act
-            var types = VisitSyntaxTree(source);
-
-            // Assert
-            types[0].Modifiers.Should().HaveCount(1);
-            types[0].Modifiers.Should().Contain("public");
-        }
-
-        [TestMethod]
-        public void NestedClassWithoutModifier_Should_HaveDefaultPrivateModifier()
-        {
-            // Assign
-            var source = @"
-            struct Test
-            {
-                struct NestedTest
+                void Method()
                 {
+                    var items = new string[0];
+                    foreach (var item in items)
+                    {
+                    }
                 }
             }
             ";
@@ -63,19 +31,23 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[1].Modifiers.Should().HaveCount(1);
-            types[1].Modifiers.Should().Contain("private");
+            types[0].Methods[0].Statements[0].Should().BeOfType<ForEach>();
         }
 
         [TestMethod]
-        public void NestedPublicStruct_Should_HavePublicModifier()
+        public void ForEachStatements_Should_BeParsed()
         {
             // Assign
             var source = @"
-            struct Test
+            class Test
             {
-                public struct NestedTest
+                void Method()
                 {
+                    var items = new string[0];
+                    foreach (var item in items)
+                    {
+                        var o = new System.Object();
+                    }
                 }
             }
             ";
@@ -84,8 +56,8 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[1].Modifiers.Should().HaveCount(1);
-            types[1].Modifiers.Should().Contain("public");
+            var forEach = types[0].Methods[0].Statements[0];
+            forEach.Statements.Should().HaveCount(1);
         }
 
         private static IReadOnlyList<TypeDescription> VisitSyntaxTree(string source)
