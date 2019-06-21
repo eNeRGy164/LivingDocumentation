@@ -58,6 +58,12 @@ namespace LivingDocumentation
             branchingAnalyzer.Visit(node);
         }
 
+        public override void VisitForEachStatement(ForEachStatementSyntax node)
+        {
+            var loopingAnalyzer = new LoopingAnalyzer(semanticModel, statements);
+            loopingAnalyzer.Visit(node);
+        }
+
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             if (Program.RuntimeOptions.VerboseOutput && semanticModel.GetTypeInfo(node).Type.Kind == SymbolKind.ErrorType)
