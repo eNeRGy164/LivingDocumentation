@@ -24,8 +24,8 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types.First().Modifiers.Should().HaveCount(1);
-            types.First().Modifiers.Should().Contain("internal");
+            types[0].Modifiers.Should().HaveCount(1);
+            types[0].Modifiers.Should().Contain("internal");
         }
 
         [TestMethod]
@@ -42,8 +42,8 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types.First().Modifiers.Should().HaveCount(1);
-            types.First().Modifiers.Should().Contain("public");
+            types[0].Modifiers.Should().HaveCount(1);
+            types[0].Modifiers.Should().Contain("public");
         }
 
         [TestMethod]
@@ -60,8 +60,8 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types.First().Modifiers.Should().HaveCountGreaterThan(1);
-            types.First().Modifiers.Should().Contain("static");
+            types[0].Modifiers.Should().HaveCountGreaterThan(1);
+            types[0].Modifiers.Should().Contain("static");
         }
 
         [TestMethod]
@@ -81,8 +81,8 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types.Last().Modifiers.Should().HaveCount(1);
-            types.Last().Modifiers.Should().Contain("private");
+            types[1].Modifiers.Should().HaveCount(1);
+            types[1].Modifiers.Should().Contain("private");
         }
 
         [TestMethod]
@@ -102,13 +102,13 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types.Last().Modifiers.Should().HaveCount(1);
-            types.Last().Modifiers.Should().Contain("public");
+            types[1].Modifiers.Should().HaveCount(1);
+            types[1].Modifiers.Should().Contain("public");
         }
 
         private static IReadOnlyList<TypeDescription> VisitSyntaxTree(string source)
         {
-            source.Should().NotBeNull();
+            source.Should().NotBeNullOrWhiteSpace("without source code there is nothing to test");
 
             var syntaxTree = CSharpSyntaxTree.ParseText(source.Trim());
             var compilation = CSharpCompilation.Create("Test")
@@ -117,7 +117,7 @@ namespace LivingDocumentation.Analyzer.Tests
                                                .AddSyntaxTrees(syntaxTree);
 
             var diagnostics = compilation.GetDiagnostics();
-            diagnostics.Should().HaveCount(0);
+            diagnostics.Should().HaveCount(0, "there shoudn't be any compile errors");
 
             var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
