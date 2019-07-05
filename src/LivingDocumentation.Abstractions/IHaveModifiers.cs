@@ -1,9 +1,10 @@
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace LivingDocumentation
 {
     public interface IHaveModifiers
     {
-        List<string> Modifiers { get; }
+        [JsonProperty(Order = -2)]
+        Modifier Modifiers { get; set; }
     }
 }

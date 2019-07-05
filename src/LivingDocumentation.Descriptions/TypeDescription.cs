@@ -1,14 +1,30 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 
 namespace LivingDocumentation
 {
-    [DebuggerDisplay("{Type} {Name} ({Namespace})")]
+    [DebuggerDisplay("{Type} {Name,nq} ({Namespace,nq})")]
     public class TypeDescription : IHaveModifiers
     {
+
+        [JsonProperty(Order = 1, PropertyName = nameof(Fields), DefaultValueHandling = DefaultValueHandling.Include)]
+        private readonly List<FieldDescription> fields = new List<FieldDescription>();
+
+        [JsonProperty(Order = 2, PropertyName = nameof(Constructors), DefaultValueHandling = DefaultValueHandling.Include)]
+        private readonly List<ConstructorDescription> constructors = new List<ConstructorDescription>();
+
+        [JsonProperty(Order = 3, PropertyName = nameof(Properties), DefaultValueHandling = DefaultValueHandling.Include)]
+        private readonly List<PropertyDescription> properties = new List<PropertyDescription>();
+
+        [JsonProperty(Order = 4, PropertyName = nameof(Methods), DefaultValueHandling = DefaultValueHandling.Include)]
+        private readonly List<MethodDescription> methods = new List<MethodDescription>();
+
+        [JsonProperty(Order = 5, PropertyName = nameof(EnumMembers), DefaultValueHandling = DefaultValueHandling.Include)]
+        private readonly List<EnumMemberDescription> enumMembers = new List<EnumMemberDescription>();
+
         public TypeDescription(TypeType type, string fullName)
         {
             this.Type = type;
@@ -23,43 +39,59 @@ namespace LivingDocumentation
 
         public List<string> BaseTypes { get; } = new List<string>();
 
-        public List<string> Modifiers { get; } = new List<string>();
+        [DefaultValue(Modifier.Internal)]
+        public Modifier Modifiers { get; set; }
 
         public List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
 
-        [JsonProperty]
-        private List<MemberDescription> AllMembers { get; } = new List<MemberDescription>();
+        [JsonIgnore]
+        public string Name => this.FullName.Substring(Math.Min(this.FullName.LastIndexOf('.') + 1, this.FullName.Length)).ToString();
 
         [JsonIgnore]
-        public string Name => this.FullName.Substring(Math.Max(0, this.FullName.LastIndexOf('.'))).Trim('.');
+        public string Namespace => this.FullName.Substring(0, Math.Max(this.FullName.LastIndexOf('.'), 0));
 
         [JsonIgnore]
-        public string Namespace => this.FullName.Substring(0, Math.Max(this.FullName.LastIndexOf('.'), 0)).Trim('.');
+        public IReadOnlyList<ConstructorDescription> Constructors => this.constructors;
 
         [JsonIgnore]
-        private IEnumerable<MemberDescription> Members => this.AllMembers.Where(m => !m.IsInherited);
+        public IReadOnlyList<PropertyDescription> Properties => this.properties;
 
         [JsonIgnore]
-        private IEnumerable<MemberDescription> InheritedMembers => this.AllMembers.Where(m => m.IsInherited);
+        public IReadOnlyList<MethodDescription> Methods => this.methods;
 
         [JsonIgnore]
-        public IReadOnlyList<ConstructorDescription> Constructors => this.Members.OfType<ConstructorDescription>().ToList();
+        public IReadOnlyList<FieldDescription> Fields => this.fields;
 
         [JsonIgnore]
-        public IReadOnlyList<PropertyDescription> Properties => this.Members.OfType<PropertyDescription>().ToList();
-
-        [JsonIgnore]
-        public IReadOnlyList<MethodDescription> Methods => this.Members.OfType<MethodDescription>().ToList();
-
-        [JsonIgnore]
-        public IReadOnlyList<FieldDescription> Fields => this.Members.OfType<FieldDescription>().ToList();
-
-        [JsonIgnore]
-        public IReadOnlyList<EnumMemberDescription> EnumMembers => this.Members.OfType<EnumMemberDescription>().ToList();
+        public IReadOnlyList<EnumMemberDescription> EnumMembers => this.enumMembers;
 
         public void AddMember(MemberDescription member)
         {
-            this.AllMembers.Add(member);
+            switch (member)
+            {
+                case ConstructorDescription c:
+                    this.constructors.Add(c);
+                    break;
+
+                case FieldDescription f:
+                    this.fields.Add(f);
+                    break;
+
+                case PropertyDescription p:
+                    this.properties.Add(p);
+                    break;
+
+                case MethodDescription m:
+                    this.methods.Add(m);
+                    break;
+
+                case EnumMemberDescription e:
+                    this.enumMembers.Add(e);
+                    break;
+
+                default:
+                    throw new NotSupportedException($"Unable to add {member.GetType()} as member");
+            }
         }
 
         public override bool Equals(object obj)

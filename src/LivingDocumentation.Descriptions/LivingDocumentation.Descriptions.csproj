@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <TargetFramework>netstandard1.1</TargetFramework>
     <RootNamespace>LivingDocumentation</RootNamespace>
     
     <Version>0.1.0</Version>
@@ -13,6 +13,10 @@
     <PackageTags>Living Documentation LivingDocumentation Roslyn UML Generation</PackageTags>
     <NeutralLanguage>English (United States)</NeutralLanguage>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.3" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LivingDocumentation.Abstractions\LivingDocumentation.Abstractions.csproj" />

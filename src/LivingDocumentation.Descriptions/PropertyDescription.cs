@@ -1,9 +1,10 @@
 using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace LivingDocumentation
 {
-    [DebuggerDisplay("Property {Type} {Name}")]
+    [DebuggerDisplay("Property {Type,nq} {Name,nq}")]
     public class PropertyDescription : MemberDescription
     {
         public string Type { get; }
@@ -13,8 +14,10 @@ namespace LivingDocumentation
         [JsonIgnore]
         public bool HasInitializer => this.Initializer != null;
 
+        public override MemberType MemberType => MemberType.Property;
+
         public PropertyDescription(string type, string name)
-            : base(MemberType.Property, name)
+            : base(name)
         {
             this.Type = type;
         }

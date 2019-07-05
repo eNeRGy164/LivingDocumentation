@@ -1,23 +1,26 @@
-﻿namespace LivingDocumentation
+﻿using System;
+
+namespace LivingDocumentation
 {
-    public static class Modifier
+    [Flags]
+    public enum Modifier
     {
-        public const string Public = "public";
+        Internal = 0000_0000_0001,
 
-        public const string Static = "static";
+        Public = 0000_0000_0010,
 
-        public const string Internal = "internal";
+        Private = 0000_0000_0100,
 
-        public const string Protected = "protected";
+        Protected = 0000_0000_1000,
 
-        public const string Abstract = "abstract";
+        Static = 0000_0001_0000,
 
-        public const string Private = "private";
+        Abstract = 0000_0010_0000,
 
-        public const string Async = "async";
+        Override = 0000_0100_0000,
 
-        public const string Override = "override";
+        Readonly = 0000_1000_0000,
 
-        public const string Readonly = "readonly";
+        Async = 0001_0000_0000,
     }
 }
