@@ -5,22 +5,22 @@ namespace LivingDocumentation
     [Flags]
     public enum Modifier
     {
-        Internal = 0000_0000_0001,
+        Internal = 1 << 0,
 
-        Public = 0000_0000_0010,
+        Public = 1 << 1,
 
-        Private = 0000_0000_0100,
+        Private = 1 << 2,
 
-        Protected = 0000_0000_1000,
+        Protected = 1 << 3,
 
-        Static = 0000_0001_0000,
+        Static = 1 << 4,
 
-        Abstract = 0000_0010_0000,
+        Abstract = 1 << 5,
 
-        Override = 0000_0100_0000,
+        Override = 1 << 6,
 
-        Readonly = 0000_1000_0000,
+        Readonly = 1 << 7,
 
-        Async = 0001_0000_0000,
+        Async = 1 << 8,
     }
 }

@@ -24,8 +24,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[0].Modifiers.Should().HaveCount(1);
-            types[0].Modifiers.Should().Contain("internal");
+            types[0].Modifiers.Should().Be(Modifier.Internal);
         }
 
         [TestMethod]
@@ -42,8 +41,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[0].Modifiers.Should().HaveCount(1);
-            types[0].Modifiers.Should().Contain("public");
+            types[0].Modifiers.Should().Be(Modifier.Public);
         }
 
         [TestMethod]
@@ -60,8 +58,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[0].Modifiers.Should().HaveCountGreaterThan(1);
-            types[0].Modifiers.Should().Contain("static");
+            types[0].Modifiers.Should().HaveFlag(Modifier.Static);
         }
 
         [TestMethod]
@@ -81,8 +78,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[1].Modifiers.Should().HaveCount(1);
-            types[1].Modifiers.Should().Contain("private");
+            types[1].Modifiers.Should().Be(Modifier.Private);
         }
 
         [TestMethod]
@@ -102,8 +98,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[1].Modifiers.Should().HaveCount(1);
-            types[1].Modifiers.Should().Contain("public");
+            types[1].Modifiers.Should().Be(Modifier.Public);
         }
 
         private static IReadOnlyList<TypeDescription> VisitSyntaxTree(string source)
