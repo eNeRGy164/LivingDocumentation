@@ -64,7 +64,7 @@ namespace LivingDocumentation
             var fieldDescription = new FieldDescription(semanticModel.GetTypeDisplayString(node.Declaration.Type), node.Declaration.Variables.First().Identifier.ValueText);
             this.currentType.AddMember(fieldDescription);
 
-            fieldDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureMemberDefaultAccessModifier(fieldDescription);
 
             fieldDescription.Initializer = node.Declaration.Variables.First().Initializer?.Value.ToString(); // Assumption: Field has only a single initializer
@@ -78,7 +78,7 @@ namespace LivingDocumentation
             var propertyDescription = new PropertyDescription(semanticModel.GetTypeDisplayString(node.Type), node.Identifier.ToString());
             this.currentType.AddMember(propertyDescription);
 
-            propertyDescription.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            propertyDescription.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureMemberDefaultAccessModifier(propertyDescription);
 
             propertyDescription.Initializer = node.Initializer?.Value.ToString();
@@ -92,7 +92,7 @@ namespace LivingDocumentation
             var enumMemberDescription = new EnumMemberDescription(node.Identifier.ToString(), node.EqualsValue?.Value.ToString());
             this.currentType.AddMember(enumMemberDescription);
 
-            enumMemberDescription.Modifiers.Add(Modifier.Public);
+            enumMemberDescription.Modifiers |= Modifier.Public;
             enumMemberDescription.Documentation = ExtractDocumentation(node);
 
             base.VisitEnumMemberDeclaration(node);
@@ -131,7 +131,7 @@ namespace LivingDocumentation
                 this.currentType.BaseTypes.AddRange(node.BaseList.Types.Select(t => semanticModel.GetTypeDisplayString(t.Type)));
             }
 
-            this.currentType.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            this.currentType.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureTypeDefaultAccessModifier(node);
 
             this.currentType.Documentation = ExtractDocumentation(node);
@@ -149,7 +149,7 @@ namespace LivingDocumentation
                 // Not nested, default is internal
                 if (!this.currentType.IsPublic() && !this.currentType.IsInternal())
                 {
-                    this.currentType.Modifiers.Add(Modifier.Internal);
+                    this.currentType.Modifiers |= Modifier.Internal;
                 }
             }
             else
@@ -157,7 +157,7 @@ namespace LivingDocumentation
                 // Nested, default is private
                 if (!this.currentType.IsPublic() && !this.currentType.IsInternal() && !this.currentType.IsPrivate() && !this.currentType.IsProtected())
                 {
-                    this.currentType.Modifiers.Add(Modifier.Private);
+                    this.currentType.Modifiers |= Modifier.Private;
                 }
             }
         }
@@ -167,7 +167,7 @@ namespace LivingDocumentation
             // Default is private
             if (!member.IsPublic() && !member.IsInternal() && !member.IsPrivate() && !member.IsProtected())
             {
-                member.Modifiers.Add(Modifier.Private);
+                member.Modifiers |= Modifier.Private;
             }
         }
 
@@ -233,7 +233,7 @@ namespace LivingDocumentation
 
         private void ExtractBaseMethodDeclaration(BaseMethodDeclarationSyntax node, IHaveAMethodBody method)
         {
-            method.Modifiers.AddRange(node.Modifiers.Select(m => m.ValueText));
+            method.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureMemberDefaultAccessModifier(method);
 
             foreach (var parameter in node.ParameterList.Parameters)
@@ -246,6 +246,11 @@ namespace LivingDocumentation
 
             var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, method.Statements);
             invocationAnalyzer.Visit((SyntaxNode)node.Body ?? node.ExpressionBody);
+        }
+
+        private static Modifier ParseModifiers(SyntaxTokenList modifiers)
+        {
+            return (Modifier)modifiers.Select(m => Enum.TryParse(typeof(Modifier), m.ValueText, true, out var value) ? (int)value : 0).Sum();
         }
     }
 }

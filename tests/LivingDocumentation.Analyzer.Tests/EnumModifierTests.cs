@@ -24,8 +24,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[0].Modifiers.Should().HaveCount(1);
-            types[0].Modifiers.Should().Contain("internal");
+            types[0].Modifiers.Should().Be(Modifier.Internal);
         }
 
         [TestMethod]
@@ -42,8 +41,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[0].Modifiers.Should().HaveCount(1);
-            types[0].Modifiers.Should().Contain("public");
+            types[0].Modifiers.Should().Be(Modifier.Public);
         }
 
         [TestMethod]
@@ -61,8 +59,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var types = VisitSyntaxTree(source);
 
             // Assert
-            types[0].EnumMembers[0].Modifiers.Should().HaveCount(1);
-            types[0].EnumMembers[0].Modifiers.Should().Contain("public");
+            types[0].EnumMembers[0].Modifiers.Should().Be(Modifier.Public);
         }
 
         private static IReadOnlyList<TypeDescription> VisitSyntaxTree(string source)

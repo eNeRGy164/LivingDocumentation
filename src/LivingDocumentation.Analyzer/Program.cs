@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Buildalyzer;
+using Buildalyzer.Workspaces;
 using CommandLine;
-using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.MSBuild;
 using Newtonsoft.Json;
 
 namespace LivingDocumentation
@@ -66,44 +66,43 @@ namespace LivingDocumentation
 
         private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)
         {
-            MSBuildLocator.RegisterDefaults();
+            var manager = new AnalyzerManager(solutionFile);
+            var workspace = manager.GetWorkspace();
+            var assembliesInSolution = workspace.CurrentSolution.Projects.Select(p => p.AssemblyName).ToList();
 
-            using (var workspace = MSBuildWorkspace.Create())
+            // Every project in the solution, except unit test projects
+            var projects = workspace.CurrentSolution.Projects
+                .Where(p => !manager.Projects.First(mp => p.Id.Id == mp.Value.ProjectGuid).Value.ProjectFile.PackageReferences.Any(pr => pr.Name.Contains("Test")));
+
+            foreach (var project in projects)
             {
-                var solution = await workspace.OpenSolutionAsync(solutionFile);
-                var assembliesInSolution = solution.Projects.Select(p => p.AssemblyName).ToList();
+                var compilation = await project.GetCompilationAsync();
+                var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
 
-                // Every project in the solution, except unit test projects
-                var projects = workspace.CurrentSolution.Projects.Where(p => !p.Name.Contains("Test", StringComparison.OrdinalIgnoreCase));
-
-                foreach (var project in projects)
+                if (RuntimeOptions.VerboseOutput)
                 {
-                    var compilation = await project.GetCompilationAsync();
-                    var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
-
-                    if (RuntimeOptions.VerboseOutput)
+                    var diagnostics = compilation.GetDiagnostics();
+                    if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
                     {
-                        var diagnostics = compilation.GetDiagnostics();
-                        if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+                        Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
+                        foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
                         {
-                            Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
-                            foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
-                            {
-                                Console.WriteLine("- " + diagnostic.ToString());
-                            }
+                            Console.WriteLine("- " + diagnostic.ToString());
                         }
                     }
+                }
 
-                    // Every file in the project
-                    foreach (var syntaxTree in compilation.SyntaxTrees)
-                    {
-                        var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
+                // Every file in the project
+                foreach (var syntaxTree in compilation.SyntaxTrees)
+                {
+                    var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
-                        var visitor = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
-                        visitor.Visit(syntaxTree.GetRoot());
-                    }
+                    var visitor = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
+                    visitor.Visit(syntaxTree.GetRoot());
                 }
             }
+
+            workspace.Dispose();
         }
     }
 }

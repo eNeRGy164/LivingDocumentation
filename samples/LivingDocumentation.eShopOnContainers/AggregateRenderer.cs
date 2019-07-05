@@ -27,6 +27,7 @@ namespace LivingDocumentation.eShopOnContainers
                 var stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine("@startuml");
                 stringBuilder.AppendLine("skinparam MinClassWidth 160");
+                stringBuilder.AppendLine("skinparam Linetype ortho");
                 stringBuilder.AppendLine($"namespace {aggregateName} <<aggregate>> {{");
 
                 var rootBuilder = this.RenderClass(aggregate);

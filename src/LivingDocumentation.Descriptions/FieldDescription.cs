@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace LivingDocumentation
 {
-    [DebuggerDisplay("Field {Type} {Name}")]
+    [DebuggerDisplay("Field {Type,nq} {Name,nq}")]
     public class FieldDescription : MemberDescription
     {
         public string Type { get; }
@@ -13,8 +13,10 @@ namespace LivingDocumentation
         [JsonIgnore]
         public bool HasInitializer => this.Initializer != null;
 
+        public override MemberType MemberType => MemberType.Field;
+
         public FieldDescription(string type, string name)
-            : base(MemberType.Field, name)
+            : base(name)
         {
             this.Type = type;
         }

@@ -4,10 +4,10 @@ namespace LivingDocumentation
 {
     public interface IMemberable : IHaveModifiers
     {
-        [JsonProperty(Order = 1)]
+        [JsonIgnore]
         MemberType MemberType { get; }
 
-        [JsonProperty(Order = 2)]
+        [JsonProperty(Order = -3)]
         string Name { get; }
 
         string Documentation { get; }

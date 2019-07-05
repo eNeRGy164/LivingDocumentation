@@ -263,4 +263,4 @@ paket-files/
 *.sln.iml
 pub/
 
-Properties/launchSettings.json
+**/launchSettings.json

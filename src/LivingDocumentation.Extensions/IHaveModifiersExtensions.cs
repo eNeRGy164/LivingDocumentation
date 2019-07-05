@@ -4,47 +4,47 @@
     {
         public static bool IsStatic(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Static);
+            return (iHaveModifiers.Modifiers & Modifier.Static) == Modifier.Static;
         }
 
         public static bool IsPublic(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Public);
+            return (iHaveModifiers.Modifiers & Modifier.Public) == Modifier.Public;
         }
 
         public static bool IsInternal(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Internal);
+            return (iHaveModifiers.Modifiers & Modifier.Internal) == Modifier.Internal;
         }
 
         public static bool IsProtected(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Protected);
+            return (iHaveModifiers.Modifiers & Modifier.Protected) == Modifier.Protected;
         }
 
         public static bool IsAbstract(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Abstract);
+            return (iHaveModifiers.Modifiers & Modifier.Abstract) == Modifier.Abstract;
         }
 
         public static bool IsPrivate(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Private);
+            return (iHaveModifiers.Modifiers & Modifier.Private) == Modifier.Private;
         }
 
         public static bool IsAsync(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Async);
+            return (iHaveModifiers.Modifiers & Modifier.Async) == Modifier.Async;
         }
 
         public static bool IsOverride(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Override);
+            return (iHaveModifiers.Modifiers & Modifier.Override) == Modifier.Override;
         }
 
         public static bool IsReadonly(this IHaveModifiers iHaveModifiers)
         {
-            return iHaveModifiers.Modifiers.Contains(Modifier.Readonly);
+            return (iHaveModifiers.Modifiers & Modifier.Readonly) == Modifier.Readonly;
         }
     }
 }
