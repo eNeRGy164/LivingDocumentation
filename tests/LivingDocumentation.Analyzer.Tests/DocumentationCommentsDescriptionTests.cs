@@ -48,13 +48,13 @@ namespace LivingDocumentation.Analyzer.Tests
         }
 
         [TestMethod]
-        public void DefaultDocumentationCode_Should_NotBeNull()
+        public void DefaultDocumentationExample_Should_NotBeNull()
         {
             // Assign
             var documentation = new DocumentationCommentsDescription();
 
             // Assert
-            documentation.Code.Should().NotBeNull();
+            documentation.Example.Should().NotBeNull();
         }
     }
 }

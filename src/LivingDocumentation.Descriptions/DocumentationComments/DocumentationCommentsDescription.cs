@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -14,27 +15,29 @@ namespace LivingDocumentation
         private static readonly Regex MemberIdPrefix = new Regex("^[NTFPME\\!]:", RegexOptions.ECMAScript);
 
         [DefaultValue("")]
-        public string Summary { get; set; } = string.Empty;
+        public string Example { get; set; } = string.Empty;
 
         [DefaultValue("")]
         public string Remarks { get; set; } = string.Empty;
 
         [DefaultValue("")]
-        public string Value { get; set; } = string.Empty;
-
-        [DefaultValue("")]
-        public string Code { get; set; } = string.Empty;
-
-        [DefaultValue("")]
         public string Returns { get; set; } = string.Empty;
 
-        public IDictionary<string, string> Permission { get; set; } = new Dictionary<string, string>();
+        [DefaultValue("")]
+        public string Summary { get; set; } = string.Empty;
 
-        public IDictionary<string, string> Param { get; set; } = new Dictionary<string, string>();
+        [DefaultValue("")]
+        public string Value { get; set; } = string.Empty;
 
-        public IDictionary<string, string> SeeAlso { get; set; } = new Dictionary<string, string>();
+        public IDictionary<string, string> Exceptions { get; set; } = new Dictionary<string, string>();
 
-        public IDictionary<string, string> TypeParam { get; set; } = new Dictionary<string, string>();
+        public IDictionary<string, string> Permissions { get; set; } = new Dictionary<string, string>();
+
+        public IDictionary<string, string> Params { get; set; } = new Dictionary<string, string>();
+
+        public IDictionary<string, string> SeeAlsos { get; set; } = new Dictionary<string, string>();
+
+        public IDictionary<string, string> TypeParams { get; set; } = new Dictionary<string, string>();
 
         public static DocumentationCommentsDescription Parse(string documentationCommentXml)
         {
@@ -44,17 +47,57 @@ namespace LivingDocumentation
                 return null;
             }
 
-            var documentation = new DocumentationCommentsDescription();
-
             var element = XElement.Parse(documentationCommentXml);
 
-            documentation.Code = documentation.ParseSection(element.Element("code"));
-            documentation.Remarks = documentation.ParseSection(element.Element("remarks"));
-            documentation.Returns = documentation.ParseSection(element.Element("returns"));
-            documentation.Summary = documentation.ParseSection(element.Element("summary"));
-            documentation.Value = documentation.ParseSection(element.Element("value"));
+            var documentation = new DocumentationCommentsDescription();
+
+            documentation.Example = documentation.ParseSection(element.Element(Section.Example));
+            documentation.Remarks = documentation.ParseSection(element.Element(Section.Remarks));
+            documentation.Returns = documentation.ParseSection(element.Element(Section.Returns));
+            documentation.Summary = documentation.ParseSection(element.Element(Section.Summary));
+            documentation.Value = documentation.ParseSection(element.Element(Section.Value));
+
+            documentation.ParseSection(element.Elements(Section.Exception));
+            documentation.ParseSection(element.Elements(Section.Param));
+            documentation.ParseSection(element.Elements(Section.Permission));
+            documentation.ParseSection(element.Elements(Section.SeeAlso));
+            documentation.ParseSection(element.Elements(Section.TypeParam));
 
             return documentation;
+        }
+
+        private void ParseSection(IEnumerable<XElement> sections)
+        {
+            if (sections == null || !sections.Any())
+            {
+                return;
+            }
+
+            foreach (var section in sections)
+            {
+                switch (section.Name.LocalName)
+                {
+                    case Section.Exception when !string.IsNullOrWhiteSpace(section.Attribute(Argument.CRef).Value):
+                        this.Exceptions.Add(StripIDPrefix(section.Attribute(Argument.CRef).Value), this.ParseSection(section));
+                        break;
+
+                    case Section.Param when !string.IsNullOrWhiteSpace(section.Attribute(Argument.Name).Value):
+                        this.Params.Add(StripIDPrefix(section.Attribute(Argument.Name).Value), this.ParseSection(section));
+                        break;
+
+                    case Section.Permission when !string.IsNullOrWhiteSpace(section.Attribute(Argument.CRef).Value):
+                        this.Permissions.Add(StripIDPrefix(section.Attribute(Argument.CRef).Value), this.ParseSection(section));
+                        break;
+
+                    case Section.SeeAlso when !string.IsNullOrWhiteSpace(section.Attribute(Argument.CRef).Value):
+                        this.ProcessSeeAlsoTag(section);
+                        break;
+
+                    case Section.TypeParam when !string.IsNullOrWhiteSpace(section.Attribute(Argument.Name).Value):
+                        this.TypeParams.Add(StripIDPrefix(section.Attribute(Argument.Name).Value), this.ParseSection(section));
+                        break;
+                }
+            }
         }
 
         private string ParseSection(XElement section)
@@ -82,12 +125,16 @@ namespace LivingDocumentation
                         ProcessInlineContent(contents, element.Value);
                         break;
 
-                    case XElement element when element.Name == Inline.ParamRef || element.Name == Inline.TypeParamRef:
-                        ProcessInlineContent(contents, this.StripIDPrefix(element.Attribute(Argument.Name)?.Value));
+                    case XElement element when (element.Name == Inline.ParamRef || element.Name == Inline.TypeParamRef) && element.Attribute(Argument.Name) != null:
+                        ProcessInlineContent(contents, StripIDPrefix(element.Attribute(Argument.Name).Value));
                         break;
 
                     case XElement element when element.Name == Inline.See:
-                        ProcessInlineContent(contents, element.IsEmpty ? this.StripIDPrefix(element.Attribute(Argument.CRef)?.Value) : element.Value);
+                        ProcessInlineContent(contents, element.IsEmpty ? StripIDPrefix(element.Attribute(Argument.CRef)?.Value) : element.Value);
+                        break;
+
+                    case XElement element when element.Name == Section.SeeAlso:
+                        this.ProcessSeeAlsoTag(element);
                         break;
 
                     case XElement element when !element.IsEmpty:
@@ -120,7 +167,20 @@ namespace LivingDocumentation
             stringBuilder.Append('\n');
         }
 
-        private string StripIDPrefix(string value)
+        private void ProcessSeeAlsoTag(XElement element)
+        {
+            var key = StripIDPrefix(element.Attribute(Argument.CRef).Value);
+
+            var contents = new StringBuilder();
+
+            ProcessInlineContent(contents, element.Value);
+
+            var value = contents.ToString().Trim();
+
+            this.SeeAlsos.Add(key, !string.IsNullOrEmpty(value) ? value : key);
+        }
+
+        private static string StripIDPrefix(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {

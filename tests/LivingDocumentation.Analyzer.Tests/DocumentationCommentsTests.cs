@@ -18,9 +18,9 @@ namespace LivingDocumentation.Analyzer.Tests
             /// <remarks>
             /// This is a remark.
             /// </remarks>
-            /// <code>
-            /// This is code.
-            /// </code>
+            /// <example>
+            /// This is an example.
+            /// </example>
             class Test
             {
             }
@@ -34,7 +34,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].DocumentationComments.Summary.Should().Be("This is a Test Class.");
                 types[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].DocumentationComments.Example.Should().Be("This is an example.");
             }
         }
 
@@ -51,9 +51,9 @@ namespace LivingDocumentation.Analyzer.Tests
                 /// <remarks>
                 /// This is a remark.
                 /// </remarks>
-                /// <code>
-                /// This is code.
-                /// </code>
+                /// <example>
+                /// This is an example.
+                /// </example>
                 /// <value>
                 /// This is the value.
                 /// </value>
@@ -71,7 +71,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].Events[0].DocumentationComments.Summary.Should().Be("This is a Test Event.");
                 types[0].Events[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Events[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Events[0].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Events[0].DocumentationComments.Value.Should().Be("This is the value.");
             }
         }
@@ -89,9 +89,9 @@ namespace LivingDocumentation.Analyzer.Tests
                 /// <remarks>
                 /// This is a remark.
                 /// </remarks>
-                /// <code>
-                /// This is code.
-                /// </code>
+                /// <example>
+                /// This is an example.
+                /// </example>
                 /// <value>
                 /// This is the value.
                 /// </value>
@@ -109,12 +109,12 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].Events[0].DocumentationComments.Summary.Should().Be("These are Test Events.");
                 types[0].Events[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Events[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Events[0].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Events[0].DocumentationComments.Value.Should().Be("This is the value.");
 
                 types[0].Events[1].DocumentationComments.Summary.Should().Be("These are Test Events.");
                 types[0].Events[1].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Events[1].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Events[1].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Events[1].DocumentationComments.Value.Should().Be("This is the value.");
             }
         }
@@ -132,9 +132,9 @@ namespace LivingDocumentation.Analyzer.Tests
                 /// <remarks>
                 /// This is a remark.
                 /// </remarks>
-                /// <code>
-                /// This is code.
-                /// </code>
+                /// <example>
+                /// This is an example.
+                /// </example>
                 /// <value>
                 /// This is the value.
                 /// </value>
@@ -150,7 +150,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].Fields[0].DocumentationComments.Summary.Should().Be("This is a Test Field.");
                 types[0].Fields[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Fields[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Fields[0].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Fields[0].DocumentationComments.Value.Should().Be("This is the value.");
             }
         }
@@ -168,9 +168,9 @@ namespace LivingDocumentation.Analyzer.Tests
                 /// <remarks>
                 /// This is a remark.
                 /// </remarks>
-                /// <code>
-                /// This is code.
-                /// </code>
+                /// <example>
+                /// This is an example.
+                /// </example>
                 /// <value>
                 /// This is the value.
                 /// </value>
@@ -186,12 +186,12 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].Fields[0].DocumentationComments.Summary.Should().Be("These are Test Fields.");
                 types[0].Fields[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Fields[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Fields[0].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Fields[0].DocumentationComments.Value.Should().Be("This is the value.");
 
                 types[0].Fields[1].DocumentationComments.Summary.Should().Be("These are Test Fields.");
                 types[0].Fields[1].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Fields[1].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Fields[1].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Fields[1].DocumentationComments.Value.Should().Be("This is the value.");
             }
         }
@@ -207,9 +207,9 @@ namespace LivingDocumentation.Analyzer.Tests
             /// <remarks>
             /// This is a remark.
             /// </remarks>
-            /// <code>
-            /// This is code.
-            /// </code>
+            /// <example>
+            /// This is an example.
+            /// </example>
             interface Test
             {
             }
@@ -223,7 +223,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].DocumentationComments.Summary.Should().Be("This is a Test Interface.");
                 types[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].DocumentationComments.Example.Should().Be("This is an example.");
             }
         }
 
@@ -238,9 +238,9 @@ namespace LivingDocumentation.Analyzer.Tests
             /// <remarks>
             /// This is a remark.
             /// </remarks>
-            /// <code>
-            /// This is code.
-            /// </code>
+            /// <example>
+            /// This is an example.
+            /// </example>
             enum Test
             {
             }
@@ -254,7 +254,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].DocumentationComments.Summary.Should().Be("This is a Test Enum.");
                 types[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].DocumentationComments.Example.Should().Be("This is an example.");
             }
         }
 
@@ -269,9 +269,9 @@ namespace LivingDocumentation.Analyzer.Tests
             /// <remarks>
             /// This is a remark.
             /// </remarks>
-            /// <code>
-            /// This is code.
-            /// </code>
+            /// <example>
+            /// This is an example.
+            /// </example>
             struct Test
             {
             }
@@ -285,7 +285,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].DocumentationComments.Summary.Should().Be("This is a Test Struct.");
                 types[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].DocumentationComments.Example.Should().Be("This is an example.");
             }
         }
 
@@ -302,9 +302,9 @@ namespace LivingDocumentation.Analyzer.Tests
                 /// <remarks>
                 /// This is a remark.
                 /// </remarks>
-                /// <code>
-                /// This is code.
-                /// </code>
+                /// <example>
+                /// This is an example.
+                /// </example>
                 /// <returns>
                 /// Returns a string.
                 /// </returns>
@@ -320,7 +320,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].Methods[0].DocumentationComments.Summary.Should().Be("This is a Test Method.");
                 types[0].Methods[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Methods[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Methods[0].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Methods[0].DocumentationComments.Returns.Should().Be("Returns a string.");
             }
         }
@@ -338,9 +338,9 @@ namespace LivingDocumentation.Analyzer.Tests
                 /// <remarks>
                 /// This is a remark.
                 /// </remarks>
-                /// <code>
-                /// This is code.
-                /// </code>
+                /// <example>
+                /// This is an example.
+                /// </example>
                 /// <returns>
                 /// Returns a string.
                 /// </returns>
@@ -356,7 +356,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].Constructors[0].DocumentationComments.Summary.Should().Be("This is a Test Constructor.");
                 types[0].Constructors[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Constructors[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Constructors[0].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Constructors[0].DocumentationComments.Returns.Should().Be("Returns a string.");
             }
         }
@@ -374,9 +374,9 @@ namespace LivingDocumentation.Analyzer.Tests
                 /// <remarks>
                 /// This is a remark.
                 /// </remarks>
-                /// <code>
-                /// This is code.
-                /// </code>
+                /// <example>
+                /// This is an example.
+                /// </example>
                 /// <value>
                 /// This is the value.
                 /// </value>
@@ -392,7 +392,7 @@ namespace LivingDocumentation.Analyzer.Tests
             {
                 types[0].Properties[0].DocumentationComments.Summary.Should().Be("This is a Test Property.");
                 types[0].Properties[0].DocumentationComments.Remarks.Should().Be("This is a remark.");
-                types[0].Properties[0].DocumentationComments.Code.Should().Be("This is code.");
+                types[0].Properties[0].DocumentationComments.Example.Should().Be("This is an example.");
                 types[0].Properties[0].DocumentationComments.Value.Should().Be("This is the value.");
             }
         }
