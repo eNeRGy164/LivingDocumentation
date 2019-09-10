@@ -38,7 +38,7 @@ namespace LivingDocumentation
 
         public string FullName { get; }
 
-        public string Documentation { get; set; }
+        public DocumentationCommentsDescription DocumentationComments { get; set; }
 
         public List<string> BaseTypes { get; } = new List<string>();
 

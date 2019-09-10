@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -68,7 +67,7 @@ namespace LivingDocumentation
                 this.EnsureMemberDefaultAccessModifier(fieldDescription);
 
                 fieldDescription.Initializer = variable.Initializer?.Value.ToString();
-                fieldDescription.Documentation = this.ExtractDocumentation(variable);
+                fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
             }
 
             base.VisitFieldDeclaration(node);
@@ -78,14 +77,14 @@ namespace LivingDocumentation
         {
             foreach (var variable in node.Declaration.Variables)
             {
-                var eventDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
-                this.currentType.AddMember(eventDescription);
+                var fieldDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
+                this.currentType.AddMember(fieldDescription);
 
-                eventDescription.Modifiers |= ParseModifiers(node.Modifiers);
-                this.EnsureMemberDefaultAccessModifier(eventDescription);
+                fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
+                this.EnsureMemberDefaultAccessModifier(fieldDescription);
 
-                eventDescription.Initializer = variable.Initializer?.Value.ToString();
-                eventDescription.Documentation = this.ExtractDocumentation(variable);
+                fieldDescription.Initializer = variable.Initializer?.Value.ToString();
+                fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
             }
 
             base.VisitEventFieldDeclaration(node);
@@ -100,7 +99,7 @@ namespace LivingDocumentation
             this.EnsureMemberDefaultAccessModifier(propertyDescription);
 
             propertyDescription.Initializer = node.Initializer?.Value.ToString();
-            propertyDescription.Documentation = this.ExtractDocumentation(node);
+            propertyDescription.DocumentationComments = this.ExtractDocumentation(node);
 
             base.VisitPropertyDeclaration(node);
         }
@@ -111,7 +110,7 @@ namespace LivingDocumentation
             this.currentType.AddMember(enumMemberDescription);
 
             enumMemberDescription.Modifiers |= Modifier.Public;
-            enumMemberDescription.Documentation = this.ExtractDocumentation(node);
+            enumMemberDescription.DocumentationComments = this.ExtractDocumentation(node);
 
             base.VisitEnumMemberDeclaration(node);
         }
@@ -152,7 +151,7 @@ namespace LivingDocumentation
             this.currentType.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureTypeDefaultAccessModifier(node);
 
-            this.currentType.Documentation = this.ExtractDocumentation(node);
+            this.currentType.DocumentationComments = this.ExtractDocumentation(node);
 
             if (node.AttributeLists != null)
             {
@@ -233,26 +232,15 @@ namespace LivingDocumentation
             }
         }
 
-        private string ExtractDocumentation(SyntaxNode node)
+        private DocumentationCommentsDescription ExtractDocumentation(SyntaxNode node)
         {
-            var documentationCommentXml = semanticModel.GetDeclaredSymbol(node)?.GetDocumentationCommentXml();
-
-            if (string.IsNullOrWhiteSpace(documentationCommentXml) || documentationCommentXml.StartsWith("<!--", StringComparison.Ordinal))
-            {
-                // No documenation or unparseable documentation
-                return null;
-            }
-
-            var element = XElement.Parse(documentationCommentXml);
-            var summary = element.Element("summary");
-
-            return summary?.Value.Trim();
+            return DocumentationCommentsDescription.Parse(this.semanticModel.GetDeclaredSymbol(node)?.GetDocumentationCommentXml());
         }
 
         private void ExtractBaseMethodDeclaration(BaseMethodDeclarationSyntax node, IHaveAMethodBody method)
         {
             method.Modifiers |= ParseModifiers(node.Modifiers);
-            method.Documentation = this.ExtractDocumentation(node);
+            method.DocumentationComments = this.ExtractDocumentation(node);
             this.EnsureMemberDefaultAccessModifier(method);
 
             foreach (var parameter in node.ParameterList.Parameters)

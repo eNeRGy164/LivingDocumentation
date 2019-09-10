@@ -10,6 +10,6 @@ namespace LivingDocumentation
         [JsonProperty(Order = -3)]
         string Name { get; }
 
-        string Documentation { get; }
+        IHaveDocumentationComments DocumentationComments { get; }
     }
 }
