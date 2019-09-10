@@ -16,7 +16,7 @@ namespace LivingDocumentation
     {
         private static ParserResult<Options> ParsedResults;
 
-        public static Options RuntimeOptions { get; private set; }
+        public static Options RuntimeOptions { get; private set; } = new Options();
 
         public class Options
         {
@@ -28,6 +28,13 @@ namespace LivingDocumentation
 
             [Option('v', "verbose", Default = false, HelpText = "Show warnings during compilation.")]
             public bool VerboseOutput { get; set; }
+
+            [Option('p', "pretty", Default = false, HelpText = "Store JSON output in indented formatting.")]
+            public bool PrettyPrint { get; set;
+            }
+
+            [Option('q', "quiet", Default = false, HelpText = "Don't output informational messages.")]
+            public bool Quiet { get; set; }
         }
 
         public static async Task Main(string[] args)
@@ -53,15 +60,21 @@ namespace LivingDocumentation
             // Write analysis 
             var serializerSettings = new JsonSerializerSettings
             {
-                DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
                 ContractResolver = new SkipEmptyCollectionsContractResolver(),
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = options.PrettyPrint ? Formatting.Indented : Formatting.None
             };
 
             var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
 
             await File.WriteAllTextAsync(options.OutputPath, result);
-            Console.WriteLine($"Living Documentation Analysis output generated in {stopwatch.ElapsedMilliseconds}ms at {options.OutputPath}");
+
+            if (!options.Quiet)
+            {
+                Console.WriteLine($"Living Documentation Analysis output generated in {stopwatch.ElapsedMilliseconds}ms at {options.OutputPath}"); 
+            }
         }
 
         private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)

@@ -20,16 +20,16 @@ namespace LivingDocumentation
 
         public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
-            string containingType = semanticModel.GetTypeDisplayString(node);
+            string containingType = this.semanticModel.GetTypeDisplayString(node);
 
             var invocation = new InvocationDescription(containingType, node.Type.ToString());
-            statements.Add(invocation);
+            this.statements.Add(invocation);
 
             if (node.ArgumentList != null)
             {
                 foreach (var argument in node.ArgumentList.Arguments)
                 {
-                    var argumentDescription = new ArgumentDescription(semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
+                    var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
                     invocation.Arguments.Add(argumentDescription);
                 }
             }
@@ -38,7 +38,7 @@ namespace LivingDocumentation
             {
                 foreach (var expression in node.Initializer.Expressions)
                 {
-                    var argumentDescription = new ArgumentDescription(semanticModel.GetTypeDisplayString(expression), expression.ToString());
+                    var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(expression), expression.ToString());
                     invocation.Arguments.Add(argumentDescription);
                 }
             }
@@ -48,41 +48,41 @@ namespace LivingDocumentation
 
         public override void VisitSwitchStatement(SwitchStatementSyntax node)
         {
-            var branchingAnalyzer = new BranchingAnalyzer(semanticModel, statements);
+            var branchingAnalyzer = new BranchingAnalyzer(this.semanticModel, this.statements);
             branchingAnalyzer.Visit(node);
         }
 
         public override void VisitIfStatement(IfStatementSyntax node)
         {
-            var branchingAnalyzer = new BranchingAnalyzer(semanticModel, statements);
+            var branchingAnalyzer = new BranchingAnalyzer(this.semanticModel, this.statements);
             branchingAnalyzer.Visit(node);
         }
 
         public override void VisitForEachStatement(ForEachStatementSyntax node)
         {
-            var loopingAnalyzer = new LoopingAnalyzer(semanticModel, statements);
+            var loopingAnalyzer = new LoopingAnalyzer(this.semanticModel, this.statements);
             loopingAnalyzer.Visit(node);
         }
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (Program.RuntimeOptions.VerboseOutput && semanticModel.GetTypeInfo(node).Type.Kind == SymbolKind.ErrorType)
+            if (Program.RuntimeOptions.VerboseOutput && this.semanticModel.GetTypeInfo(node).Type.Kind == SymbolKind.ErrorType)
             {
                 Console.WriteLine("WARN: Could not resolve type of invocation of the following block:");
                 Console.WriteLine(node.ToFullString());
                 return;
             }
 
-            if (semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof"))
+            if (this.semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof"))
             {
                 // nameof is compiler sugar, and is actually a method we are not interrested in
                 return;
             }
 
-            string containingType = semanticModel.GetSymbolInfo(node.Expression).Symbol?.ContainingSymbol.ToDisplayString();
+            string containingType = this.semanticModel.GetSymbolInfo(node.Expression).Symbol?.ContainingSymbol.ToDisplayString();
             if (containingType == null)
             {
-                containingType = semanticModel.GetSymbolInfo(node.Expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
+                containingType = this.semanticModel.GetSymbolInfo(node.Expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
             }
 
             string methodName = string.Empty;
@@ -98,11 +98,11 @@ namespace LivingDocumentation
             }
 
             var invocation = new InvocationDescription(containingType, methodName);
-            statements.Add(invocation);
+            this.statements.Add(invocation);
 
             foreach (var argument in node.ArgumentList.Arguments)
             {
-                var argumentDescription = new ArgumentDescription(semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
+                var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
                 invocation.Arguments.Add(argumentDescription);
             }
 

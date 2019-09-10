@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29009.5
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.779
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Analyzer", "src\LivingDocumentation.Analyzer\LivingDocumentation.Analyzer.csproj", "{72E336A0-A9D8-494D-9332-CDE8341B247B}"
 EndProject
@@ -27,7 +27,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{742D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{93C52A66-6790-47D3-90A7-26EFFC41D4C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.Analyzer.Tests", "tests\LivingDocumentation.Analyzer.Tests\LivingDocumentation.Analyzer.Tests.csproj", "{90E0C6A2-BF79-406D-BC5C-2637AD2BADE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Analyzer.Tests", "tests\LivingDocumentation.Analyzer.Tests\LivingDocumentation.Analyzer.Tests.csproj", "{90E0C6A2-BF79-406D-BC5C-2637AD2BADE2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4FC1E9E3-E30A-47E2-BBFD-D1105EF4710F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		GitVersion.yml = GitVersion.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

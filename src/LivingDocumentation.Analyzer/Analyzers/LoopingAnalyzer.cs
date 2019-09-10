@@ -21,11 +21,11 @@ namespace LivingDocumentation
         public override void VisitForEachStatement(ForEachStatementSyntax node)
         {
             var forEachStatement = new ForEach();
-            statements.Add(forEachStatement);
+            this.statements.Add(forEachStatement);
 
             forEachStatement.Expression = $"{node.Identifier.ToString()} in {node.Expression.ToString()}";
 
-            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, forEachStatement.Statements);
+            var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, forEachStatement.Statements);
             invocationAnalyzer.Visit(node.Statement);
         }
     }
