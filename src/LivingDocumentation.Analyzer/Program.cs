@@ -90,7 +90,6 @@ namespace LivingDocumentation
             foreach (var project in projects)
             {
                 var compilation = await project.GetCompilationAsync();
-                var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
 
                 if (RuntimeOptions.VerboseOutput)
                 {
@@ -110,7 +109,7 @@ namespace LivingDocumentation
                 {
                     var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
-                    var visitor = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
+                    var visitor = new SourceAnalyzer(semanticModel, types);
                     visitor.Visit(syntaxTree.GetRoot());
                 }
             }

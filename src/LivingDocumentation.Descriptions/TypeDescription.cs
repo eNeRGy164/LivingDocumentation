@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,20 +10,23 @@ namespace LivingDocumentation
     public class TypeDescription : IHaveModifiers
     {
 
-        [JsonProperty(Order = 1, PropertyName = nameof(Fields), DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty(Order = 1, PropertyName = nameof(Fields))]
         private readonly List<FieldDescription> fields = new List<FieldDescription>();
 
-        [JsonProperty(Order = 2, PropertyName = nameof(Constructors), DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty(Order = 2, PropertyName = nameof(Constructors))]
         private readonly List<ConstructorDescription> constructors = new List<ConstructorDescription>();
 
-        [JsonProperty(Order = 3, PropertyName = nameof(Properties), DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty(Order = 3, PropertyName = nameof(Properties))]
         private readonly List<PropertyDescription> properties = new List<PropertyDescription>();
 
-        [JsonProperty(Order = 4, PropertyName = nameof(Methods), DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty(Order = 4, PropertyName = nameof(Methods))]
         private readonly List<MethodDescription> methods = new List<MethodDescription>();
 
-        [JsonProperty(Order = 5, PropertyName = nameof(EnumMembers), DefaultValueHandling = DefaultValueHandling.Include)]
+        [JsonProperty(Order = 5, PropertyName = nameof(EnumMembers))]
         private readonly List<EnumMemberDescription> enumMembers = new List<EnumMemberDescription>();
+
+        [JsonProperty(Order = 6, PropertyName = nameof(Events))]
+        private readonly List<EventDescription> events = new List<EventDescription>();
 
         public TypeDescription(TypeType type, string fullName)
         {
@@ -60,6 +63,9 @@ namespace LivingDocumentation
         public IReadOnlyList<MethodDescription> Methods => this.methods;
 
         [JsonIgnore]
+        public IReadOnlyList<EventDescription> Events => this.events;
+
+        [JsonIgnore]
         public IReadOnlyList<FieldDescription> Fields => this.fields;
 
         [JsonIgnore]
@@ -85,8 +91,12 @@ namespace LivingDocumentation
                     this.methods.Add(m);
                     break;
 
-                case EnumMemberDescription e:
-                    this.enumMembers.Add(e);
+                case EnumMemberDescription em:
+                    this.enumMembers.Add(em);
+                    break;
+
+                case EventDescription e:
+                    this.events.Add(e);
                     break;
 
                 default:

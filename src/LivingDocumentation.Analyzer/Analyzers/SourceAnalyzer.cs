@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -12,77 +12,95 @@ namespace LivingDocumentation
     {
         private readonly SemanticModel semanticModel;
         private readonly IList<TypeDescription> types;
-        private readonly IReadOnlyList<AssemblyIdentity> referencedAssemblies;
 
         private TypeDescription currentType = null;
 
-        public SourceAnalyzer(in SemanticModel semanticModel, IList<TypeDescription> types, IReadOnlyList<AssemblyIdentity> referencedAssemblies)
+        public SourceAnalyzer(in SemanticModel semanticModel, IList<TypeDescription> types)
         {
             this.types = types;
             this.semanticModel = semanticModel;
-            this.referencedAssemblies = referencedAssemblies;
         }
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if (ProcessedEmbeddedType(node)) return;
+            if (this.ProcessedEmbeddedType(node)) return;
 
-            ExtractBaseTypeDeclaration(TypeType.Class, node);
+            this.ExtractBaseTypeDeclaration(TypeType.Class, node);
 
             base.VisitClassDeclaration(node);
         }
 
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
-            if (ProcessedEmbeddedType(node)) return;
+            if (this.ProcessedEmbeddedType(node)) return;
 
-            ExtractBaseTypeDeclaration(TypeType.Enum, node);
+            this.ExtractBaseTypeDeclaration(TypeType.Enum, node);
 
             base.VisitEnumDeclaration(node);
         }
 
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            if (ProcessedEmbeddedType(node)) return;
+            if (this.ProcessedEmbeddedType(node)) return;
 
-            ExtractBaseTypeDeclaration(TypeType.Struct, node);
+            this.ExtractBaseTypeDeclaration(TypeType.Struct, node);
 
             base.VisitStructDeclaration(node);
         }
 
         public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            if (ProcessedEmbeddedType(node)) return;
+            if (this.ProcessedEmbeddedType(node)) return;
 
-            ExtractBaseTypeDeclaration(TypeType.Interface, node);
+            this.ExtractBaseTypeDeclaration(TypeType.Interface, node);
 
             base.VisitInterfaceDeclaration(node);
         }
 
         public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
         {
-            var fieldDescription = new FieldDescription(semanticModel.GetTypeDisplayString(node.Declaration.Type), node.Declaration.Variables.First().Identifier.ValueText);
-            this.currentType.AddMember(fieldDescription);
+            foreach (var variable in node.Declaration.Variables)
+            {
+                var fieldDescription = new FieldDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
+                this.currentType.AddMember(fieldDescription);
 
-            fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
-            this.EnsureMemberDefaultAccessModifier(fieldDescription);
+                fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
+                this.EnsureMemberDefaultAccessModifier(fieldDescription);
 
-            fieldDescription.Initializer = node.Declaration.Variables.First().Initializer?.Value.ToString(); // Assumption: Field has only a single initializer
-            fieldDescription.Documentation = ExtractDocumentation(node);
+                fieldDescription.Initializer = variable.Initializer?.Value.ToString();
+                fieldDescription.Documentation = this.ExtractDocumentation(variable);
+            }
 
             base.VisitFieldDeclaration(node);
         }
 
+        public override void VisitEventFieldDeclaration(EventFieldDeclarationSyntax node)
+        {
+            foreach (var variable in node.Declaration.Variables)
+            {
+                var eventDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
+                this.currentType.AddMember(eventDescription);
+
+                eventDescription.Modifiers |= ParseModifiers(node.Modifiers);
+                this.EnsureMemberDefaultAccessModifier(eventDescription);
+
+                eventDescription.Initializer = variable.Initializer?.Value.ToString();
+                eventDescription.Documentation = this.ExtractDocumentation(variable);
+            }
+
+            base.VisitEventFieldDeclaration(node);
+        }
+
         public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
-            var propertyDescription = new PropertyDescription(semanticModel.GetTypeDisplayString(node.Type), node.Identifier.ToString());
+            var propertyDescription = new PropertyDescription(this.semanticModel.GetTypeDisplayString(node.Type), node.Identifier.ToString());
             this.currentType.AddMember(propertyDescription);
 
             propertyDescription.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureMemberDefaultAccessModifier(propertyDescription);
 
             propertyDescription.Initializer = node.Initializer?.Value.ToString();
-            propertyDescription.Documentation = ExtractDocumentation(node);
+            propertyDescription.Documentation = this.ExtractDocumentation(node);
 
             base.VisitPropertyDeclaration(node);
         }
@@ -93,7 +111,7 @@ namespace LivingDocumentation
             this.currentType.AddMember(enumMemberDescription);
 
             enumMemberDescription.Modifiers |= Modifier.Public;
-            enumMemberDescription.Documentation = ExtractDocumentation(node);
+            enumMemberDescription.Documentation = this.ExtractDocumentation(node);
 
             base.VisitEnumMemberDeclaration(node);
         }
@@ -103,24 +121,24 @@ namespace LivingDocumentation
             var constructorDescription = new ConstructorDescription(node.Identifier.ToString());
             this.currentType.AddMember(constructorDescription);
 
-            ExtractBaseMethodDeclaration(node, constructorDescription);
+            this.ExtractBaseMethodDeclaration(node, constructorDescription);
 
             base.VisitConstructorDeclaration(node);
         }
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            var methodDescription = new MethodDescription(semanticModel.GetTypeInfo(node.ReturnType).Type.ToDisplayString(), node.Identifier.ToString());
+            var methodDescription = new MethodDescription(this.semanticModel.GetTypeInfo(node.ReturnType).Type.ToDisplayString(), node.Identifier.ToString());
             this.currentType.AddMember(methodDescription);
 
-            ExtractBaseMethodDeclaration(node, methodDescription);
+            this.ExtractBaseMethodDeclaration(node, methodDescription);
 
             base.VisitMethodDeclaration(node);
         }
 
         private void ExtractBaseTypeDeclaration(TypeType type, BaseTypeDeclarationSyntax node)
         {
-            this.currentType = new TypeDescription(type, semanticModel.GetDeclaredSymbol(node).ToDisplayString());
+            this.currentType = new TypeDescription(type, this.semanticModel.GetDeclaredSymbol(node).ToDisplayString());
             if (!this.types.Contains(this.currentType))
             {
                 this.types.Add(this.currentType);
@@ -128,17 +146,17 @@ namespace LivingDocumentation
 
             if (node.BaseList != null)
             {
-                this.currentType.BaseTypes.AddRange(node.BaseList.Types.Select(t => semanticModel.GetTypeDisplayString(t.Type)));
+                this.currentType.BaseTypes.AddRange(node.BaseList.Types.Select(t => this.semanticModel.GetTypeDisplayString(t.Type)));
             }
 
             this.currentType.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureTypeDefaultAccessModifier(node);
 
-            this.currentType.Documentation = ExtractDocumentation(node);
+            this.currentType.Documentation = this.ExtractDocumentation(node);
 
             if (node.AttributeLists != null)
             {
-                ExtractAttributes(node);
+                this.ExtractAttributes(node);
             }
         }
 
@@ -178,7 +196,7 @@ namespace LivingDocumentation
                 return false;
             }
 
-            var embeddedAnalyzer = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
+            var embeddedAnalyzer = new SourceAnalyzer(this.semanticModel, this.types);
             embeddedAnalyzer.Visit(node);
 
             return true;
@@ -188,7 +206,7 @@ namespace LivingDocumentation
         {
             foreach (var attribute in node.AttributeLists.SelectMany(a => a.Attributes))
             {
-                var attributeDescription = new AttributeDescription(semanticModel.GetTypeDisplayString(attribute), attribute.Name.ToString());
+                var attributeDescription = new AttributeDescription(this.semanticModel.GetTypeDisplayString(attribute), attribute.Name.ToString());
                 this.currentType.Attributes.Add(attributeDescription);
 
                 if (attribute.ArgumentList != null)
@@ -208,7 +226,7 @@ namespace LivingDocumentation
                                 break;
                         }
 
-                        var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression?.ToString(), semanticModel.GetTypeDisplayString(argument.Expression), value);
+                        var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression?.ToString(), this.semanticModel.GetTypeDisplayString(argument.Expression), value);
                         attributeDescription.Arguments.Add(argumentDescription);
                     }
                 }
@@ -234,17 +252,18 @@ namespace LivingDocumentation
         private void ExtractBaseMethodDeclaration(BaseMethodDeclarationSyntax node, IHaveAMethodBody method)
         {
             method.Modifiers |= ParseModifiers(node.Modifiers);
+            method.Documentation = this.ExtractDocumentation(node);
             this.EnsureMemberDefaultAccessModifier(method);
 
             foreach (var parameter in node.ParameterList.Parameters)
             {
-                var parameterDescription = new ParameterDescription(semanticModel.GetTypeDisplayString(parameter.Type), parameter.Identifier.ToString());
+                var parameterDescription = new ParameterDescription(this.semanticModel.GetTypeDisplayString(parameter.Type), parameter.Identifier.ToString());
                 method.Parameters.Add(parameterDescription);
 
                 parameterDescription.HasDefaultValue = parameter.Default != null;
             }
 
-            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, method.Statements);
+            var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, method.Statements);
             invocationAnalyzer.Visit((SyntaxNode)node.Body ?? node.ExpressionBody);
         }
 
