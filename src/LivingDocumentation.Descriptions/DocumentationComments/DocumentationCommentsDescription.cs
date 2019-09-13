@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using LivingDocumentation.DocumentationComments;
+using Attribute = LivingDocumentation.DocumentationComments.Attribute;
 
 namespace LivingDocumentation
 {
@@ -77,24 +78,24 @@ namespace LivingDocumentation
             {
                 switch (section.Name.LocalName)
                 {
-                    case Section.Exception when !string.IsNullOrWhiteSpace(section.Attribute(Argument.CRef).Value):
-                        this.Exceptions.Add(StripIDPrefix(section.Attribute(Argument.CRef).Value), this.ParseSection(section));
+                    case Section.Exception when !string.IsNullOrWhiteSpace(section.Attribute(Attribute.CRef).Value):
+                        this.Exceptions.Add(StripIDPrefix(section.Attribute(Attribute.CRef).Value), this.ParseSection(section));
                         break;
 
-                    case Section.Param when !string.IsNullOrWhiteSpace(section.Attribute(Argument.Name).Value):
-                        this.Params.Add(StripIDPrefix(section.Attribute(Argument.Name).Value), this.ParseSection(section));
+                    case Section.Param when !string.IsNullOrWhiteSpace(section.Attribute(Attribute.Name).Value):
+                        this.Params.Add(StripIDPrefix(section.Attribute(Attribute.Name).Value), this.ParseSection(section));
                         break;
 
-                    case Section.Permission when !string.IsNullOrWhiteSpace(section.Attribute(Argument.CRef).Value):
-                        this.Permissions.Add(StripIDPrefix(section.Attribute(Argument.CRef).Value), this.ParseSection(section));
+                    case Section.Permission when !string.IsNullOrWhiteSpace(section.Attribute(Attribute.CRef).Value):
+                        this.Permissions.Add(StripIDPrefix(section.Attribute(Attribute.CRef).Value), this.ParseSection(section));
                         break;
 
-                    case Section.SeeAlso when !string.IsNullOrWhiteSpace(section.Attribute(Argument.CRef).Value):
+                    case Section.SeeAlso when !string.IsNullOrWhiteSpace(section.Attribute(Attribute.CRef).Value):
                         this.ProcessSeeAlsoTag(section);
                         break;
 
-                    case Section.TypeParam when !string.IsNullOrWhiteSpace(section.Attribute(Argument.Name).Value):
-                        this.TypeParams.Add(StripIDPrefix(section.Attribute(Argument.Name).Value), this.ParseSection(section));
+                    case Section.TypeParam when !string.IsNullOrWhiteSpace(section.Attribute(Attribute.Name).Value):
+                        this.TypeParams.Add(StripIDPrefix(section.Attribute(Attribute.Name).Value), this.ParseSection(section));
                         break;
                 }
             }
@@ -117,20 +118,24 @@ namespace LivingDocumentation
                         ProcessInlineContent(contents, text.Value);
                         break;
 
-                    case XElement element when element.Name == Block.Code || element.Name == Block.List || element.Name == Block.Para:
+                    case XElement element when element.Name == Block.Code || element.Name == Block.Para:
                         ProcessBlockContent(contents, element.Value);
+                        break;
+
+                    case XElement element when element.Name == Block.List:
+                        this.ProcessListContent(contents, element);
                         break;
 
                     case XElement element when element.Name == Inline.C:
                         ProcessInlineContent(contents, element.Value);
                         break;
 
-                    case XElement element when (element.Name == Inline.ParamRef || element.Name == Inline.TypeParamRef) && element.Attribute(Argument.Name) != null:
-                        ProcessInlineContent(contents, StripIDPrefix(element.Attribute(Argument.Name).Value));
+                    case XElement element when (element.Name == Inline.ParamRef || element.Name == Inline.TypeParamRef) && element.Attribute(Attribute.Name) != null:
+                        ProcessInlineContent(contents, StripIDPrefix(element.Attribute(Attribute.Name).Value));
                         break;
 
                     case XElement element when element.Name == Inline.See:
-                        ProcessInlineContent(contents, element.IsEmpty ? StripIDPrefix(element.Attribute(Argument.CRef)?.Value) : element.Value);
+                        ProcessInlineContent(contents, element.IsEmpty ? StripIDPrefix(element.Attribute(Attribute.CRef)?.Value) : element.Value);
                         break;
 
                     case XElement element when element.Name == Section.SeeAlso:
@@ -144,6 +149,96 @@ namespace LivingDocumentation
             }
 
             return contents.ToString().Trim();
+        }
+
+        private void ProcessListContent(StringBuilder contents, XElement element)
+        {
+            var listType = element.Attribute(Attribute.Type)?.Value;
+            switch (listType)
+            {
+                case ListType.Bullet:
+                    foreach (var item in element.Elements(List.Item))
+                    {
+                        var term = item.Element(List.Term)?.Value.Trim() ?? string.Empty;
+                        var description = item.Element(List.Description)?.Value.Trim() ?? string.Empty;
+
+                        contents.Append("* ");
+
+                        if (!string.IsNullOrEmpty(term))
+                        {
+                            contents.Append(term);
+                            contents.Append(" - ");
+                        }
+
+                        if (!string.IsNullOrEmpty(description))
+                        {
+                            contents.Append(description);
+                        }
+
+                        if (string.IsNullOrEmpty(term) && string.IsNullOrEmpty(description))
+                        {
+                            contents.Append(item.Value.Trim());
+                        }
+
+                        contents.Append('\n');
+
+                    }
+                    break;
+
+                case ListType.Number:
+                    if (!int.TryParse(element.Attribute(Attribute.Start)?.Value ?? "1", out var startIndex))
+                    {
+                        startIndex = 1;
+                    }
+
+                    foreach (var item in element.Elements(List.Item))
+                    {
+                        var term = item.Element(List.Term)?.Value.Trim() ?? string.Empty;
+                        var description = item.Element(List.Description)?.Value.Trim() ?? string.Empty;
+
+                        contents.Append(startIndex);
+                        contents.Append(". ");
+
+                        if (!string.IsNullOrEmpty(term))
+                        {
+                            contents.Append(term);
+                            contents.Append(" - ");
+                        }
+
+                        if (!string.IsNullOrEmpty(description))
+                        {
+                            contents.Append(description);
+                        }
+
+                        if (string.IsNullOrEmpty(term) && string.IsNullOrEmpty(description))
+                        {
+                            contents.Append(item.Value.Trim());
+                        }
+
+                        contents.Append('\n');
+
+                        startIndex++;
+                    }
+                    break;
+
+                case ListType.Definition:
+                    foreach (var item in element.Elements(List.Item))
+                    {
+                        var term = item.Element(List.Term)?.Value.Trim() ?? string.Empty;
+                        var description = item.Element(List.Description)?.Value.Trim() ?? string.Empty;
+
+                        contents.Append(term);
+                        contents.Append('\n');
+                        contents.Append(new string(' ', 4));
+                        contents.Append(description);
+                        contents.Append('\n');
+                    }
+                    break;
+
+                default:
+                    contents.Append(string.Join(" ", element.Descendants().Select(e => this.ParseSection(e))));
+                    break;
+            }
         }
 
         private static void ProcessInlineContent(StringBuilder stringBuilder, string text)
@@ -169,7 +264,7 @@ namespace LivingDocumentation
 
         private void ProcessSeeAlsoTag(XElement element)
         {
-            var key = StripIDPrefix(element.Attribute(Argument.CRef).Value);
+            var key = StripIDPrefix(element.Attribute(Attribute.CRef).Value);
 
             var contents = new StringBuilder();
 

@@ -521,5 +521,232 @@ namespace LivingDocumentation.Analyzer.Tests
             // Assert
             types[0].DocumentationComments.Summary.Should().Be("A b c");
         }
+
+        [TestMethod]
+        public void TagWithInvalidList_Should_HaveListItemsAsInlineTextInComment()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list>
+            /// <item>First item</item>
+            /// <item>Second item</item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("First item Second item");
+        }
+
+        [TestMethod]
+        public void TagWithBulletList_Should_HaveListItemsAsLinesInComment()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list type=""bullet"">
+            /// <item>First item</item>
+            /// <item>Second item</item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("* First item\n* Second item");
+        }
+
+        [TestMethod]
+        public void TagWithBulletListWithDescriptions_Should_HaveListItemsAsLinesInComment()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list type=""bullet"">
+            /// <item><description>First item</description></item>
+            /// <item><description>Second item</description></item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("* First item\n* Second item");
+        }
+
+        [TestMethod]
+        public void TagWithBulletListWithTermsAndDescriptions_Should_HaveListItemsAsLinesInComment()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list type=""bullet"">
+            /// <item>
+            /// <term>Term 1</term>
+            /// <description>First item</description>
+            /// </item>
+            /// <item>
+            /// <term>Term 2</term>
+            /// <description>Second item</description>
+            /// </item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("* Term 1 - First item\n* Term 2 - Second item");
+        }
+
+
+
+        [TestMethod]
+        public void TagWithNumberedList_Should_HaveNumberedListItemsAsLinesInComment()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list type=""number"">
+            /// <item>First item</item>
+            /// <item>Second item</item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("1. First item\n2. Second item");
+        }
+
+        [TestMethod]
+        public void TagWithNumberedListWithStart_Should_HaveCorrectNumberedListItemsAsLinesInComment()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list type=""number"" start=""3"">
+            /// <item>First item</item>
+            /// <item>Second item</item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("3. First item\n4. Second item");
+        }
+
+        [TestMethod]
+        public void TagWithNumberedListWithDescriptions_Should_HaveNumberedListItemsAsLinesInComment()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list type=""number"">
+            /// <item><description>First item</description></item>
+            /// <item><description>Second item</description></item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("1. First item\n2. Second item");
+        }
+
+        [TestMethod]
+        public void TagWithNumberedListWithTermsAndDescriptions_Should_HaveNumberedListItemsAsLinesInComment()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list type=""number"">
+            /// <item>
+            /// <term>Term 1</term>
+            /// <description>First item</description>
+            /// </item>
+            /// <item>
+            /// <term>Term 2</term>
+            /// <description>Second item</description>
+            /// </item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("1. Term 1 - First item\n2. Term 2 - Second item");
+        }
+
+        [TestMethod]
+        public void TagWithDefinitionListWithTermsAndDescriptions_Should_HaveSeperateLinesWithTermAndDescriptionIndented()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// <list type=""definition"">
+            /// <item>
+            /// <term>Term 1</term>
+            /// <description>First item</description>
+            /// </item>
+            /// <item>
+            /// <term>Term 2</term>
+            /// <description>Second item</description>
+            /// </item>
+            /// </list>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("Term 1\n    First item\nTerm 2\n    Second item");
+        }
     }
 }
