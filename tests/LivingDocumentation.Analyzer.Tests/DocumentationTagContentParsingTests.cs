@@ -48,6 +48,37 @@ namespace LivingDocumentation.Analyzer.Tests
         }
 
         [TestMethod]
+        public void Example_Should_BeRead()
+        {
+            // Assign
+            var source = @"
+            class Test
+            {
+                /// <example>
+                /// The following example demonstrates the use of this method.
+                /// 
+                /// <code>
+                /// // Get a new random number
+                /// SampleClass sc = new SampleClass(10);
+                /// 
+                /// int random = sc.GetRandomNumber();
+                ///
+                /// Console.WriteLine(""Random value: {0}"", random);
+                /// </code>
+                /// </example>
+                void Method() {}
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].Methods[0].DocumentationComments.Example.Should().Be("The following example demonstrates the use of this method.\n\n// Get a new random number\nSampleClass sc = new SampleClass(10);\n\nint random = sc.GetRandomNumber();\n\nConsole.WriteLine(\"Random value: {0}\", random);");
+        }
+
+
+        [TestMethod]
         public void Exception_Should_BeRead()
         {
             // Assign
@@ -307,6 +338,27 @@ namespace LivingDocumentation.Analyzer.Tests
 
             // Assert
             types[0].DocumentationComments.Summary.Should().Be("A");
+        }
+
+        [TestMethod]
+        public void NonSummaryWithWhitespace_Should_OnlyNonNewLinesBeTrimmed()
+        {
+            // Assign
+            var source = @"
+            /// <remarks>
+            ///   A  
+            ///   B
+            /// </remarks>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Remarks.Should().Be("A\nB");
         }
 
         [TestMethod]
@@ -747,6 +799,43 @@ namespace LivingDocumentation.Analyzer.Tests
 
             // Assert
             types[0].DocumentationComments.Summary.Should().Be("Term 1\n    First item\nTerm 2\n    Second item");
+        }
+
+        [TestMethod]
+        public void TagWithNestedContent_Should_RenderCorrectly()
+        {
+            // Assign
+            var source = @"
+            /// <summary>
+            /// This is a summary with mixed content.
+            /// <para>A <see cref=""System.Object"">paragraph</see></para>
+            /// <para>Another <paramref name=""paragraph""/></para>
+            /// <list type=""definition"">
+            /// <item>
+            /// <term>Term 1</term>
+            /// <description>First <typeparamref name=""item""/></description>
+            /// </item>
+            /// <item>
+            /// <term>Term <c>2</c></term>
+            /// <description><para>Second item</para></description>
+            /// </item>
+            /// </list>
+            /// <code>
+            /// class ACodeSample { }
+            /// </code>
+            /// More text <c>null</c> and more text
+            /// <seealso cref=""System.Object""/>
+            /// </summary>
+            class Test
+            {
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].DocumentationComments.Summary.Should().Be("This is a summary with mixed content.\nA paragraph\nAnother paragraph\nTerm 1\n    First item\nTerm 2\n    Second item\nclass ACodeSample { }\nMore text null and more text");
         }
     }
 }
