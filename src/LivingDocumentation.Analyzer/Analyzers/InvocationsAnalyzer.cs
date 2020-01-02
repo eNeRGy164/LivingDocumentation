@@ -73,7 +73,7 @@ namespace LivingDocumentation
                 return;
             }
 
-            if (this.semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof"))
+            if (this.semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof", StringComparison.Ordinal))
             {
                 // nameof is compiler sugar, and is actually a method we are not interrested in
                 return;
@@ -96,8 +96,11 @@ namespace LivingDocumentation
                     methodName = i.Identifier.ValueText;
                     break;
             }
+            if (methodName == "Fire")
+            {
 
-            var invocation = new InvocationDescription(containingType, methodName);
+            }
+                var invocation = new InvocationDescription(containingType, methodName);
             this.statements.Add(invocation);
 
             foreach (var argument in node.ArgumentList.Arguments)

@@ -27,6 +27,26 @@ namespace LivingDocumentation.Analyzer.Tests
         }
 
         [TestMethod]
+        public void EventDeclaration_Should_CreateEventDescriptionTests2()
+        {
+            // Assign
+            var source = @"
+            class Test
+            {
+                event System.Action @event;
+
+                Test() { @event(); }
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].Events.Should().HaveCount(1);
+        }
+
+        [TestMethod]
         public void MultipleEventDeclaration_Should_CreateEventDescriptionPerEvent()
         {
             // Assign

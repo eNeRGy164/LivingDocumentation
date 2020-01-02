@@ -29,6 +29,10 @@
   <ItemGroup>
     <PackageReference Include="Buildalyzer.Workspaces" Version="2.3.0" />
     <PackageReference Include="CommandLineParser" Version="2.5.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
