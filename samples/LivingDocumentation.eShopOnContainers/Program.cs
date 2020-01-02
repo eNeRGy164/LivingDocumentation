@@ -14,8 +14,7 @@ namespace LivingDocumentation.eShopOnContainers
 
             var serializerSettings = new JsonSerializerSettings
             {
-                DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-                Formatting = Formatting.None,
+                DefaultValueHandling = DefaultValueHandling.Include,
                 ContractResolver = new SkipEmptyCollectionsContractResolver(),
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 TypeNameHandling = TypeNameHandling.Auto

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
     <RootNamespace>LivingDocumentation</RootNamespace>
+    <LangVersion>latest</LangVersion>
     
     <Version>0.1.0</Version>
     <Authors>Michaël Hompus</Authors>

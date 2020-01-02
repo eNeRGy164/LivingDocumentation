@@ -1,4 +1,4 @@
-using LivingDocumentation.Uml;
+﻿using LivingDocumentation.Uml;
 using System;
 using System.Linq;
 using System.Text;
@@ -7,11 +7,11 @@ namespace LivingDocumentation.eShopOnContainers
 {
     public static class eShopOnContainersExtensions
     {
-        const string IntegrationEvent = "IntegrationEvent";
-        const string DomainEvent = "DomainEvent";
-        const string DomainEventHandler = "DomainEventHandler";
-        const string Command = "Command";
-        const string CommandHandler = "CommandHandler";
+        private const string IntegrationEvent = "IntegrationEvent";
+        private const string DomainEvent = "DomainEvent";
+        private const string DomainEventHandler = "DomainEventHandler";
+        private const string Command = "Command";
+        private const string CommandHandler = "CommandHandler";
 
         public static string ArrowColor(this string name)
         {

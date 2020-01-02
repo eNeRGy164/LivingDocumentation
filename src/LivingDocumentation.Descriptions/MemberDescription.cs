@@ -14,7 +14,7 @@ namespace LivingDocumentation
 
         public bool IsInherited { get; internal set; } = false;
 
-        public string Documentation { get; set; }
+        public IHaveDocumentationComments DocumentationComments { get; set; }
 
         public MemberDescription(string name)
         {

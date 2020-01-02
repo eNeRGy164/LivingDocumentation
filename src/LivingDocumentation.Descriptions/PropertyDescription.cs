@@ -1,5 +1,4 @@
-using Newtonsoft.Json;
-using System.ComponentModel;
+﻿using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace LivingDocumentation
@@ -12,7 +11,7 @@ namespace LivingDocumentation
         public string Initializer { get; set; }
         
         [JsonIgnore]
-        public bool HasInitializer => this.Initializer != null;
+        public bool HasInitializer => !string.IsNullOrWhiteSpace(this.Initializer);
 
         public override MemberType MemberType => MemberType.Property;
 

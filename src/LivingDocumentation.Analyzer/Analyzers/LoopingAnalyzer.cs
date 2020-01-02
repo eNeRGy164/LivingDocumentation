@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,11 +19,11 @@ namespace LivingDocumentation
         public override void VisitForEachStatement(ForEachStatementSyntax node)
         {
             var forEachStatement = new ForEach();
-            statements.Add(forEachStatement);
+            this.statements.Add(forEachStatement);
 
             forEachStatement.Expression = $"{node.Identifier.ToString()} in {node.Expression.ToString()}";
 
-            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, forEachStatement.Statements);
+            var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, forEachStatement.Statements);
             invocationAnalyzer.Visit(node.Statement);
         }
     }

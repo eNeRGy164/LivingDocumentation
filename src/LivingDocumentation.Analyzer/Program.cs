@@ -12,23 +12,11 @@ using Newtonsoft.Json;
 
 namespace LivingDocumentation
 {
-    public class Program
+    public static partial class Program
     {
         private static ParserResult<Options> ParsedResults;
 
-        public static Options RuntimeOptions { get; private set; }
-
-        public class Options
-        {
-            [Option("solution", Required = true, HelpText = "The solution to analyze.")]
-            public string SolutionPath { get; set; }
-
-            [Option("output", Required = true, HelpText = "The location of the output.")]
-            public string OutputPath { get; set; }
-
-            [Option('v', "verbose", Default = false, HelpText = "Show warnings during compilation.")]
-            public bool VerboseOutput { get; set; }
-        }
+        public static Options RuntimeOptions { get; private set; } = new Options();
 
         public static async Task Main(string[] args)
         {
@@ -37,7 +25,7 @@ namespace LivingDocumentation
             await ParsedResults.MapResult(
                 options => RunApplicationAsync(options),
                 errors => Task.FromResult(1)
-            );
+            ).ConfigureAwait(false);
         }
 
         private static async Task RunApplicationAsync(Options options)
@@ -47,21 +35,27 @@ namespace LivingDocumentation
             var types = new List<TypeDescription>();
 
             var stopwatch = Stopwatch.StartNew();
-            await AnalyzeSolutionAsync(types, options.SolutionPath);
+            await AnalyzeSolutionAsync(types, options.SolutionPath).ConfigureAwait(false);
             stopwatch.Stop();
 
             // Write analysis 
             var serializerSettings = new JsonSerializerSettings
             {
-                DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
                 ContractResolver = new SkipEmptyCollectionsContractResolver(),
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = TypeNameHandling.Auto,
+                Formatting = options.PrettyPrint ? Formatting.Indented : Formatting.None
             };
 
             var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
 
-            await File.WriteAllTextAsync(options.OutputPath, result);
-            Console.WriteLine($"Living Documentation Analysis output generated in {stopwatch.ElapsedMilliseconds}ms at {options.OutputPath}");
+            await File.WriteAllTextAsync(options.OutputPath, result).ConfigureAwait(false);
+
+            if (!options.Quiet)
+            {
+                Console.WriteLine($"Living Documentation Analysis output generated in {stopwatch.ElapsedMilliseconds}ms at {options.OutputPath}");
+            }
         }
 
         private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)
@@ -72,12 +66,11 @@ namespace LivingDocumentation
 
             // Every project in the solution, except unit test projects
             var projects = workspace.CurrentSolution.Projects
-                .Where(p => !manager.Projects.First(mp => p.Id.Id == mp.Value.ProjectGuid).Value.ProjectFile.PackageReferences.Any(pr => pr.Name.Contains("Test")));
+                .Where(p => !manager.Projects.First(mp => p.Id.Id == mp.Value.ProjectGuid).Value.ProjectFile.PackageReferences.Any(pr => pr.Name.Contains("Test", StringComparison.Ordinal)));
 
             foreach (var project in projects)
             {
-                var compilation = await project.GetCompilationAsync();
-                var referencedAssemblies = compilation.ReferencedAssemblyNames.Where(a => !assembliesInSolution.Contains(a.Name)).ToList();
+                var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
 
                 if (RuntimeOptions.VerboseOutput)
                 {
@@ -97,7 +90,7 @@ namespace LivingDocumentation
                 {
                     var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
-                    var visitor = new SourceAnalyzer(semanticModel, types, referencedAssemblies);
+                    var visitor = new SourceAnalyzer(semanticModel, types);
                     visitor.Visit(syntaxTree.GetRoot());
                 }
             }

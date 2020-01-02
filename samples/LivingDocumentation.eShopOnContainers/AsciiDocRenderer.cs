@@ -30,12 +30,12 @@ namespace LivingDocumentation.eShopOnContainers
 
             RenderFileHeader(stringBuilder);
 
-            RenderAggregates(stringBuilder);
-            RenderCommands(stringBuilder);
-            RenderCommandHandlers(stringBuilder);
-            RenderDomainEvents(stringBuilder);
-            RenderDomainEventHandlers(stringBuilder);
-            RenderIntegrationEvents(stringBuilder);
+            this.RenderAggregates(stringBuilder);
+            this.RenderCommands(stringBuilder);
+            this.RenderCommandHandlers(stringBuilder);
+            this.RenderDomainEvents(stringBuilder);
+            this.RenderDomainEventHandlers(stringBuilder);
+            this.RenderIntegrationEvents(stringBuilder);
 
             File.WriteAllText("documentation.generated.adoc", stringBuilder.ToString());
         }
@@ -79,9 +79,9 @@ namespace LivingDocumentation.eShopOnContainers
                 stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" command.");
                 stringBuilder.AppendLine();
 
-                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                if (!string.IsNullOrWhiteSpace(type.DocumentationComments?.Summary))
                 {
-                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine(type.DocumentationComments.Summary);
                     stringBuilder.AppendLine();
                 }
 
@@ -115,9 +115,9 @@ namespace LivingDocumentation.eShopOnContainers
                 stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
                 stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" command handler.");
 
-                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                if (!string.IsNullOrWhiteSpace(type.DocumentationComments?.Summary))
                 {
-                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine(type.DocumentationComments.Summary);
                     stringBuilder.AppendLine();
                 }
 
@@ -147,12 +147,12 @@ namespace LivingDocumentation.eShopOnContainers
                 stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" domain event.");
                 stringBuilder.AppendLine();
 
-                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                if (!string.IsNullOrWhiteSpace(type.DocumentationComments?.Summary))
                 {
-                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine(type.DocumentationComments.Summary);
                     stringBuilder.AppendLine();
                 }
-
+                
                 stringBuilder.AppendLine($".{type.Name.ToSentenceCase()} Fields");
                 stringBuilder.AppendLine("[%header%,width=\"75%\",cols=\"2h,3d\"]");
                 stringBuilder.AppendLine("|===");
@@ -183,9 +183,9 @@ namespace LivingDocumentation.eShopOnContainers
                 stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
                 stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" event handler.");
 
-                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                if (!string.IsNullOrWhiteSpace(type.DocumentationComments?.Summary))
                 {
-                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine(type.DocumentationComments.Summary);
                     stringBuilder.AppendLine();
                 }
 
@@ -214,9 +214,9 @@ namespace LivingDocumentation.eShopOnContainers
                 stringBuilder.AppendLine($"The \"`{FormatTechnicalName(type.Name).ToLower()}`\" integration event.");
                 stringBuilder.AppendLine();
 
-                if (!string.IsNullOrWhiteSpace(type.Documentation))
+                if (!string.IsNullOrWhiteSpace(type.DocumentationComments?.Summary))
                 {
-                    stringBuilder.AppendLine(type.Documentation);
+                    stringBuilder.AppendLine(type.DocumentationComments.Summary);
                     stringBuilder.AppendLine();
                 }
 

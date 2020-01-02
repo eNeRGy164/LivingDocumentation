@@ -5,8 +5,8 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     
     <RootNamespace>LivingDocumentation.Analyzer</RootNamespace>
-    <LangVersion>latest</LangVersion>
     <AssemblyName>LivingDocumentation.Analyzer</AssemblyName>
+    <LangVersion>latest</LangVersion>
 
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>livingdoc-analyze</ToolCommandName>
@@ -29,6 +29,10 @@
   <ItemGroup>
     <PackageReference Include="Buildalyzer.Workspaces" Version="2.3.0" />
     <PackageReference Include="CommandLineParser" Version="2.5.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 

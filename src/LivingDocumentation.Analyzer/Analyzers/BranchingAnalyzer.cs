@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -21,14 +20,14 @@ namespace LivingDocumentation
         public override void VisitIfStatement(IfStatementSyntax node)
         {
             var ifStatement = new If();
-            statements.Add(ifStatement);
+            this.statements.Add(ifStatement);
 
             var ifSection = new IfElseSection();
             ifStatement.Sections.Add(ifSection);
 
             ifSection.Condition = node.Condition.ToString();
 
-            var ifInvocationAnalyzer = new InvocationsAnalyzer(semanticModel, ifSection.Statements);
+            var ifInvocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, ifSection.Statements);
             ifInvocationAnalyzer.Visit(node.Statement);
 
             var elseNode = node.Else;
@@ -37,7 +36,7 @@ namespace LivingDocumentation
                 var section = new IfElseSection();
                 ifStatement.Sections.Add(section);
 
-                var elseInvocationAnalyzer = new InvocationsAnalyzer(semanticModel, section.Statements);
+                var elseInvocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, section.Statements);
                 elseInvocationAnalyzer.Visit(elseNode.Statement);
 
                 if (elseNode.Statement.IsKind(SyntaxKind.IfStatement))
@@ -57,7 +56,7 @@ namespace LivingDocumentation
         public override void VisitSwitchStatement(SwitchStatementSyntax node)
         {
             var switchStatement = new Switch();
-            statements.Add(switchStatement);
+            this.statements.Add(switchStatement);
 
             switchStatement.Expression = node.Expression.ToString();
 
@@ -68,7 +67,7 @@ namespace LivingDocumentation
 
                 switchSection.Labels.AddRange(section.Labels.Select(l => Label(l)));
 
-                var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, switchSection.Statements);
+                var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, switchSection.Statements);
                 invocationAnalyzer.Visit(section);
             }
         }
