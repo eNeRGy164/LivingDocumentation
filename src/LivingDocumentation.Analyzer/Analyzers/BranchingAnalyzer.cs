@@ -77,7 +77,13 @@ namespace LivingDocumentation
             switch (label)
             {
                 case CasePatternSwitchLabelSyntax casePatternLabel:
-                    return casePatternLabel.WhenClause?.Condition?.ToString() ?? casePatternLabel.Pattern?.ToString();
+                    var condition = casePatternLabel.WhenClause?.Condition?.ToString();
+                    if (condition == null)
+                    {
+                        return casePatternLabel.Pattern?.ToString();
+                    }
+
+                    return $"{casePatternLabel.Pattern} when {condition}";
 
                 case CaseSwitchLabelSyntax caseLabel:
                     return caseLabel.Value.ToString();
