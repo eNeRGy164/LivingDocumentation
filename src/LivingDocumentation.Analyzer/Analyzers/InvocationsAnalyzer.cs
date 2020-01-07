@@ -96,11 +96,8 @@ namespace LivingDocumentation
                     methodName = i.Identifier.ValueText;
                     break;
             }
-            if (methodName == "Fire")
-            {
 
-            }
-                var invocation = new InvocationDescription(containingType, methodName);
+            var invocation = new InvocationDescription(containingType, methodName);
             this.statements.Add(invocation);
 
             foreach (var argument in node.ArgumentList.Arguments)
@@ -110,6 +107,22 @@ namespace LivingDocumentation
             }
 
             base.VisitInvocationExpression(node);
+        }
+
+        public override void VisitReturnStatement(ReturnStatementSyntax node)
+        {
+            var returnDescription = new ReturnDescription(node.Expression?.ToString() ?? string.Empty);
+            this.statements.Add(returnDescription);
+
+            base.VisitReturnStatement(node);
+        }
+
+        public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
+        {
+            var returnDescription = new ReturnDescription(node.Expression.ToString());
+            this.statements.Add(returnDescription);
+
+            base.VisitArrowExpressionClause(node);
         }
     }
 }
