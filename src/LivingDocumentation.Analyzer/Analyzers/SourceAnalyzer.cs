@@ -153,10 +153,7 @@ namespace LivingDocumentation
 
             this.currentType.DocumentationComments = this.ExtractDocumentation(node);
 
-            if (node.AttributeLists != null)
-            {
-                this.ExtractAttributes(node);
-            }
+            this.ExtractAttributes(node.AttributeLists, this.currentType.Attributes);
         }
 
         private void EnsureTypeDefaultAccessModifier(BaseTypeDeclarationSyntax node)
@@ -201,12 +198,17 @@ namespace LivingDocumentation
             return true;
         }
 
-        private void ExtractAttributes(BaseTypeDeclarationSyntax node)
+        private void ExtractAttributes(SyntaxList<AttributeListSyntax> attributes, List<IAttributeDescription> attributeDescriptions)
         {
-            foreach (var attribute in node.AttributeLists.SelectMany(a => a.Attributes))
+            if (attributes == null)
+            {
+                return;
+            }
+
+            foreach (var attribute in attributes.SelectMany(a => a.Attributes))
             {
                 var attributeDescription = new AttributeDescription(this.semanticModel.GetTypeDisplayString(attribute), attribute.Name.ToString());
-                this.currentType.Attributes.Add(attributeDescription);
+                attributeDescriptions.Add(attributeDescription);
 
                 if (attribute.ArgumentList != null)
                 {
@@ -241,7 +243,9 @@ namespace LivingDocumentation
         {
             method.Modifiers |= ParseModifiers(node.Modifiers);
             method.DocumentationComments = this.ExtractDocumentation(node);
+            
             this.EnsureMemberDefaultAccessModifier(method);
+            this.ExtractAttributes(node.AttributeLists, method.Attributes);
 
             foreach (var parameter in node.ParameterList.Parameters)
             {

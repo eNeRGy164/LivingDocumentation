@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace LivingDocumentation
@@ -16,6 +17,10 @@ namespace LivingDocumentation
         public bool IsInherited { get; internal set; } = false;
 
         public IHaveDocumentationComments DocumentationComments { get; set; }
+
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
+        [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeDescription>>))]
+        public List<IAttributeDescription> Attributes { get; } = new List<IAttributeDescription>();
 
         public MemberDescription(string name)
         {

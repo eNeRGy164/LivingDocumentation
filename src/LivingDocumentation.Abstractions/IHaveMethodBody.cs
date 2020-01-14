@@ -11,5 +11,7 @@ namespace LivingDocumentation
         List<IParameterDescription> Parameters { get; }
 
         List<Statement> Statements { get; }
+
+        List<IAttributeDescription> Attributes { get; }
     }
 }

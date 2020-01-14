@@ -3,7 +3,7 @@
 namespace LivingDocumentation
 {
     [DebuggerDisplay("AttributeArgument {Name} {Type} {Value}")]
-    public class AttributeArgumentDescription
+    public class AttributeArgumentDescription : IAttributeArgumentDescription
     {
         public string Name { get; }
 
