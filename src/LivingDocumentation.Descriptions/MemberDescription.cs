@@ -10,6 +10,7 @@ namespace LivingDocumentation
         public string Name { get; }
 
         [DefaultValue(Modifier.Private)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Modifier Modifiers { get; set; }
 
         public bool IsInherited { get; internal set; } = false;

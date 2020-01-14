@@ -12,15 +12,7 @@ namespace LivingDocumentation.eShopOnContainers
             // Read analysis 
             var result = await File.ReadAllTextAsync("analysis.json");
 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                DefaultValueHandling = DefaultValueHandling.Include,
-                ContractResolver = new SkipEmptyCollectionsContractResolver(),
-                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-                TypeNameHandling = TypeNameHandling.Auto
-            };
-
-            var types = JsonConvert.DeserializeObject<List<TypeDescription>>(result, serializerSettings);
+            var types = JsonConvert.DeserializeObject<List<TypeDescription>>(result, JsonDefaults.DeserializerSettings());
             
             var aggregateFiles = new AggregateRenderer(types).Render();
             var commandHandlerFiles = new CommandHandlerRenderer(types).Render();
