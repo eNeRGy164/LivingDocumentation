@@ -85,5 +85,38 @@ namespace LivingDocumentation.Analyzer.Tests
             types[0].Methods[0].Name.Should().Be("Method");
             types[0].Methods[0].Modifiers.Should().Be(Modifier.Private);
         }
+
+        [TestMethod]
+        public void AttributeCollection_Should_GiveAttributeWithNameAndType()
+        {
+            // Assign
+            var json = @"[{""FullName"":""Test"",""Attributes"":[{""Type"":""System.ObsoleteAttribute"",""Name"":""System.Obsolete""}]}]";
+
+            // Act
+            var types = JsonConvert.DeserializeObject<List<TypeDescription>>(json, JsonDefaults.DeserializerSettings());
+
+            // Assert
+            types[0].Attributes.Should().HaveCount(1);
+            types[0].Attributes[0].Should().NotBeNull();
+            types[0].Attributes[0].Type.Should().Be("System.ObsoleteAttribute");
+            types[0].Attributes[0].Name.Should().Be("System.Obsolete");
+        }
+
+        [TestMethod]
+        public void AttributeArgumentCollection_Should_GiveAttributeArgumentWithName_TypeAndValue()
+        {
+            // Assign
+            var json = @"[{""FullName"":""Test"",""Attributes"":[{""Type"":""System.ObsoleteAttribute"",""Name"":""System.Obsolete"",""Arguments"":[{""Name"":""\""Reason\"""",""Type"":""string"",""Value"":""Reason""}]}]}]";
+
+            // Act
+            var types = JsonConvert.DeserializeObject<List<TypeDescription>>(json, JsonDefaults.DeserializerSettings());
+
+            // Assert
+            types[0].Attributes[0].Arguments.Should().HaveCount(1);
+            types[0].Attributes[0].Arguments[0].Should().NotBeNull();
+            types[0].Attributes[0].Arguments[0].Type.Should().Be("string");
+            types[0].Attributes[0].Arguments[0].Name.Should().Be(@"""Reason""");
+            types[0].Attributes[0].Arguments[0].Value.Should().Be(@"Reason");
+        }
     }
 }

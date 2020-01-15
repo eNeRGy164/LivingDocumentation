@@ -85,5 +85,41 @@ namespace LivingDocumentation.Analyzer.Tests
             // Assert
             result.Should().Match(@"[{""FullName"":""Test"",""Methods"":[{""Name"":""Method"",""ReturnType"":""int"",*}]}]");
         }
+
+        [TestMethod]
+        public void Attributes_Should_GiveNameAndType()
+        {
+            // Assign
+            var source = @"
+            [System.Obsolete]
+            class Test {
+            }";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            var result = JsonConvert.SerializeObject(types, JsonDefaults.SerializerSettings());
+
+            // Assert
+            result.Should().Match(@"[{""FullName"":""Test"",""Attributes"":[{""Type"":""System.ObsoleteAttribute"",""Name"":""System.Obsolete""}]}]");
+        }
+
+        [TestMethod]
+        public void AttributeArguments_Should_GiveName_TypeAndValue()
+        {
+            // Assign
+            var source = @"
+            [System.Obsolete(""Reason"")]
+            class Test {
+            }";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            var result = JsonConvert.SerializeObject(types, JsonDefaults.SerializerSettings());
+
+            // Assert
+            result.Should().Match(@"[{""FullName"":""Test"",""Attributes"":[{""Type"":""System.ObsoleteAttribute"",""Name"":""System.Obsolete"",""Arguments"":[{""Name"":""\""Reason\"""",""Type"":""string"",""Value"":""Reason""}]}]}]");
+        }
     }
 }
