@@ -218,7 +218,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var source = @"
             class Test
             {
-                void Method([System.ParamArray] string[] params) {}
+                void Method([System.ParamArray] string[] parameters) {}
             }
             ";
 
