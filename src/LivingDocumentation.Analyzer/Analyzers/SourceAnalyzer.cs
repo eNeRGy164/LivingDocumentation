@@ -65,6 +65,7 @@ namespace LivingDocumentation
 
                 fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
                 this.EnsureMemberDefaultAccessModifier(fieldDescription);
+                this.ExtractAttributes(node.AttributeLists, fieldDescription.Attributes);
 
                 fieldDescription.Initializer = variable.Initializer?.Value.ToString();
                 fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
@@ -77,14 +78,15 @@ namespace LivingDocumentation
         {
             foreach (var variable in node.Declaration.Variables)
             {
-                var fieldDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
-                this.currentType.AddMember(fieldDescription);
+                var eventDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
+                this.currentType.AddMember(eventDescription);
 
-                fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
-                this.EnsureMemberDefaultAccessModifier(fieldDescription);
+                eventDescription.Modifiers |= ParseModifiers(node.Modifiers);
+                this.EnsureMemberDefaultAccessModifier(eventDescription);
+                this.ExtractAttributes(node.AttributeLists, eventDescription.Attributes);
 
-                fieldDescription.Initializer = variable.Initializer?.Value.ToString();
-                fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
+                eventDescription.Initializer = variable.Initializer?.Value.ToString();
+                eventDescription.DocumentationComments = this.ExtractDocumentation(variable);
             }
 
             base.VisitEventFieldDeclaration(node);
@@ -97,6 +99,7 @@ namespace LivingDocumentation
 
             propertyDescription.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureMemberDefaultAccessModifier(propertyDescription);
+            this.ExtractAttributes(node.AttributeLists, propertyDescription.Attributes);
 
             propertyDescription.Initializer = node.Initializer?.Value.ToString();
             propertyDescription.DocumentationComments = this.ExtractDocumentation(node);
