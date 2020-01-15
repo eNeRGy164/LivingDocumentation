@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LivingDocumentation
 {
@@ -9,5 +10,7 @@ namespace LivingDocumentation
         string Name { get; }
 
         bool HasDefaultValue { get; }
+
+        List<IAttributeDescription> Attributes { get; }
     }
 }

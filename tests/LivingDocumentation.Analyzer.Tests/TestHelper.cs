@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -8,7 +9,7 @@ namespace LivingDocumentation.Analyzer.Tests
 {
     internal class TestHelper
     {
-        public static IReadOnlyList<TypeDescription> VisitSyntaxTree(string source)
+        public static IReadOnlyList<TypeDescription> VisitSyntaxTree(string source, params string[] ignoreErrorCodes)
         {
             source.Should().NotBeNullOrWhiteSpace("without source code there is nothing to test");
 
@@ -18,7 +19,7 @@ namespace LivingDocumentation.Analyzer.Tests
                                                .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
                                                .AddSyntaxTrees(syntaxTree);
 
-            var diagnostics = compilation.GetDiagnostics();
+            var diagnostics = compilation.GetDiagnostics().Where(d => !ignoreErrorCodes.Contains(d.Id));
             diagnostics.Should().HaveCount(0, "there shoudn't be any compile errors");
 
             var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
