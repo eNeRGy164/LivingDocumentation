@@ -46,7 +46,9 @@ namespace LivingDocumentation
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Modifier Modifiers { get; set; }
 
-        public List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
+        [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeDescription>>))]
+        public List<IAttributeDescription> Attributes { get; } = new List<IAttributeDescription>();
 
         [JsonIgnore]
         public string Name => this.FullName.Substring(Math.Min(this.FullName.LastIndexOf('.') + 1, this.FullName.Length)).ToString();

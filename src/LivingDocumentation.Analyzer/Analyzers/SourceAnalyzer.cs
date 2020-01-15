@@ -65,6 +65,7 @@ namespace LivingDocumentation
 
                 fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
                 this.EnsureMemberDefaultAccessModifier(fieldDescription);
+                this.ExtractAttributes(node.AttributeLists, fieldDescription.Attributes);
 
                 fieldDescription.Initializer = variable.Initializer?.Value.ToString();
                 fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
@@ -77,14 +78,15 @@ namespace LivingDocumentation
         {
             foreach (var variable in node.Declaration.Variables)
             {
-                var fieldDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
-                this.currentType.AddMember(fieldDescription);
+                var eventDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
+                this.currentType.AddMember(eventDescription);
 
-                fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
-                this.EnsureMemberDefaultAccessModifier(fieldDescription);
+                eventDescription.Modifiers |= ParseModifiers(node.Modifiers);
+                this.EnsureMemberDefaultAccessModifier(eventDescription);
+                this.ExtractAttributes(node.AttributeLists, eventDescription.Attributes);
 
-                fieldDescription.Initializer = variable.Initializer?.Value.ToString();
-                fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
+                eventDescription.Initializer = variable.Initializer?.Value.ToString();
+                eventDescription.DocumentationComments = this.ExtractDocumentation(variable);
             }
 
             base.VisitEventFieldDeclaration(node);
@@ -97,6 +99,7 @@ namespace LivingDocumentation
 
             propertyDescription.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureMemberDefaultAccessModifier(propertyDescription);
+            this.ExtractAttributes(node.AttributeLists, propertyDescription.Attributes);
 
             propertyDescription.Initializer = node.Initializer?.Value.ToString();
             propertyDescription.DocumentationComments = this.ExtractDocumentation(node);
@@ -153,10 +156,7 @@ namespace LivingDocumentation
 
             this.currentType.DocumentationComments = this.ExtractDocumentation(node);
 
-            if (node.AttributeLists != null)
-            {
-                this.ExtractAttributes(node);
-            }
+            this.ExtractAttributes(node.AttributeLists, this.currentType.Attributes);
         }
 
         private void EnsureTypeDefaultAccessModifier(BaseTypeDeclarationSyntax node)
@@ -201,12 +201,17 @@ namespace LivingDocumentation
             return true;
         }
 
-        private void ExtractAttributes(BaseTypeDeclarationSyntax node)
+        private void ExtractAttributes(SyntaxList<AttributeListSyntax> attributes, List<IAttributeDescription> attributeDescriptions)
         {
-            foreach (var attribute in node.AttributeLists.SelectMany(a => a.Attributes))
+            if (attributes == null)
+            {
+                return;
+            }
+
+            foreach (var attribute in attributes.SelectMany(a => a.Attributes))
             {
                 var attributeDescription = new AttributeDescription(this.semanticModel.GetTypeDisplayString(attribute), attribute.Name.ToString());
-                this.currentType.Attributes.Add(attributeDescription);
+                attributeDescriptions.Add(attributeDescription);
 
                 if (attribute.ArgumentList != null)
                 {
@@ -241,7 +246,9 @@ namespace LivingDocumentation
         {
             method.Modifiers |= ParseModifiers(node.Modifiers);
             method.DocumentationComments = this.ExtractDocumentation(node);
+            
             this.EnsureMemberDefaultAccessModifier(method);
+            this.ExtractAttributes(node.AttributeLists, method.Attributes);
 
             foreach (var parameter in node.ParameterList.Parameters)
             {
