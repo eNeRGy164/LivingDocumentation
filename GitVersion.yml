@@ -1,9 +1,9 @@
-mode: ContinuousDelivery
+mode: Mainline
 branches:
   feature:
     regex: ^(?!master)
-    tag: ''
+    tag: 'beta'
   pull-request:
-    tag: ''
+    tag: 'rc'
 ignore:
   sha: []
