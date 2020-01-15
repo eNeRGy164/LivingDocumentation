@@ -1,4 +1,9 @@
 mode: ContinuousDelivery
-branches: {}
+branches:
+  feature:
+    regex: ^(?!master)
+    tag: ''
+  pull-request:
+    tag: ''
 ignore:
   sha: []
