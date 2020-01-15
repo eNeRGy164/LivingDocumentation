@@ -12,7 +12,7 @@ namespace LivingDocumentation
         public string Name { get; }
 
         [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
-        [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeDescription>>))]
+        [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeArgumentDescription>>))]
         public List<IAttributeArgumentDescription> Arguments { get; } = new List<IAttributeArgumentDescription>();
 
         public AttributeDescription(string type, string name)

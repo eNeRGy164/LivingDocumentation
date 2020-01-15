@@ -1,4 +1,10 @@
-mode: ContinuousDelivery
-branches: {}
+mode: Mainline
+branches:
+  feature:
+    regex: ^(?!master|pull)
+    tag: beta
+  pull-request:
+    tag: rc
+    tag-number-pattern: ''
 ignore:
   sha: []

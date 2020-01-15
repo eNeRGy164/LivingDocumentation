@@ -17,6 +17,8 @@ namespace LivingDocumentation
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
+            serializer.TypeNameHandling = TypeNameHandling.None;
+
             serializer.Serialize(writer, value);
         }
     }
