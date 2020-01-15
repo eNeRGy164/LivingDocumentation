@@ -194,6 +194,44 @@ namespace LivingDocumentation.Analyzer.Tests
         }
 
         [TestMethod]
+        public void ParameterWithoutAttributes_Should_HaveEmptyAttributeCollection()
+        {
+            // Assign
+            var source = @"
+            class Test
+            {
+                void Method(string body) {}
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source);
+
+            // Assert
+            types[0].Methods[0].Parameters[0].Attributes.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void ParameterWithAttribute_Should_HaveAttributeInCollection()
+        {
+            // Assign
+            var source = @"
+            class Test
+            {
+                void Method([System.ParamArray] string[] params) {}
+            }
+            ";
+
+            // Act
+            var types = TestHelper.VisitSyntaxTree(source, ignoreErrorCodes: "CS0674");
+
+            // Assert
+            types[0].Methods[0].Parameters[0].Attributes.Should().HaveCount(1);
+            types[0].Methods[0].Parameters[0].Attributes[0].Should().NotBeNull();
+            types[0].Methods[0].Parameters[0].Attributes[0].Name.Should().Be("System.ParamArray");
+        }
+
+        [TestMethod]
         public void ConstructorWithoutAttributes_Should_HaveEmptyAttributeCollection()
         {
             // Assign

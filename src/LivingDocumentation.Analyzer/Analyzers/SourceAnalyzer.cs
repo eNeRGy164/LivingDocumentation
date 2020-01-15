@@ -256,6 +256,7 @@ namespace LivingDocumentation
                 method.Parameters.Add(parameterDescription);
 
                 parameterDescription.HasDefaultValue = parameter.Default != null;
+                this.ExtractAttributes(parameter.AttributeLists, parameterDescription.Attributes);
             }
 
             var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, method.Statements);
