@@ -1,9 +1,9 @@
 mode: Mainline
 branches:
   feature:
-    regex: ^(?!master)
-    tag: 'beta'
+    regex: ^(?!master|pull)
+    tag: beta
   pull-request:
-    tag: 'rc'
+    tag: rc
 ignore:
   sha: []
