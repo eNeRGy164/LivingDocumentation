@@ -39,14 +39,8 @@ namespace LivingDocumentation
             stopwatch.Stop();
 
             // Write analysis 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore,
-                ContractResolver = new SkipEmptyCollectionsContractResolver(),
-                TypeNameHandling = TypeNameHandling.Auto,
-                Formatting = options.PrettyPrint ? Formatting.Indented : Formatting.None
-            };
+            var serializerSettings = JsonDefaults.SerializerSettings();
+            serializerSettings.Formatting = options.PrettyPrint ? Formatting.Indented : Formatting.None;
 
             var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
 

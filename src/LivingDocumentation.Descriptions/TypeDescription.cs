@@ -43,6 +43,7 @@ namespace LivingDocumentation
         public List<string> BaseTypes { get; } = new List<string>();
 
         [DefaultValue(Modifier.Internal)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public Modifier Modifiers { get; set; }
 
         public List<AttributeDescription> Attributes { get; } = new List<AttributeDescription>();
