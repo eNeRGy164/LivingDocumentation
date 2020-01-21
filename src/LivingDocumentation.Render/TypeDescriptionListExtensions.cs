@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivingDocumentation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,20 +9,39 @@ namespace LivingDocumentation
     {
         public static TypeDescription FirstOrDefault(this IEnumerable<TypeDescription> types, string typeName)
         {
+            if (types == null)
+            {
+                throw new ArgumentNullException(nameof(types));
+            }
+
             return types.FirstOrDefault(t => string.Equals(t.FullName, typeName));
         }
 
         public static IReadOnlyList<IHaveAMethodBody> GetInvokedMethod(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
-            return types
-                .Where(t => string.Equals(t.FullName, invocation.ContainingType))
-                .SelectMany(t => t.Methods.Cast<IHaveAMethodBody>().Concat(t.Constructors))
-                .Where(m => string.Equals(m.Name, invocation.Name) && MatchParameters(invocation, m))
+            if (types == null)
+            {
+                throw new ArgumentNullException(nameof(types));
+            }
+
+            var type = types.FirstOrDefault(invocation.ContainingType);
+            if (type == null)
+            {
+                return new List<IHaveAMethodBody>(0);
+            }
+
+            return type.MethodBodies()
+                .Where(m => invocation.MatchesMethod(m))
                 .ToList();
         }
 
         public static IReadOnlyList<InvocationDescription> GetInvocationConsequences(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
+            if (types == null)
+            {
+                throw new ArgumentNullException(nameof(types));
+            }
+
             var consequences = types.GetInvokedMethod(invocation)
                 .SelectMany(m => m.Statements.OfType<InvocationDescription>())
                 .SelectMany(im => types.GetInvocationConsequences(im))
@@ -33,6 +53,11 @@ namespace LivingDocumentation
 
         public static IReadOnlyList<Statement> GetInvocationConsequenceStatements(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
+            if (types == null)
+            {
+                throw new ArgumentNullException(nameof(types));
+            }
+
             var consequences = types.GetInvokedMethod(invocation)
                 .SelectMany(m => m.Statements)
                 .SelectMany(im => TraverseStatement(types, im))
@@ -42,8 +67,13 @@ namespace LivingDocumentation
             return consequences;
         }
 
-        private static IReadOnlyList<Statement> TraverseStatement(this IEnumerable<TypeDescription> types, Statement sourceStatement)
+        public static IReadOnlyList<Statement> TraverseStatement(this IEnumerable<TypeDescription> types, Statement sourceStatement)
         {
+            if (types == null)
+            {
+                throw new ArgumentNullException(nameof(types));
+            }
+
             switch (sourceStatement)
             {
                 case InvocationDescription invocationDescription:
@@ -66,7 +96,7 @@ namespace LivingDocumentation
 
                     destinationSwitch.Expression = sourceSwitch.Expression;
 
-                    return new List<Statement> { destinationSwitch };
+                    return new List<Statement>(1) { destinationSwitch };
 
                 case If sourceIf:
                     var destinationÍf = new If();
@@ -85,33 +115,88 @@ namespace LivingDocumentation
                         destinationÍf.Sections.Add(section);
                     }
 
-                    return new List<Statement> { destinationÍf };
+                    return new List<Statement>(1) { destinationÍf };
 
                 default:
                     return new List<Statement>(0);
             }
         }
 
-        private static bool MatchParameters(InvocationDescription invocation, IHaveAMethodBody method)
+        public static void PopulateInheritedBaseTypes(this IEnumerable<TypeDescription> types)
         {
-            if (invocation.Arguments.Count == 0)
+            if (types == null)
             {
-                return method.Parameters.Count == 0;
+                throw new ArgumentNullException(nameof(types));
             }
 
-            var invokedWithTypes = invocation.Arguments.Select(a => a.Type).ToList();
-            if (invokedWithTypes.Count > method.Parameters.Count)
+            foreach (var type in types)
             {
-                return false;
+                for (var i = 0; i < type.BaseTypes.Count; i++)
+                {
+                    string baseType = type.BaseTypes[i];
+
+                    types.PopulateInheritedBaseTypes(baseType, type.BaseTypes);
+                }
+            }
+        }
+
+        private static void PopulateInheritedBaseTypes(this IEnumerable<TypeDescription> types, string fullName, List<string> baseTypes)
+        {
+            var type = types.FirstOrDefault(fullName);
+            if (type == null)
+            {
+                return;
             }
 
-            var optionalArguments = method.Parameters.Count(p => p.HasDefaultValue);
-            if (optionalArguments == 0)
+            foreach (var baseType in type.BaseTypes)
             {
-                return method.Parameters.Select(p => p.Type).SequenceEqual(invokedWithTypes);
+                if (!baseTypes.Contains(baseType))
+                {
+                    baseTypes.Add(baseType);
+                }
+
+                types.PopulateInheritedBaseTypes(baseType, baseTypes);
+            }
+        }
+
+        public static void PopulateInheritedMembers(this IEnumerable<TypeDescription> types)
+        {
+            if (types == null)
+            {
+                throw new ArgumentNullException(nameof(types));
             }
 
-            return method.Parameters.Take(invokedWithTypes.Count).Select(p => p.Type).SequenceEqual(invokedWithTypes);
+            foreach (var type in types)
+            {
+                foreach (string baseType in type.BaseTypes)
+                {
+                    var inheretedType = types.FirstOrDefault(baseType);
+                    if (inheretedType == null)
+                    {
+                        continue;
+                    }
+
+                    InheritMember(type, type.Fields, inheretedType.Fields);
+                    InheritMember(type, type.Constructors, inheretedType.Constructors);
+                    InheritMember(type, type.Properties, inheretedType.Properties);
+                    InheritMember(type, type.Methods, inheretedType.Methods);
+                    InheritMember(type, type.EnumMembers, inheretedType.EnumMembers);
+                    InheritMember(type, type.Events, inheretedType.Events);
+                }
+            }
+        }
+
+        private static void InheritMember(TypeDescription type, IReadOnlyList<MemberDescription> typeMembers, IReadOnlyList<MemberDescription> baseTypeMembers)
+        {
+            foreach (var member in baseTypeMembers.Where(f => !f.IsPrivate()))
+            {
+                // TODO: More complex support for overrides, etc.
+                if (!typeMembers.Contains(member))
+                {
+                    // TODO: Clone?
+                    type.AddMember(member);
+                }
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace LivingDocumentation
 {
@@ -51,10 +52,10 @@ namespace LivingDocumentation
         public List<IAttributeDescription> Attributes { get; } = new List<IAttributeDescription>();
 
         [JsonIgnore]
-        public string Name => this.FullName.Substring(Math.Min(this.FullName.LastIndexOf('.') + 1, this.FullName.Length)).ToString();
+        public string Name => this.FullName.ClassName();
 
         [JsonIgnore]
-        public string Namespace => this.FullName.Substring(0, Math.Max(this.FullName.LastIndexOf('.'), 0));
+        public string Namespace => this.FullName.Namespace();
 
         [JsonIgnore]
         public IReadOnlyList<ConstructorDescription> Constructors => this.constructors;
@@ -112,12 +113,29 @@ namespace LivingDocumentation
             if (!(obj is TypeDescription)) return false;
 
             var other = (TypeDescription)obj;
-            return string.Equals(this.FullName, other.FullName, StringComparison.Ordinal);
+            return string.Equals(this.FullName, other.FullName);
         }
 
         public override int GetHashCode()
         {
             return this.FullName.GetHashCode();
+        }
+
+        public IEnumerable<IHaveAMethodBody> MethodBodies()
+        {
+            return this.Constructors
+                .Cast<IHaveAMethodBody>()
+                .Concat(this.Methods);
+        }
+
+        public bool ImplementsType(string fullName)
+        {
+            return this.BaseTypes.Contains(fullName);
+        }
+
+        public bool ImplementsTypeStartsWith(string partialName)
+        {
+            return this.BaseTypes.Any(bt => bt.StartsWith(partialName, StringComparison.Ordinal));
         }
     }
 }

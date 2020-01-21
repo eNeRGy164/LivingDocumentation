@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>LivingDocumentation</RootNamespace>
     <LangVersion>latest</LangVersion>
     
@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LivingDocumentation.Abstractions\LivingDocumentation.Abstractions.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj" />
   </ItemGroup>
 
 </Project>
