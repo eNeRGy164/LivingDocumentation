@@ -127,7 +127,7 @@ namespace LivingDocumentation.Analyzer.Tests
         }
 
         [TestMethod]
-        public void TypeDescription_AddMember_Should_ThrowEdescriptionception()
+        public void TypeDescription_AddMember_Should_ThrowNotSupportedException()
         {
             var description = new TypeDescription(0, null);
 
@@ -150,6 +150,106 @@ namespace LivingDocumentation.Analyzer.Tests
             var description = new TypeDescription(0, null);
 
             description.Attributes.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void TypeDescription_MethodBodies_ConstuctorsAndMethodBodies_Should_BeReturnConcatenated()
+        {
+            // Assign
+            var description = new TypeDescription(TypeType.Class, "Test");
+            var c = new ConstructorDescription("Test");
+            description.AddMember(c);
+            var m = new MethodDescription("void", "Method");
+            description.AddMember(m);
+
+            // Act
+            var bodies = description.MethodBodies();
+
+            // Assert
+            bodies.Should().AllBeAssignableTo<IHaveAMethodBody>();
+            bodies.Should().BeEquivalentTo(c, m);
+        }
+
+        [TestMethod]
+        public void TypeDescription_ImplementsType_DoesNotHaveAnyBaseTypes_Should_ReturnFalse()
+        {
+            // Assign
+            var description = new TypeDescription(TypeType.Class, "Test");
+
+            // Act
+            var implementsType = description.ImplementsType("System.Object");
+
+            // Assert
+            implementsType.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void TypeDescription_ImplementsType_DoesHaveBaseType_Should_ReturnTrue()
+        {
+            // Assign
+            var description = new TypeDescription(TypeType.Class, "Test");
+            description.BaseTypes.Add("System.Object");
+
+            // Act
+            var implementsType = description.ImplementsType("System.Object");
+
+            // Assert
+            implementsType.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TypeDescription_ImplementsType_DoesNotHaveBaseType_Should_ReturnFalse()
+        {
+            // Assign
+            var description = new TypeDescription(TypeType.Class, "Test");
+            description.BaseTypes.Add("System.Object");
+
+            // Act
+            var implementsType = description.ImplementsType("System.Object2");
+
+            // Assert
+            implementsType.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void TypeDescription_ImplementsTypeStartsWith_DoesNotHaveAnyBaseTypes_Should_ReturnFalse()
+        {
+            // Assign
+            var description = new TypeDescription(TypeType.Class, "Test");
+
+            // Act
+            var implementsType = description.ImplementsTypeStartsWith("System.Object");
+
+            // Assert
+            implementsType.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void TypeDescription_ImplementsTypeStartsWith_DoesHaveBaseType_Should_ReturnTrue()
+        {
+            // Assign
+            var description = new TypeDescription(TypeType.Class, "Test");
+            description.BaseTypes.Add("System.Object");
+
+            // Act
+            var implementsType = description.ImplementsTypeStartsWith("System.");
+
+            // Assert
+            implementsType.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TypeDescription_ImplementsTypeStartsWith_DoesNotHaveBaseType_Should_ReturnFalse()
+        {
+            // Assign
+            var description = new TypeDescription(TypeType.Class, "Test");
+            description.BaseTypes.Add("System.Object");
+
+            // Act
+            var implementsType = description.ImplementsTypeStartsWith("SystemX.");
+
+            // Assert
+            implementsType.Should().BeFalse();
         }
 
         private class UnsupportedMemberDescription : MemberDescription
