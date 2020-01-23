@@ -17,6 +17,7 @@ namespace LivingDocumentation
         [JsonIgnore]
         public bool IsInherited { get; internal set; } = false;
 
+        [JsonConverter(typeof(ConcreteTypeConverter<DocumentationCommentsDescription>))]
         public IHaveDocumentationComments DocumentationComments { get; set; }
 
         [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
