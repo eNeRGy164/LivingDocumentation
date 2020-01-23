@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace LivingDocumentation
 {
@@ -10,6 +11,7 @@ namespace LivingDocumentation
 
         List<IParameterDescription> Parameters { get; }
 
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Arrays)]
         List<Statement> Statements { get; }
 
         List<IAttributeDescription> Attributes { get; }
