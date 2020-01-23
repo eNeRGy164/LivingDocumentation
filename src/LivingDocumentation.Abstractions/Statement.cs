@@ -5,7 +5,7 @@ namespace LivingDocumentation
 {
     public abstract class Statement
     {
-        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Arrays)]
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Objects)]
         public virtual List<Statement> Statements { get; } = new List<Statement>();
     }
 }

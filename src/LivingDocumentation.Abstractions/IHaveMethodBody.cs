@@ -11,7 +11,7 @@ namespace LivingDocumentation
 
         List<IParameterDescription> Parameters { get; }
 
-        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Arrays)]
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Objects)]
         List<Statement> Statements { get; }
 
         List<IAttributeDescription> Attributes { get; }
