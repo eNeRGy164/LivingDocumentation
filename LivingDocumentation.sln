@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Descrip
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Statements", "src\LivingDocumentation.Statements\LivingDocumentation.Statements.csproj", "{B20022C7-CD5D-4E81-BE07-17CF155E8CF1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.eShopOnContainers", "samples\LivingDocumentation.eShopOnContainers\LivingDocumentation.eShopOnContainers.csproj", "{A28A9E7A-DB6F-4210-8069-CF6166500FA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Sample.eShopOnContainers", "samples\LivingDocumentation.eShopOnContainers\LivingDocumentation.Sample.eShopOnContainers.csproj", "{A28A9E7A-DB6F-4210-8069-CF6166500FA0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.UML", "src\LivingDocumentation.UML\LivingDocumentation.UML.csproj", "{570577AE-FD4B-4410-883E-49970BAD9C5D}"
 EndProject
@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.RenderExtensions.Tests", "tests\LivingDocumentation.RenderExtensions.Tests\LivingDocumentation.RenderExtensions.Tests.csproj", "{0A28D3CE-00A8-4473-B571-F8AE0FFFF1AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.Serializations.Tests", "tests\LivingDocumentation.Serializations.Tests\LivingDocumentation.Serializations.Tests.csproj", "{B24D4233-6227-43C1-A402-53AC5706633A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Serializations.Tests", "tests\LivingDocumentation.Serializations.Tests\LivingDocumentation.Serializations.Tests.csproj", "{B24D4233-6227-43C1-A402-53AC5706633A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
