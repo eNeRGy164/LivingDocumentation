@@ -124,5 +124,13 @@ namespace LivingDocumentation
 
             base.VisitArrowExpressionClause(node);
         }
+
+        public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
+        {
+            var assignmentDescription = new AssignmentDescription(node.Left.ToString(), node.OperatorToken.Text, node.Right.ToString());
+            this.statements.Add(assignmentDescription);
+
+            base.VisitAssignmentExpression(node);
+        }
     }
 }
