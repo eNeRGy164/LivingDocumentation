@@ -140,10 +140,15 @@ namespace LivingDocumentation
 
         private void ExtractBaseTypeDeclaration(TypeType type, BaseTypeDeclarationSyntax node)
         {
-            this.currentType = new TypeDescription(type, this.semanticModel.GetDeclaredSymbol(node).ToDisplayString());
-            if (!this.types.Contains(this.currentType))
+            var currentType = new TypeDescription(type, this.semanticModel.GetDeclaredSymbol(node).ToDisplayString());
+            if (!this.types.Contains(currentType))
             {
-                this.types.Add(this.currentType);
+                this.types.Add(currentType);
+                this.currentType = currentType;
+            }
+            else
+            {
+                this.currentType = this.types.First(t => string.Equals(t.FullName, currentType.FullName, StringComparison.Ordinal));
             }
 
             if (node.BaseList != null)
@@ -246,7 +251,7 @@ namespace LivingDocumentation
         {
             method.Modifiers |= ParseModifiers(node.Modifiers);
             method.DocumentationComments = this.ExtractDocumentation(node);
-            
+
             this.EnsureMemberDefaultAccessModifier(method);
             this.ExtractAttributes(node.AttributeLists, method.Attributes);
 
