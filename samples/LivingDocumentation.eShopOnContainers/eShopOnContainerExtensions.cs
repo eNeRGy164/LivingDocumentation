@@ -1,7 +1,5 @@
-﻿using LivingDocumentation.Uml;
-using System;
+﻿using System;
 using System.Linq;
-using System.Text;
 
 namespace LivingDocumentation.eShopOnContainers
 {
@@ -17,17 +15,17 @@ namespace LivingDocumentation.eShopOnContainers
         {
             if (name.EndsWith(IntegrationEvent))
             {
-                return "[#Green]";
+                return "Green";
             }
 
             if (name.EndsWith(DomainEvent))
             {
-                return "[#OrangeRed]";
+                return "OrangeRed";
             }
 
             if (name.EndsWith(Command))
             {
-                return "[#DodgerBlue]";
+                return "DodgerBlue";
             }
 
             return string.Empty;
@@ -118,33 +116,6 @@ namespace LivingDocumentation.eShopOnContainers
             }
 
             return false;
-        }
-
-        public static void RenderProperty(this PropertyDescription property, StringBuilder stringBuilder)
-        {
-            if (property.IsStatic()) stringBuilder.Append("{static} ");
-            stringBuilder.Append(property.ToUmlVisibility());
-            stringBuilder.AppendLine(property.Name);
-        }
-
-        public static void RenderStereoType(this TypeDescription type, StringBuilder stringBuilder)
-        {
-            stringBuilder.Append("<<");
-            if (type.IsEnumeration()) stringBuilder.Append("enumeration");
-            if (type.IsAggregateRoot()) stringBuilder.Append("(R, LightBlue)root");
-            if (type.IsValueObject()) stringBuilder.Append("(O, Wheat)value object");
-            if (type.IsEntity()) stringBuilder.Append("entity");
-            stringBuilder.Append(">>");
-        }
-
-        public static void RenderMethod(this MethodDescription method, StringBuilder stringBuilder)
-        {
-            if (method.IsStatic()) stringBuilder.Append("{static} ");
-            stringBuilder.Append(method.ToUmlVisibility());
-            stringBuilder.Append(method.Name);
-            stringBuilder.Append('(');
-            stringBuilder.AppendJoin(", ", method.Parameters.Select(s => s.Name));
-            stringBuilder.AppendLine(")");
         }
 
         public static bool IsAggregateRoot(this TypeDescription type)

@@ -2,24 +2,29 @@
 {
     public static class IHaveModifiersExtensions
     { 
-        public static char ToUmlVisibility(this IHaveModifiers modifiers)
+        public static VisibilityModifier ToUmlVisibility(this IHaveModifiers modifiers)
         {
             if (modifiers.IsPublic())
             {
-                return '+';
+                return VisibilityModifier.Public;
             }
 
             if (modifiers.IsInternal())
             {
-                return '~';
+                return VisibilityModifier.PackagePrivate;
             }
 
             if (modifiers.IsProtected())
             {
-                return '#';
+                return VisibilityModifier.Protected;
             }
 
-            return '-';
+            if (modifiers.IsPrivate())
+            {
+                return VisibilityModifier.Private;
+            }
+
+            return VisibilityModifier.None;
         }
     }
 }
