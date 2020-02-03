@@ -1,3 +1,4 @@
+﻿using LivingDocumentation.Uml;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,30 +8,23 @@ namespace LivingDocumentation.eShopOnContainers
 {
     public class CommandHandlerRenderer
     {
-        private readonly IList<TypeDescription> types;
-
-        public CommandHandlerRenderer(IList<TypeDescription> types)
-        {
-            this.types = types;
-        }
-
         public IReadOnlyDictionary<string, string> Render()
         {
             var files = new Dictionary<string, string>();
 
-            var commandHandlers = types.Where(t => t.IsCommandHandler()).ToList();
+            var commandHandlers = Program.Types.Where(t => t.IsCommandHandler()).ToList();
 
             foreach (var commandHandler in commandHandlers)
             {
                 var commandHandlerName = commandHandler.Name;
 
                 var message = commandHandler.GetCommandHandlerDeclaration().GenericTypes().First();
-                var messageType = types.FirstOrDefault(message);
+                var messageType = Program.Types.FirstOrDefault(message);
 
                 var aggregates = new List<string>();
                 var flowBuilder = new StringBuilder();
 
-                flowBuilder.AppendLine($"Q-{messageType.Name.ArrowColor()}>H ++:{messageType.Name.FormatForDiagram()}");
+                flowBuilder.Arrow("Q", "->", "H", label: messageType.Name.FormatForDiagram(), color: messageType.Name.ArrowColor(), activateTarget: true);
 
                 var handlingMethod = commandHandler.HandlingMethod(message);
 
@@ -47,27 +41,32 @@ namespace LivingDocumentation.eShopOnContainers
 
                                 foreach (var invocation in section.Statements.OfType<InvocationDescription>())
                                 {
-                                    TraverseInvocation(aggregates, sectionBuilder, invocation);
+                                    this.TraverseInvocation(aggregates, sectionBuilder, invocation);
                                 }
 
                                 if (sectionBuilder.Length > 0)
                                 {
-                                    var first = switchBuilder.Length == 0;
-                                    if (first) switchBuilder.AppendLine("||5||");
-                                    switchBuilder.Append(first ? "alt " : "else ");
-                                    switchBuilder.AppendJoin(',', section.Labels);
-                                    switchBuilder.AppendLine();
-                                    switchBuilder.AppendLine("||5||");
+                                    if (switchBuilder.Length == 0)
+                                    {
+                                        switchBuilder.Space(5);
+                                        switchBuilder.AltStart(string.Join(',', section.Labels));
+                                    }
+                                    else
+                                    {
+                                        switchBuilder.ElseStart();
+                                    }
+
+                                    switchBuilder.Space(5);
                                     switchBuilder.Append(sectionBuilder);
-                                    switchBuilder.AppendLine("||5||");
+                                    switchBuilder.Space(5);
                                 }
                             }
 
                             if (switchBuilder.Length > 0)
                             {
                                 flowBuilder.Append(switchBuilder);
-                                flowBuilder.AppendLine("end");
-                                flowBuilder.AppendLine("||5||");
+                                flowBuilder.GroupEnd();
+                                flowBuilder.Space(5);
                             }
                             break;
 
@@ -80,70 +79,76 @@ namespace LivingDocumentation.eShopOnContainers
 
                                 foreach (var invocation in section.Statements.OfType<InvocationDescription>())
                                 {
-                                    TraverseInvocation(aggregates, sectionBuilder, invocation);
+                                    this.TraverseInvocation(aggregates, sectionBuilder, invocation);
                                 }
 
                                 if (sectionBuilder.Length > 0)
                                 {
-                                    var first = ifBuilder.Length == 0;
-                                    if (first) ifBuilder.AppendLine("||5||");
-                                    ifBuilder.Append(first ? "alt " : "else ");
-                                    ifBuilder.AppendLine(section.Condition ?? "");
-                                    ifBuilder.AppendLine("||5||");
+                                    if (ifBuilder.Length == 0)
+                                    {
+                                        ifBuilder.Space(5);
+                                        ifBuilder.AltStart(section.Condition);
+                                    }
+                                    else
+                                    {
+                                        ifBuilder.ElseStart(section.Condition);
+                                    }
+
+                                    ifBuilder.Space(5);
                                     ifBuilder.Append(sectionBuilder);
-                                    ifBuilder.AppendLine("||5||");
+                                    ifBuilder.Space(5);
                                 }
                             }
 
                             if (ifBuilder.Length > 0)
                             {
                                 flowBuilder.Append(ifBuilder);
-                                flowBuilder.AppendLine("end");
-                                flowBuilder.AppendLine("||5||");
+                                flowBuilder.GroupEnd();
+                                flowBuilder.Space(5);
                             }
                             break;
 
                         case InvocationDescription invocation:
-                            TraverseInvocation(aggregates, flowBuilder, invocation);
+                            this.TraverseInvocation(aggregates, flowBuilder, invocation);
                             break;
                     }
                 }
 
-                flowBuilder.AppendLine("deactivate H");
+                flowBuilder.Deactivate("H");
 
                 var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine("@startuml");
-                stringBuilder.AppendLine("skinparam lifelineStrategy solid");
-                stringBuilder.AppendLine("skinparam SequenceArrowThickness 2");
-                stringBuilder.AppendLine("skinparam SequenceBoxBackgroundColor SeaShell");
-                stringBuilder.AppendLine("skinparam SequenceLifeLineBorderColor Black");
-                stringBuilder.AppendLine("skinparam SequenceLifeLineBorderThickness 2");
-                stringBuilder.AppendLine("skinparam BoxPadding 20");
-                stringBuilder.AppendLine("skinparam ParticipantPadding 20");
-                stringBuilder.AppendLine("skinparam ArrowColor Black");
-                stringBuilder.AppendLine("skinparam SequenceMessageAlignment ReverseDirection");
-                stringBuilder.AppendLine("queue Queue as Q");
-                stringBuilder.AppendLine($"box \"{commandHandlerName.FormatForDiagram()}\"");
-                stringBuilder.AppendLine($"participant Handle as H");
+                stringBuilder.UmlDiagramStart();
+                stringBuilder.SkinParameter("lifelineStrategy", "solid");
+                stringBuilder.SkinParameter("SequenceArrowThickness", "2");
+                stringBuilder.SkinParameter("SequenceBoxBackgroundColor", "SeaShell");
+                stringBuilder.SkinParameter("SequenceLifeLineBorderColor", "Black");
+                stringBuilder.SkinParameter("SequenceLifeLineBorderThickness", "2");
+                stringBuilder.SkinParameter("BoxPadding", "20");
+                stringBuilder.SkinParameter("ParticipantPadding", "20");
+                stringBuilder.SkinParameter("ArrowColor", "Black");
+                stringBuilder.SkinParameter("SequenceMessageAlignment", "ReverseDirection");
+                stringBuilder.Participant("Q", displayName: "Queue", type: ParticipantType.Queue);
+                stringBuilder.BoxStart(commandHandlerName.FormatForDiagram());
+                stringBuilder.Participant("H", displayName: "Handle");
 
                 foreach (var aggregate in aggregates)
                 {
-                    stringBuilder.AppendLine($"entity {aggregate}");
+                    stringBuilder.Participant(aggregate, type: ParticipantType.Entity);
                 }
 
-                stringBuilder.AppendLine("end box");
-                stringBuilder.AppendLine("queue Domain as DQ");
-                stringBuilder.AppendLine("||5||");
+                stringBuilder.BoxEnd();
+                stringBuilder.Participant("DQ", displayName: "Domain", type: ParticipantType.Queue);
+                stringBuilder.Space(5);
 
                 stringBuilder.Append(flowBuilder);
 
                 foreach (var aggregate in aggregates)
                 {
-                    stringBuilder.AppendLine($"deactivate {aggregate}");
+                    stringBuilder.Deactivate(aggregate);
                 }
 
-                stringBuilder.AppendLine("||5||");
-                stringBuilder.AppendLine("@enduml");
+                stringBuilder.Space(5);
+                stringBuilder.UmlDiagramEnd();
 
                 var fileName = $"commandhandler.{commandHandlerName.ToLowerInvariant()}.puml";
                 files.Add(commandHandler.FullName, fileName);
@@ -167,27 +172,32 @@ namespace LivingDocumentation.eShopOnContainers
 
                         foreach (var invokedMethod in section.Statements.OfType<InvocationDescription>())
                         {
-                            TraverseInvocation(aggregates, sectionBuilder, invokedMethod);
+                            this.TraverseInvocation(aggregates, sectionBuilder, invokedMethod);
                         }
 
                         if (sectionBuilder.Length > 0)
                         {
-                            var first = switchBuilder.Length == 0;
-                            if (first) switchBuilder.AppendLine("||5||");
-                            switchBuilder.Append(first ? "alt " : "else ");
-                            switchBuilder.AppendJoin(',', section.Labels);
-                            switchBuilder.AppendLine();
-                            switchBuilder.AppendLine("||5||");
+                            if (switchBuilder.Length == 0)
+                            {
+                                switchBuilder.Space(5);
+                                switchBuilder.AltStart(string.Join(',', section.Labels));
+                            }
+                            else
+                            {
+                                switchBuilder.ElseStart();
+                            }
+
+                            switchBuilder.Space(5);
                             switchBuilder.Append(sectionBuilder);
-                            switchBuilder.AppendLine("||5||");
+                            switchBuilder.Space(5);
                         }
                     }
 
                     if (switchBuilder.Length > 0)
                     {
                         stringBuilder.Append(switchBuilder);
-                        stringBuilder.AppendLine("end");
-                        stringBuilder.AppendLine("||5||");
+                        stringBuilder.GroupEnd();
+                        stringBuilder.Space(5);
                     }
                     break;
 
@@ -200,60 +210,65 @@ namespace LivingDocumentation.eShopOnContainers
 
                         foreach (var invokedMethod in section.Statements.OfType<InvocationDescription>())
                         {
-                            TraverseInvocation(aggregates, sectionBuilder, invokedMethod);
+                            this.TraverseInvocation(aggregates, sectionBuilder, invokedMethod);
                         }
 
                         if (sectionBuilder.Length > 0)
                         {
-                            var first = ifBuilder.Length == 0;
-                            if (first) ifBuilder.AppendLine("||5||");
-                            ifBuilder.Append(first ? "group if " : "else ");
-                            ifBuilder.AppendLine(string.IsNullOrEmpty(section.Condition) ? string.Empty : $" [{section.Condition.Replace("\n", "\\n")}]");
-                            ifBuilder.AppendLine("||5||");
+                            if (ifBuilder.Length == 0)
+                            {
+                                ifBuilder.Space(5);
+                                ifBuilder.GroupStart(label: "if", text: section.Condition);
+                            }
+                            else
+                            {
+                                ifBuilder.ElseStart(section.Condition);
+                            }
+
+                            ifBuilder.Space(5);
                             ifBuilder.Append(sectionBuilder);
-                            ifBuilder.AppendLine("||5||");
+                            ifBuilder.Space(5);
                         }
                     }
 
                     if (ifBuilder.Length > 0)
                     {
                         stringBuilder.Append(ifBuilder);
-                        stringBuilder.AppendLine("end");
-                        stringBuilder.AppendLine("||5||");
+                        stringBuilder.GroupEnd();
+                        stringBuilder.Space(5);
                     }
                     break;
 
                 case InvocationDescription invokedMethod:
                     {
-                        var containingType = types.FirstOrDefault(invokedMethod.ContainingType);
+                        var containingType = Program.Types.FirstOrDefault(invokedMethod.ContainingType);
                         if (containingType.IsAggregateRoot())
                         {
                             if (!aggregates.Contains(containingType.Name))
                             {
                                 aggregates.Add(containingType.Name);
-                                var prefix = string.Empty;
-                                if (containingType.Name == invokedMethod.Name) prefix = "new ";
-                                stringBuilder.AppendLine($"H->{containingType.Name} ++:{prefix}{invokedMethod.Name.FormatForDiagram()}");
+                                var prefix = (containingType.Name == invokedMethod.Name) ? "new " : string.Empty;
+                                stringBuilder.Arrow("H", "->", containingType.Name, label: prefix + invokedMethod.Name.FormatForDiagram(), activateTarget: true);
                             }
                             else
                             {
-                                if (types.GetInvokedMethod(invokedMethod).First().IsPublic())
+                                if (Program.Types.GetInvokedMethod(invokedMethod).First().IsPublic())
                                 {
-                                    stringBuilder.AppendLine($"H->{containingType.Name}:{invokedMethod.Name.FormatForDiagram()}");
+                                    stringBuilder.Arrow("H", "->", containingType.Name, label: invokedMethod.Name.FormatForDiagram());
                                 }
                             }
 
-                            foreach (var call in types.GetInvocationConsequenceStatements(invokedMethod).Where(s => s != invokedMethod))
+                            foreach (var call in Program.Types.GetInvocationConsequenceStatements(invokedMethod).Where(s => s != invokedMethod))
                             {
-                                TraverseInvocation(aggregates, stringBuilder, call);
+                                this.TraverseInvocation(aggregates, stringBuilder, call);
                             }
                         }
                         else
                         {
-                            foreach (var call in types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
+                            foreach (var call in Program.Types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
                             {
-                                var eventType = types.FirstOrDefault(call.Arguments.First().Type);
-                                stringBuilder.AppendLine($"H-{eventType.Name.ArrowColor()}>DQ:{eventType.Name.FormatForDiagram()}");
+                                var eventType = Program.Types.FirstOrDefault(call.Arguments.First().Type);
+                                stringBuilder.Arrow("H", "->", "DQ", label: eventType.Name.FormatForDiagram(), color: eventType.Name.ArrowColor());
                             }
                         }
                     }

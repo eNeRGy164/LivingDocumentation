@@ -7,18 +7,20 @@ namespace LivingDocumentation.eShopOnContainers
 {
     public class Program
     {
+        public static List<TypeDescription> Types;
+
         public static async Task Main(string[] args)
         {
             // Read analysis 
             var result = await File.ReadAllTextAsync("analysis.json");
 
-            var types = JsonConvert.DeserializeObject<List<TypeDescription>>(result, JsonDefaults.DeserializerSettings());
+            Types = JsonConvert.DeserializeObject<List<TypeDescription>>(result, JsonDefaults.DeserializerSettings());
             
-            var aggregateFiles = new AggregateRenderer(types).Render();
-            var commandHandlerFiles = new CommandHandlerRenderer(types).Render();
-            var eventHandlerFiles = new EventHandlerRenderer(types).Render();
+            var aggregateFiles = new AggregateRenderer().Render();
+            var commandHandlerFiles = new CommandHandlerRenderer().Render();
+            var eventHandlerFiles = new EventHandlerRenderer().Render();
 
-            new AsciiDocRenderer(types, aggregateFiles, commandHandlerFiles, eventHandlerFiles).Render();
+            new AsciiDocRenderer(Types, aggregateFiles, commandHandlerFiles, eventHandlerFiles).Render();
         }
     }
 }

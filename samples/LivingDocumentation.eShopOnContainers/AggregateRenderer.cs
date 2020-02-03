@@ -1,3 +1,4 @@
+﻿using LivingDocumentation.Uml;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,34 +8,27 @@ namespace LivingDocumentation.eShopOnContainers
 {
     public class AggregateRenderer
     {
-        private readonly IList<TypeDescription> types;
-
-        public AggregateRenderer(IList<TypeDescription> types)
-        {
-            this.types = types;
-        }
-
         public IReadOnlyDictionary<string, string> Render()
         {
             var files = new Dictionary<string, string>();
 
-            var aggregates = this.types.Where(t => t.IsAggregateRoot()).ToList();
+            var aggregates = Program.Types.Where(t => t.IsAggregateRoot()).ToList();
 
             foreach (var aggregate in aggregates)
             {
                 var aggregateName = aggregate.Name;
 
                 var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine("@startuml");
-                stringBuilder.AppendLine("skinparam MinClassWidth 160");
-                stringBuilder.AppendLine("skinparam Linetype ortho");
-                stringBuilder.AppendLine($"namespace {aggregateName} <<aggregate>> {{");
+                stringBuilder.UmlDiagramStart();
+                stringBuilder.SkinParameter("MinClassWidth", "160");
+                stringBuilder.SkinParameter("Linetype", "ortho");
+                stringBuilder.NamespaceStart(aggregateName, stereotype: "aggregate");
 
                 var rootBuilder = this.RenderClass(aggregate);
                 stringBuilder.Append(rootBuilder);
 
-                stringBuilder.AppendLine("}");
-                stringBuilder.AppendLine("@enduml");
+                stringBuilder.NamespaceEnd();
+                stringBuilder.UmlDiagramEnd();
 
                 var fileName = $"aggregate.{aggregateName.ToLowerInvariant()}.puml";
                 files.Add(aggregate.FullName, fileName);
@@ -49,53 +43,65 @@ namespace LivingDocumentation.eShopOnContainers
         {
             StringBuilder stringBuilder = new StringBuilder();
 
-            if (type.IsAbstract()) stringBuilder.Append("abstract ");
             if (type.IsEnumeration())
             {
-                stringBuilder.Append("enum");
-            }
-            else
-            {
-                stringBuilder.Append("class");
-            }
-            stringBuilder.Append($" {type.Name} ");
-            type.RenderStereoType(stringBuilder);
-            stringBuilder.AppendLine("{");
+                stringBuilder.EnumStart(type.Name, stereotype: "enumeration");
 
-            if (type.IsEnumeration())
-            {
                 foreach (var field in type.Fields)
                 {
-                    stringBuilder.AppendLine(field.Name);
+                    stringBuilder.ClassMember(field.Name);
                 }
+
+                stringBuilder.EnumEnd();
             }
             else
             {
+                if (type.IsAggregateRoot())
+                {
+                    stringBuilder.ClassStart(type.Name, isAbstract: type.IsAbstract(), stereotype: "root", customSpot: new CustomSpot('R', "LightBlue"));
+                }
+
+                if (type.IsValueObject())
+                {
+                    stringBuilder.ClassStart(type.Name, isAbstract: type.IsAbstract(), stereotype: "value object", customSpot: new CustomSpot('O', "Wheat"));
+                }
+
+                if (type.IsEntity())
+                {
+                    stringBuilder.ClassStart(type.Name, isAbstract: type.IsAbstract(), stereotype: "entity");
+                }
+
                 foreach (var property in type.Properties.Where(p => !p.IsPrivate()))
                 {
-                    property.RenderProperty(stringBuilder);
+                    stringBuilder.ClassMember(property.Name, isAbstract: property.IsAbstract(), isStatic: property.IsStatic(), visibility: property.ToUmlVisibility());
                 }
 
                 foreach (var method in type.Methods.Where(m => !m.IsPrivate()))
                 {
-                    method.RenderMethod(stringBuilder);
+                    var fullMethod = $"{method.Name}({string.Join(", ", method.Parameters.Select(s => s.Name))})";
+                    stringBuilder.ClassMember(fullMethod, isAbstract: method.IsAbstract(), isStatic: method.IsStatic(), visibility: method.ToUmlVisibility());
                 }
-            }
 
-            stringBuilder.AppendLine("}");
+                stringBuilder.ClassEnd();
+            }
 
             foreach (var propertyDescription in type.Properties)
             {
-                var property = this.types.FirstOrDefault(t => string.Equals(t.FullName, propertyDescription.Type) || (propertyDescription.Type.IsEnumerable() && string.Equals(t.FullName, propertyDescription.Type.GenericTypes().First())));
+                var property = Program.Types.FirstOrDefault(t => string.Equals(t.FullName, propertyDescription.Type) || (propertyDescription.Type.IsEnumerable() && string.Equals(t.FullName, propertyDescription.Type.GenericTypes().First())));
                 if (property != null)
                 {
                     var classBuilder = this.RenderClass(property);
                     stringBuilder.Append(classBuilder);
 
                     // Relation
-                    stringBuilder.Append($"{type.Name} -- {property.Name}");
-                    if (propertyDescription.Type.IsEnumerable()) stringBuilder.Append(" : 1..*");
-                    stringBuilder.AppendLine();
+                    if (propertyDescription.Type.IsEnumerable())
+                    {
+                        stringBuilder.Relationship(type.Name, "--", property.Name, label: "1..*");
+                    }
+                    else
+                    {
+                        stringBuilder.Relationship(type.Name, "--", property.Name);
+                    }
                 }
             }
 
