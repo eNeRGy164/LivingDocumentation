@@ -56,8 +56,6 @@ namespace LivingDocumentation.Uml
         /// <param name="style">The style of note. Default <see cref="NoteStyle.Normal"/>.</param>
         public static void Note(this StringBuilder stringBuilder, string participant, string note, NoteStyle style = NoteStyle.Normal)
         {
-            if (stringBuilder is null) throw new ArgumentNullException(nameof(stringBuilder));
-
             stringBuilder.Note(NotePosition.Over, note, participant: participant, style: style);
         }
 
@@ -70,8 +68,6 @@ namespace LivingDocumentation.Uml
         /// <param name="style">The style of note. Default <see cref="NoteStyle.Normal"/>.</param>
         public static void Note(this StringBuilder stringBuilder, string participantA, string participantB, string note, NoteStyle style = NoteStyle.Normal)
         {
-            if (stringBuilder is null) throw new ArgumentNullException(nameof(stringBuilder));
-
             stringBuilder.Note(NotePosition.Over, note, participant: participantA + Constant.Comma + participantB, style: style);
         }
     }

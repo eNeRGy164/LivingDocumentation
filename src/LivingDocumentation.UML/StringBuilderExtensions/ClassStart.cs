@@ -16,7 +16,7 @@ namespace LivingDocumentation.Uml
         /// <param name="backgroundColor">Optional background color.</param>
         /// <param name="extends">Optional class extension.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="stringBuilder"/> is <c>null</c>.</exception>
-        public static void ClassStart(this StringBuilder stringBuilder, string name, string displayName = null, bool isAbstract = false, string stereotype = null, CustomSpot? customSpot = null, string backgroundColor = null, string extends = null)
+        public static void ClassStart(this StringBuilder stringBuilder, string name, string displayName = null, bool isAbstract = false, string stereotype = null, CustomSpot? customSpot = null, Color backgroundColor = null, string extends = null)
         {
             if (stringBuilder is null) throw new ArgumentNullException(nameof(stringBuilder));
 
@@ -59,11 +59,6 @@ namespace LivingDocumentation.Uml
 
             if (!(backgroundColor is null))
             {
-                if (!backgroundColor.StartsWith(Constant.ColorPrefix, StringComparison.Ordinal))
-                {
-                    stringBuilder.Append(Constant.ColorPrefix);
-                }
-
                 stringBuilder.Append(backgroundColor);
                 stringBuilder.Append(Constant.Space);
             }

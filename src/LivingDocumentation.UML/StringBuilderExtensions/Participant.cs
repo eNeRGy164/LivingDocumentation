@@ -15,7 +15,7 @@ namespace LivingDocumentation.Uml
         /// <param name="order">Optional order of the participant.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="stringBuilder"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is <c>null</c>, empty of only white space.</exception>
-        public static void Participant(this StringBuilder stringBuilder, string name, string displayName = null, ParticipantType type = ParticipantType.Participant, string color = null, int? order = null)
+        public static void Participant(this StringBuilder stringBuilder, string name, string displayName = null, ParticipantType type = ParticipantType.Participant, Color color = null, int? order = null)
         {
             if (stringBuilder is null) throw new ArgumentNullException(nameof(stringBuilder));
 
@@ -44,16 +44,10 @@ namespace LivingDocumentation.Uml
                 stringBuilder.Append(order.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(color))
+            if (!(color is null))
             {
                 stringBuilder.Append(Constant.Space);
-
-                if (!color.StartsWith(Constant.ColorPrefix, StringComparison.Ordinal))
-                {
-                    stringBuilder.Append(Constant.ColorPrefix);
-                }
-
-                stringBuilder.Append(color.Trim());
+                stringBuilder.Append(color);
             }
 
             stringBuilder.AppendNewLine();

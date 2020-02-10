@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivingDocumentation.Uml;
+using System;
 using System.Linq;
 
 namespace LivingDocumentation.eShopOnContainers
@@ -11,24 +12,24 @@ namespace LivingDocumentation.eShopOnContainers
         private const string Command = "Command";
         private const string CommandHandler = "CommandHandler";
 
-        public static string ArrowColor(this string name)
+        public static Color ArrowColor(this string name)
         {
             if (name.EndsWith(IntegrationEvent))
             {
-                return "Green";
+                return NamedColor.Green;
             }
 
             if (name.EndsWith(DomainEvent))
             {
-                return "OrangeRed";
+                return NamedColor.OrangeRed;
             }
 
             if (name.EndsWith(Command))
             {
-                return "DodgerBlue";
+                return NamedColor.DodgerBlue;
             }
 
-            return string.Empty;
+            return null;
         }
 
         public static string FormatForDiagram(this string name)
@@ -120,7 +121,8 @@ namespace LivingDocumentation.eShopOnContainers
 
         public static bool IsAggregateRoot(this TypeDescription type)
         {
-            return type != null && type.Type == TypeType.Class && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.IAggregateRoot");
+            return type != null && type.Type == TypeType.Class 
+                && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.IAggregateRoot");
         }
 
         public static bool IsEnumeration(this TypeDescription type)

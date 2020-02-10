@@ -11,7 +11,7 @@ namespace LivingDocumentation.Uml
         /// <param name="title">Optional title of the box.</param>
         /// <param name="color">Optional background color of the box.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="stringBuilder"/> is <c>null</c>.</exception>
-        public static void BoxStart(this StringBuilder stringBuilder, string title = null, string color = null)
+        public static void BoxStart(this StringBuilder stringBuilder, string title = null, Color color = null)
         {
             if (stringBuilder is null) throw new ArgumentNullException(nameof(stringBuilder));
 
@@ -25,16 +25,10 @@ namespace LivingDocumentation.Uml
                 stringBuilder.Append(Constant.Quote);
             }
 
-            if (!string.IsNullOrWhiteSpace(color))
+            if (!(color is null))
             {
                 stringBuilder.Append(Constant.Space);
-
-                if (!color.StartsWith(Constant.ColorPrefix, StringComparison.Ordinal))
-                {
-                    stringBuilder.Append(Constant.ColorPrefix);
-                }
-
-                stringBuilder.Append(color.Trim());
+                stringBuilder.Append(color);
             }
 
             stringBuilder.AppendNewLine();
