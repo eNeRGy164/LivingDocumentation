@@ -20,8 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj" />
-    <ProjectReference Include="..\..\src\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj" />
     <ProjectReference Include="..\..\src\LivingDocumentation.Json\LivingDocumentation.Json.csproj" />
     <ProjectReference Include="..\..\src\LivingDocumentation.Render\LivingDocumentation.RenderExtensions.csproj" />
     <ProjectReference Include="..\..\src\LivingDocumentation.UML\LivingDocumentation.UML.csproj" />

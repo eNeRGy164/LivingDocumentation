@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj" />
-    <ProjectReference Include="..\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj" />
     <ProjectReference Include="..\LivingDocumentation.Statements\LivingDocumentation.Statements.csproj" />
   </ItemGroup>
 

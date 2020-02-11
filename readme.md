@@ -9,7 +9,68 @@
 
 ---
 
-// TODO: Write explaination
+// TODO: Write more explaination
+
+## Install the analyzer
+
+The analyzer is a dotnet global tool.
+
+```sh
+dotnet tool install --global LivingDocumentation.Analyzer
+```
+
+## Generating documentation
+
+Using LivingDocumentation to generate documentation follows the following process flow:
+![LivingDocumentation process flow](./docs/flow.png)
+
+1. Run the LivingDocumentation.Analyzer with your Visual Studio solution file as input. The tool will analyze all source code in the solution, and generate an intermediate JSON file as output containing all classes, interfaced, enums, etc.
+2. You create a "render application" where you use the JSON file as input, and you are able to create all kinds of views on your source code. Like aggregate class diagrams, event flow sequence diagrams, etc.
+3. Output your diagrams, text, etc. in text-based formats, like Markdown, AsciiDoc and PlantUML.
+
+Both during local development, as during your CI&CD pipeline, can follow the same flow.
+
+### Local development
+
+The benefit of the intermediate JSON file is that generating it might take "long" (30s - 90s). But only needs to happen if your source solution changes. Generating the documentation takes less than a second. To have a fast feedback loop when developing your _renderers_, you don't need to recreate the JSON file every time.
+
+## Develop your own renderers
+
+A renderer application can be as simple as a command line tool that takes in the generated JSON files, makes conclusions based on the type information and writes this to a plain text file format.
+
+To be able to quickly start your should make a dependency on the NuGet packages.
+
+### NuGet package overview
+
+This is a hierarchical list of all NuGet packages and their contents & purpose.
+
+* **LivingDocumentation.RenderExtensions**
+
+  This package contains extension methods and dependencies on all types that describe the serialized analysis of the solution.
+
+  * **LivingDocumentation.Descriptions**
+
+    This package contains all classes that describe the analyzed solution, like types, methods, xml comments, etc.
+
+    * **LivingDocumentation.Abstractions**
+
+      This package contains interfaces, base classes, and enums.
+
+    * **LivingDocumentation.Extensions**
+
+      This package contains extension methods.
+
+  * **LivingDocumentation.Statements**
+
+    This package contains all classes that describe the statements in the analyzed solution, like foreach, if/else, switch, etc.
+
+* **LivingDocumentation.Json**
+
+  This package contains the Json serializers and contract resolvers to deserialize the generated JSON file.
+
+* **LivingDocumentation.UML**
+
+  This package contains a lot of supporting methods to make it easier to build valid PlantUML output.
 
 ## Running the sample
 
@@ -22,11 +83,6 @@ These steps expect the **eShopOnContainers** and **LivingDocumentation** repos t
 ```
 
 1. Install the analyzer as a global tool
-
-   ```sh
-   dotnet tool install --global LivingDocumentation.Analyzer
-   ```
-
 2. Make sure you've build the solution you want to document
 
    ```sh
