@@ -32,7 +32,8 @@ Both during local development, as during your CI&CD pipeline, can follow the sam
 
 ### Local development
 
-The benefit of the intermediate JSON file is that generating it might take "long" (30s - 90s). But only needs to happen if your source solution changes. Generating the documentation takes less than a second. To have a fast feedback loop when developing your _renderers_, you don't need to recreate the JSON file every time.
+The analysis of a solution might take quite "long" (30s - 90s). Therefore we create an intermediate JSON file, so you only need to do rerun the analysis if your source solution changes.
+Generating the documentation takes less than a second. So you can have a fast feedback loop when developing your _renderers_ as you don't need to recreate the JSON file every time.
 
 ## Develop your own renderers
 
