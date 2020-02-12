@@ -48,7 +48,7 @@
         public const string SterotypeStart = "<<";
         public const string SterotypeEnd = ">>";
 
-        public const string ColorPrefix = "#";
+        public const char ColorPrefix = '#';
 
         public const char Private = '-';
         public const char Protected = '#';

@@ -33,13 +33,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		GitVersion.yml = GitVersion.yml
+		LivingDocumentation.runsettings = LivingDocumentation.runsettings
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.RenderExtensions.Tests", "tests\LivingDocumentation.RenderExtensions.Tests\LivingDocumentation.RenderExtensions.Tests.csproj", "{0A28D3CE-00A8-4473-B571-F8AE0FFFF1AC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.Serializations.Tests", "tests\LivingDocumentation.Serializations.Tests\LivingDocumentation.Serializations.Tests.csproj", "{B24D4233-6227-43C1-A402-53AC5706633A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDocumentation.UML.Tests", "tests\LivingDocumentation.Uml.Tests\LivingDocumentation.UML.Tests.csproj", "{221D523A-62E5-4BD2-ACB4-46D14ADA45F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LivingDocumentation.UML.Tests", "tests\LivingDocumentation.Uml.Tests\LivingDocumentation.UML.Tests.csproj", "{221D523A-62E5-4BD2-ACB4-46D14ADA45F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

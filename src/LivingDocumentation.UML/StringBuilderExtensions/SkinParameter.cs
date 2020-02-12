@@ -26,5 +26,19 @@ namespace LivingDocumentation.Uml
             stringBuilder.Append(value.Trim());
             stringBuilder.AppendNewLine();
         }
+
+        /// <summary>
+        /// Renders a skin parameter.
+        /// </summary>
+        /// <param name="skinParameter">The skin parameter.</param>
+        /// <param name="value">The value of the skin parameter.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="stringBuilder"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="skinParameter"/> or <paramref name="value"/> is <c>null</c>, empty of only white space.</exception>
+        public static void SkinParameter(this StringBuilder stringBuilder, SkinParameter skinParameter, string value)
+        {
+            if (!Enum.IsDefined(typeof(SkinParameter), skinParameter)) throw new ArgumentException("A defined enum value should be provided", nameof(skinParameter));
+
+            stringBuilder.SkinParameter(skinParameter.ToString(), value);
+        }
     }
 }

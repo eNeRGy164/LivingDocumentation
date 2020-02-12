@@ -21,7 +21,7 @@ namespace LivingDocumentation.Uml
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="stringBuilder"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="left"/>, <paramref name="type"/> or <paramref name="right"/> is <c>null</c>, empty of only white space.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="type"/> consists of less then 2 characters.</exception>
-        public static void Arrow(this StringBuilder stringBuilder, string left, string type, string right, string label = null, string color = null, bool activateTarget = false, string activationColor = null, bool deactivateSource = false, bool createInstanceTarget = false, bool destroyInstanceTarget = false)
+        public static void Arrow(this StringBuilder stringBuilder, string left, string type, string right, string label = null, Color color = null, bool activateTarget = false, Color activationColor = null, bool deactivateSource = false, bool createInstanceTarget = false, bool destroyInstanceTarget = false)
         {
             if (stringBuilder is null) throw new ArgumentNullException(nameof(stringBuilder));
 
@@ -34,17 +34,11 @@ namespace LivingDocumentation.Uml
             stringBuilder.Append(left);
             stringBuilder.Append(Constant.Space);
 
-            if (!string.IsNullOrWhiteSpace(color))
+            if (!(color is null))
             {
                 stringBuilder.Append(type.Substring(0, 1));
                 stringBuilder.Append(Constant.ColorStart);
-
-                if (!color.StartsWith(Constant.ColorPrefix, StringComparison.Ordinal))
-                {
-                    stringBuilder.Append(Constant.ColorPrefix);
-                }
-
-                stringBuilder.Append(color.Trim());
+                stringBuilder.Append(color);
                 stringBuilder.Append(Constant.ColorEnd);
                 stringBuilder.Append(type.Substring(1));
             }
@@ -63,16 +57,10 @@ namespace LivingDocumentation.Uml
                 stringBuilder.Append(Constant.TargetActivation);
             }
 
-            if (!string.IsNullOrWhiteSpace(activationColor))
+            if (!(activationColor is null))
             {
                 stringBuilder.Append(Constant.Space);
-
-                if (!activationColor.StartsWith(Constant.ColorPrefix, StringComparison.Ordinal))
-                {
-                    stringBuilder.Append(Constant.ColorPrefix);
-                }
-
-                stringBuilder.Append(activationColor.Trim());
+                stringBuilder.Append(activationColor);
             }
 
             if (deactivateSource)

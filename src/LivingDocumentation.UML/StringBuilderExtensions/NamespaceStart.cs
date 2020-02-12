@@ -13,7 +13,7 @@ namespace LivingDocumentation.Uml
         /// <param name="stereotype">Optional stereo type.</param>
         /// <param name="backgroundColor">Optional background color.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="stringBuilder"/> is <c>null</c>.</exception>
-        public static void NamespaceStart(this StringBuilder stringBuilder, string name, string displayName = null, string stereotype = null, string backgroundColor = null)
+        public static void NamespaceStart(this StringBuilder stringBuilder, string name, string displayName = null, string stereotype = null, Color backgroundColor = null)
         {
             if (stringBuilder is null) throw new ArgumentNullException(nameof(stringBuilder));
 
@@ -42,11 +42,6 @@ namespace LivingDocumentation.Uml
 
             if (!(backgroundColor is null))
             {
-                if (!backgroundColor.StartsWith(Constant.ColorPrefix, StringComparison.Ordinal))
-                {
-                    stringBuilder.Append(Constant.ColorPrefix);
-                }
-
                 stringBuilder.Append(backgroundColor);
                 stringBuilder.Append(Constant.Space);
             }

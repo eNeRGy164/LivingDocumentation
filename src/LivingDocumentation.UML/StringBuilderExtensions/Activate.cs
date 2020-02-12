@@ -12,7 +12,7 @@ namespace LivingDocumentation.Uml
         /// <param name="color">Optional color of the activation line.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="stringBuilder"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is <c>null</c>, empty of only white space.</exception>
-        public static void Activate(this StringBuilder stringBuilder, string name, string color = null)
+        public static void Activate(this StringBuilder stringBuilder, string name, Color color = null)
         {
             if (stringBuilder is null) throw new ArgumentNullException(nameof(stringBuilder));
 
@@ -22,16 +22,10 @@ namespace LivingDocumentation.Uml
             stringBuilder.Append(Constant.Space);
             stringBuilder.Append(name);
 
-            if (!string.IsNullOrWhiteSpace(color))
+            if (!(color is null))
             {
                 stringBuilder.Append(Constant.Space);
-
-                if (!color.StartsWith(Constant.ColorPrefix, StringComparison.Ordinal))
-                {
-                    stringBuilder.Append(Constant.ColorPrefix);
-                }
-
-                stringBuilder.Append(color.Trim());
+                stringBuilder.Append(color);
             }
 
             stringBuilder.AppendNewLine();

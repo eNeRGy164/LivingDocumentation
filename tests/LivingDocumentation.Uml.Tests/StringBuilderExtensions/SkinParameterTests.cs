@@ -37,8 +37,6 @@ namespace LivingDocumentation.Uml.Tests
                 .And.ParamName.Should().Be("name");
         }
 
-
-
         [TestMethod]
         public void StringBuilderExtensions_SkinParameter_EmptyName_Should_ThrowArgumentException()
         {
@@ -115,6 +113,21 @@ namespace LivingDocumentation.Uml.Tests
         }
 
         [TestMethod]
+        public void StringBuilderExtensions_SkinParameter_EnumOutOfRange_Should_ThrowArgumentException()
+        {
+            // Assign
+            var stringBuilder = new StringBuilder();
+
+            // Act
+            Action action = () => stringBuilder.SkinParameter((SkinParameter)int.MaxValue, "b");
+
+            // Assert
+            action.Should().Throw<ArgumentException>()
+                .WithMessage("A defined enum value should be provided*")
+                .And.ParamName.Should().Be("skinParameter");
+        }
+
+        [TestMethod]
         public void StringBuilderExtensions_SkinParameter_Should_ContainSkinParamWithNameAndValue()
         {
             // Assign
@@ -141,7 +154,7 @@ namespace LivingDocumentation.Uml.Tests
         }
 
         [TestMethod]
-        public void StringBuilderExtensions_SkinParameter_WhitespaceAroundValueShould_ContainTrimmedValue()
+        public void StringBuilderExtensions_SkinParameter_WhitespaceAroundValue_Should_ContainTrimmedValue()
         {
             // Assign
             var stringBuilder = new StringBuilder();
@@ -151,6 +164,19 @@ namespace LivingDocumentation.Uml.Tests
 
             // Assert
             stringBuilder.ToString().Should().Be("skinparam monochrome true\n");
+        }
+
+        [TestMethod]
+        public void StringBuilderExtensions_SkinParameter_UsingEnumValue_Should_ContainName()
+        {
+            // Assign
+            var stringBuilder = new StringBuilder();
+
+            // Act
+            stringBuilder.SkinParameter(SkinParameter.Monochrome, "true");
+
+            // Assert
+            stringBuilder.ToString().Should().Be("skinparam Monochrome true\n");
         }
     }
 }
