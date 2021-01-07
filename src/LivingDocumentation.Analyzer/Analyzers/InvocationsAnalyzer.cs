@@ -66,7 +66,9 @@ namespace LivingDocumentation
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (Program.RuntimeOptions.VerboseOutput && this.semanticModel.GetTypeInfo(node).Type.Kind == SymbolKind.ErrorType)
+            var expression = this.GetExpressionWithSymbol(node);
+
+            if (Program.RuntimeOptions.VerboseOutput && this.semanticModel.GetSymbolInfo(expression).Symbol == null)
             {
                 Console.WriteLine("WARN: Could not resolve type of invocation of the following block:");
                 Console.WriteLine(node.ToFullString());
@@ -79,10 +81,10 @@ namespace LivingDocumentation
                 return;
             }
 
-            string containingType = this.semanticModel.GetSymbolInfo(node.Expression).Symbol?.ContainingSymbol.ToDisplayString();
+            string containingType = this.semanticModel.GetSymbolInfo(expression).Symbol?.ContainingSymbol.ToDisplayString();
             if (containingType == null)
             {
-                containingType = this.semanticModel.GetSymbolInfo(node.Expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
+                containingType = this.semanticModel.GetSymbolInfo(expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
             }
 
             string methodName = string.Empty;
@@ -107,6 +109,29 @@ namespace LivingDocumentation
             }
 
             base.VisitInvocationExpression(node);
+        }
+
+        private ExpressionSyntax GetExpressionWithSymbol(InvocationExpressionSyntax node)
+        {
+            var expression = node.Expression;
+
+            if (this.semanticModel.GetSymbolInfo(expression).Symbol == null)
+            {
+                // This might be part of a chain of extention methods (f.e. Fluent API's), the symbols are only available at the beginning of the chain.
+                var pNode = (SyntaxNode)node;
+
+                while (pNode != null && (!(pNode is InvocationExpressionSyntax) || (pNode is InvocationExpressionSyntax && (this.semanticModel.GetTypeInfo(pNode).Type.Kind == SymbolKind.ErrorType || this.semanticModel.GetSymbolInfo(expression).Symbol == null))))
+                {
+                    pNode = pNode.Parent;
+
+                    if (pNode is InvocationExpressionSyntax syntax)
+                    {
+                        expression = syntax.Expression;
+                    }
+                }
+            }
+
+            return expression;
         }
 
         public override void VisitReturnStatement(ReturnStatementSyntax node)
