@@ -7,6 +7,16 @@ namespace LivingDocumentation
 {
     public static class TypeDescriptionListExtensions
     {
+        public static TypeDescription First(this IEnumerable<TypeDescription> types, string typeName)
+        {
+            if (types == null)
+            {
+                throw new ArgumentNullException(nameof(types));
+            }
+
+            return types.First(t => string.Equals(t.FullName, typeName, StringComparison.Ordinal));
+        }
+
         public static TypeDescription FirstOrDefault(this IEnumerable<TypeDescription> types, string typeName)
         {
             if (types == null)
@@ -14,7 +24,7 @@ namespace LivingDocumentation
                 throw new ArgumentNullException(nameof(types));
             }
 
-            return types.FirstOrDefault(t => string.Equals(t.FullName, typeName));
+            return types.FirstOrDefault(t => string.Equals(t.FullName, typeName, StringComparison.Ordinal));
         }
 
         public static IReadOnlyList<IHaveAMethodBody> GetInvokedMethod(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
