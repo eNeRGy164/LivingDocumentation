@@ -86,7 +86,7 @@ namespace LivingDocumentation
 
             for (var i = 1; i < input.Length; i++)
             {
-                if (char.IsUpper(input[i]) || char.IsDigit(input[i]))
+                if ((char.IsUpper(input[i]) && (!char.IsUpper(input[i - 1]) || (i + 1 < input.Length) && !char.IsUpper(input[i + 1]))) || (char.IsDigit(input[i]) && !char.IsDigit(input[i - 1])))
                 {
                     stringBuilder.Append(' ');
                 }

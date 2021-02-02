@@ -137,5 +137,50 @@ namespace LivingDocumentation
         {
             return this.BaseTypes.Any(bt => bt.StartsWith(partialName, StringComparison.Ordinal));
         }
+
+        public bool IsClass()
+        {
+            return this.Type == TypeType.Class;
+        }
+
+        public bool IsEnum()
+        {
+            return this.Type == TypeType.Enum;
+        }
+
+        public bool IsInterface()
+        {
+            return this.Type == TypeType.Interface;
+        }
+
+        public bool IsStruct()
+        {
+            return this.Type == TypeType.Struct;
+        }
+
+        public bool HasProperty(string name)
+        {
+            return this.properties.Any(m => string.Equals(m.Name, name, StringComparison.Ordinal));
+        }
+
+        public bool HasMethod(string name)
+        {
+            return this.methods.Any(m => string.Equals(m.Name, name, StringComparison.Ordinal));
+        }
+
+        public bool HasEvent(string name)
+        {
+            return this.events.Any(m => string.Equals(m.Name, name, StringComparison.Ordinal));
+        }
+
+        public bool HasField(string name)
+        {
+            return this.fields.Any(m => string.Equals(m.Name, name, StringComparison.Ordinal));
+        }
+
+        public bool HasEnumMember(string name)
+        {
+            return this.enumMembers.Any(m => string.Equals(m.Name, name, StringComparison.Ordinal));
+        }
     }
 }
