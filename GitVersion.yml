@@ -1,8 +1,10 @@
 mode: Mainline
 branches:
   feature:
-    regex: ^(?!master|pull)
+    regex: ^(?!master|main|pull)
     tag: beta
+  master:
+    regex: ^main$
   pull-request:
     tag: rc
     tag-number-pattern: ''
