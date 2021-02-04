@@ -1,8 +1,10 @@
-﻿using LivingDocumentation.Uml;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using LivingDocumentation.Uml;
+using PlantUml.Builder;
+using PlantUml.Builder.ClassDiagrams;
 
 namespace LivingDocumentation.eShopOnContainers
 {
@@ -20,8 +22,8 @@ namespace LivingDocumentation.eShopOnContainers
 
                 var stringBuilder = new StringBuilder();
                 stringBuilder.UmlDiagramStart();
-                stringBuilder.SkinParameter("MinClassWidth", "160");
-                stringBuilder.SkinParameter("Linetype", "ortho");
+                stringBuilder.SkinParameter(SkinParameter.MinClassWidth, "160");
+                stringBuilder.SkinParameter(SkinParameter.Linetype, "ortho");
                 stringBuilder.NamespaceStart(aggregateName, stereotype: "aggregate");
 
                 var rootBuilder = this.RenderClass(aggregate);
@@ -49,7 +51,7 @@ namespace LivingDocumentation.eShopOnContainers
 
                 foreach (var field in type.Fields)
                 {
-                    stringBuilder.ClassMember(field.Name);
+                    stringBuilder.InlineClassMember(new ClassMember(field.Name));
                 }
 
                 stringBuilder.EnumEnd();
@@ -73,13 +75,13 @@ namespace LivingDocumentation.eShopOnContainers
 
                 foreach (var property in type.Properties.Where(p => !p.IsPrivate()))
                 {
-                    stringBuilder.ClassMember(property.Name, isAbstract: property.IsAbstract(), isStatic: property.IsStatic(), visibility: property.ToUmlVisibility());
+                    stringBuilder.InlineClassMember(new ClassMember(property.Name, isAbstract: property.IsAbstract(), isStatic: property.IsStatic(), visibility: property.ToUmlVisibility()));
                 }
 
                 foreach (var method in type.Methods.Where(m => !m.IsPrivate()))
                 {
                     var fullMethod = $"{method.Name}({string.Join(", ", method.Parameters.Select(s => s.Name))})";
-                    stringBuilder.ClassMember(fullMethod, isAbstract: method.IsAbstract(), isStatic: method.IsStatic(), visibility: method.ToUmlVisibility());
+                    stringBuilder.InlineClassMember(new ClassMember(fullMethod, isAbstract: method.IsAbstract(), isStatic: method.IsStatic(), visibility: method.ToUmlVisibility()));
                 }
 
                 stringBuilder.ClassEnd();

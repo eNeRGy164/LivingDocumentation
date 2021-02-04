@@ -1,8 +1,9 @@
-﻿using LivingDocumentation.Uml;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using PlantUml.Builder;
+using PlantUml.Builder.SequenceDiagrams;
 
 namespace LivingDocumentation.eShopOnContainers
 {
@@ -24,7 +25,7 @@ namespace LivingDocumentation.eShopOnContainers
                 var aggregates = new List<string>();
                 var flowBuilder = new StringBuilder();
 
-                flowBuilder.Arrow("DQ", "->", "H", label: messageType.Name.FormatForDiagram(), color: messageType.Name.ArrowColor(), activateTarget: true);
+                flowBuilder.Arrow("DQ", Arrow.AsyncRight.Color(messageType.Name.ArrowColor()), "H", label: messageType.Name.FormatForDiagram(), activateTarget: true);
 
                 var handlingMethod = eventHandler.HandlingMethod(message);
 
@@ -37,22 +38,22 @@ namespace LivingDocumentation.eShopOnContainers
 
                 var stringBuilder = new StringBuilder();
                 stringBuilder.UmlDiagramStart();
-                stringBuilder.SkinParameter("lifelineStrategy", "solid");
-                stringBuilder.SkinParameter("SequenceArrowThickness", "2");
-                stringBuilder.SkinParameter("SequenceBoxBackgroundColor", "SeaShell");
-                stringBuilder.SkinParameter("SequenceLifeLineBorderColor", "Black");
-                stringBuilder.SkinParameter("SequenceLifeLineBorderThickness", "2");
-                stringBuilder.SkinParameter("BoxPadding", "20");
-                stringBuilder.SkinParameter("ParticipantPadding", "20");
-                stringBuilder.SkinParameter("ArrowColor", "Black");
-                stringBuilder.SkinParameter("SequenceMessageAlignment", "ReverseDirection");
-                stringBuilder.Participant("DQ", displayName: "Domain", type: ParticipantType.Queue);
+                stringBuilder.SkinParameter(SkinParameter.LifelineStrategy, "solid");
+                stringBuilder.SkinParameter(SkinParameter.SequenceArrowThickness, "2");
+                stringBuilder.SkinParameter(SkinParameter.SequenceBoxBackgroundColor, "SeaShell");
+                stringBuilder.SkinParameter(SkinParameter.SequenceLifeLineBorderColor, "Black");
+                stringBuilder.SkinParameter(SkinParameter.SequenceLifeLineBorderThickness, "2");
+                stringBuilder.SkinParameter(SkinParameter.BoxPadding, "20");
+                stringBuilder.SkinParameter(SkinParameter.ParticipantPadding, "20");
+                stringBuilder.SkinParameter(SkinParameter.ArrowColor, "Black");
+                stringBuilder.SkinParameter(SkinParameter.SequenceMessageAlignment, "ReverseDirection");
+                stringBuilder.Queue("DQ", displayName: "Domain");
                 stringBuilder.BoxStart(eventHandlerName.FormatForDiagram());
                 stringBuilder.Participant("H", displayName: "Handle");
 
                 foreach (var aggregate in aggregates)
                 {
-                    stringBuilder.Participant(aggregate, type: ParticipantType.Entity);
+                    stringBuilder.Entity(aggregate);
                 }
 
                 stringBuilder.BoxEnd();
@@ -166,11 +167,11 @@ namespace LivingDocumentation.eShopOnContainers
                             {
                                 aggregates.Add(containingType.Name);
                                 var prefix = (containingType.Name == invokedMethod.Name) ? "new " : string.Empty;
-                                stringBuilder.Arrow("H", "->", containingType.Name, label: prefix + invokedMethod.Name.FormatForDiagram(), activateTarget: true);
+                                stringBuilder.Arrow("H", Arrow.AsyncRight, containingType.Name, label: prefix + invokedMethod.Name.FormatForDiagram(), activateTarget: true);
                             }
                             else
                             {
-                                stringBuilder.Arrow("H", "->", containingType.Name, label: invokedMethod.Name.FormatForDiagram());
+                                stringBuilder.Arrow("H", Arrow.AsyncRight, containingType.Name, label: invokedMethod.Name.FormatForDiagram());
                             }
 
                             foreach (var call in Program.Types.GetInvocationConsequenceStatements(invokedMethod).Where(s => s != invokedMethod))
@@ -183,7 +184,7 @@ namespace LivingDocumentation.eShopOnContainers
                             foreach (var call in Program.Types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
                             {
                                 var eventType = Program.Types.FirstOrDefault(call.Arguments.First().Type);
-                                stringBuilder.Arrow("H", "->", "DQ", label: eventType.Name.FormatForDiagram(), color: eventType.Name.ArrowColor());
+                                stringBuilder.Arrow("H", Arrow.AsyncRight.Color(eventType.Name.ArrowColor()), "DQ", label: eventType.Name.FormatForDiagram());
                             }
                         }
                     }
@@ -192,5 +193,4 @@ namespace LivingDocumentation.eShopOnContainers
             }
         }
     }
-
 }

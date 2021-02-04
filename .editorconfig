@@ -1,21 +1,25 @@
 # To learn more about .editorconfig see https://aka.ms/editorconfigdocs
-############################### 
-# Core EditorConfig Options   # 
-############################### 
+###############################
+# Core EditorConfig Options   #
+###############################
+
 # All files 
 [*] 
-indent_style = space 
+indent_style = space
+
 # Code files 
 [*.{cs,csx,vb,vbx}] 
-indent_size = 4 
-insert_final_newline = true 
-charset = utf-8-bom 
-############################### 
-# .NET Coding Conventions     # 
-############################### 
+indent_size = 4
+insert_final_newline = true
+charset = utf-8-bom
+
+###############################
+# .NET Coding Conventions     #
+###############################
+
 [*.{cs,vb}] 
 # Organize usings 
-dotnet_sort_system_directives_first = true:suggestion
+dotnet_sort_system_directives_first = true:warning
 # this. preferences 
 dotnet_style_qualification_for_field = true:warning
 dotnet_style_qualification_for_property = true:warning
