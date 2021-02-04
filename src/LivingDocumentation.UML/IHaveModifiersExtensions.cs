@@ -1,4 +1,6 @@
-﻿namespace LivingDocumentation.Uml
+﻿using PlantUml.Builder;
+
+namespace LivingDocumentation.Uml
 {
     public static class IHaveModifiersExtensions
     { 

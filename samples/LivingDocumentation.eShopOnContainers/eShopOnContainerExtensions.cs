@@ -1,4 +1,4 @@
-﻿using LivingDocumentation.Uml;
+﻿using PlantUml.Builder;
 using System;
 using System.Linq;
 
@@ -74,7 +74,7 @@ namespace LivingDocumentation.eShopOnContainers
 
         public static bool IsCommand(this TypeDescription type)
         {
-            return type.BaseTypes.Any(bt => bt.StartsWith("MediatR.IRequest<", StringComparison.Ordinal));
+            return type.ImplementsTypeStartsWith("MediatR.IRequest<");
         }
 
         public static bool IsDomainEvent(this TypeDescription type)
@@ -121,23 +121,31 @@ namespace LivingDocumentation.eShopOnContainers
 
         public static bool IsAggregateRoot(this TypeDescription type)
         {
-            return type != null && type.Type == TypeType.Class 
+            return type != null 
+                && type.IsClass()
                 && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.IAggregateRoot");
         }
 
         public static bool IsEnumeration(this TypeDescription type)
         {
-            return type != null && type.Type == TypeType.Class && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.SeedWork.Enumeration");
+            return type != null 
+                && type.IsClass() 
+                && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.SeedWork.Enumeration");
         }
 
         public static bool IsValueObject(this TypeDescription type)
         {
-            return type != null && type.Type == TypeType.Class && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.SeedWork.ValueObject");
+            return type != null 
+                && type.IsClass() 
+                && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.SeedWork.ValueObject");
         }
 
         public static bool IsEntity(this TypeDescription type)
         {
-            return type != null && !type.IsAggregateRoot() && type.Type == TypeType.Class && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.Entity");
+            return type != null 
+                && !type.IsAggregateRoot() 
+                && type.IsClass() 
+                && type.ImplementsType("Microsoft.eShopOnContainers.Services.Ordering.Domain.Seedwork.Entity");
         }
     }
 }

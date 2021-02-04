@@ -15,6 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="PlantUml.Builder" Version="0.1.36" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\LivingDocumentation.Descriptions\LivingDocumentation.Descriptions.csproj" />
     <ProjectReference Include="..\LivingDocumentation.Extensions\LivingDocumentation.Extensions.csproj" />
   </ItemGroup>
