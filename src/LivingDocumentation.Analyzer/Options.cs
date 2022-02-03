@@ -1,5 +1,3 @@
-﻿using CommandLine;
-
 namespace LivingDocumentation
 {
     public partial class Program
@@ -7,13 +5,13 @@ namespace LivingDocumentation
         public class Options
         {
             [Option("solution", Required = true, HelpText = "The solution to analyze.")]
-            public string SolutionPath
+            public string? SolutionPath
             {
                 get; set;
             }
 
             [Option("output", Required = true, HelpText = "The location of the output.")]
-            public string OutputPath
+            public string? OutputPath
             {
                 get; set;
             }

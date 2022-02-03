@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -27,6 +27,21 @@ namespace LivingDocumentation
             this.ExtractBaseTypeDeclaration(TypeType.Class, node);
 
             base.VisitClassDeclaration(node);
+        }
+
+        public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
+        {
+            if (this.ProcessedEmbeddedType(node)) return;
+
+            var type = TypeType.Class;
+            if (node.ClassOrStructKeyword.ValueText == "struct")
+            {
+                type = TypeType.Struct;
+            }
+
+            this.ExtractBaseTypeDeclaration(type, node);
+
+            base.VisitRecordDeclaration(node);
         }
 
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
@@ -222,18 +237,11 @@ namespace LivingDocumentation
                 {
                     foreach (var argument in attribute.ArgumentList.Arguments)
                     {
-                        string value = null;
-
-                        switch (argument.Expression)
+                        var value = argument.Expression switch
                         {
-                            case LiteralExpressionSyntax literalExpression:
-                                value = literalExpression.Token.ValueText;
-                                break;
-
-                            default:
-                                value = argument.Expression?.ToString();
-                                break;
-                        }
+                            LiteralExpressionSyntax literalExpression => literalExpression.Token.ValueText,
+                            _ => argument.Expression?.ToString(),
+                        };
 
                         var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression?.ToString(), this.semanticModel.GetTypeDisplayString(argument.Expression), value);
                         attributeDescription.Arguments.Add(argumentDescription);

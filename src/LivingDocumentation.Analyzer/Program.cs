@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
-using CommandLine;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 
@@ -14,7 +8,7 @@ namespace LivingDocumentation
 {
     public static partial class Program
     {
-        private static ParserResult<Options> ParsedResults;
+        private static ParserResult<Options>? ParsedResults;
 
         public static Options RuntimeOptions { get; private set; } = new Options();
 
@@ -44,7 +38,7 @@ namespace LivingDocumentation
 
             var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
 
-            await File.WriteAllTextAsync(options.OutputPath, result).ConfigureAwait(false);
+            await File.WriteAllTextAsync(options.OutputPath!, result).ConfigureAwait(false);
 
             if (!options.Quiet)
             {
