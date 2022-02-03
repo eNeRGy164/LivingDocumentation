@@ -4,8 +4,14 @@ namespace LivingDocumentation
     {
         public class Options
         {
-            [Option("solution", Required = true, HelpText = "The solution to analyze.")]
+            [Option("solution", Required = true, SetName = "solution", HelpText = "The solution to analyze.")]
             public string? SolutionPath
+            {
+                get; set;
+            }
+
+            [Option("project", Required = true, SetName = "project", HelpText = "The project to analyze.")]
+            public string? ProjectPath
             {
                 get; set;
             }
