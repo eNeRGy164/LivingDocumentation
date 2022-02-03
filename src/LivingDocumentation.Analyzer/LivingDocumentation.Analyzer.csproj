@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -20,9 +20,15 @@
     <Copyright>Copyright Michaël Hompus 2019</Copyright>
     <RepositoryUrl>https://github.com/eNeRGy164/LivingDocumentation</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Living Documentation LivingDocumentation Roslyn UML Generation</PackageTags>
+    <PackageTags>Living Documentation; LivingDocumentation; Roslyn; UML; Generation;</PackageTags>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Version>0.1.0</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
