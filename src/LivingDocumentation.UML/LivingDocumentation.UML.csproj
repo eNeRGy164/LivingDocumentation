@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PlantUml.Builder" Version="0.1.36" />
+    <PackageReference Include="PlantUml.Builder" Version="0.1.49" />
   </ItemGroup>
 
   <ItemGroup>
