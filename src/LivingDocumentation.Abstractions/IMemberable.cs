@@ -1,15 +1,12 @@
-﻿using Newtonsoft.Json;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+public interface IMemberable : IHaveModifiers
 {
-    public interface IMemberable : IHaveModifiers
-    {
-        [JsonIgnore]
-        MemberType MemberType { get; }
+    [JsonIgnore]
+    MemberType MemberType { get; }
 
-        [JsonProperty(Order = -3)]
-        string Name { get; }
+    [JsonProperty(Order = -3)]
+    string Name { get; }
 
-        IHaveDocumentationComments DocumentationComments { get; }
-    }
+    IHaveDocumentationComments? DocumentationComments { get; internal set; }
 }

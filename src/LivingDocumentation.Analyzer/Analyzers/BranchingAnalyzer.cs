@@ -1,5 +1,3 @@
-﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,9 +7,9 @@ namespace LivingDocumentation
     internal class BranchingAnalyzer : CSharpSyntaxWalker
     {
         private readonly SemanticModel semanticModel;
-        private readonly IList<Statement> statements;
+        private readonly List<Statement> statements;
 
-        public BranchingAnalyzer(in SemanticModel semanticModel, IList<Statement> statements)
+        public BranchingAnalyzer(in SemanticModel semanticModel, List<Statement> statements)
         {
             this.semanticModel = semanticModel;
             this.statements = statements;

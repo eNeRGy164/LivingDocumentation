@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
-using CommandLine;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 
@@ -14,7 +8,7 @@ namespace LivingDocumentation
 {
     public static partial class Program
     {
-        private static ParserResult<Options> ParsedResults;
+        private static ParserResult<Options>? ParsedResults;
 
         public static Options RuntimeOptions { get; private set; } = new Options();
 
@@ -35,7 +29,13 @@ namespace LivingDocumentation
             var types = new List<TypeDescription>();
 
             var stopwatch = Stopwatch.StartNew();
-            await AnalyzeSolutionAsync(types, options.SolutionPath).ConfigureAwait(false);
+            if (options.SolutionPath is not null)
+            {
+                await AnalyzeSolutionFileAsync(types, options.SolutionPath).ConfigureAwait(false);
+            } else
+            {
+                await AnalyzeProjectFileAsync(types, options.ProjectPath!).ConfigureAwait(false);
+            }
             stopwatch.Stop();
 
             // Write analysis 
@@ -44,7 +44,7 @@ namespace LivingDocumentation
 
             var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
 
-            await File.WriteAllTextAsync(options.OutputPath, result).ConfigureAwait(false);
+            await File.WriteAllTextAsync(options.OutputPath!, result).ConfigureAwait(false);
 
             if (!options.Quiet)
             {
@@ -52,7 +52,7 @@ namespace LivingDocumentation
             }
         }
 
-        private static async Task AnalyzeSolutionAsync(IList<TypeDescription> types, string solutionFile)
+        private static async Task AnalyzeSolutionFileAsync(List<TypeDescription> types, string solutionFile)
         {
             var manager = new AnalyzerManager(solutionFile);
             var workspace = manager.GetWorkspace();
@@ -64,32 +64,54 @@ namespace LivingDocumentation
 
             foreach (var project in projects)
             {
-                var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
-
-                if (RuntimeOptions.VerboseOutput)
-                {
-                    var diagnostics = compilation.GetDiagnostics();
-                    if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
-                    {
-                        Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
-                        foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
-                        {
-                            Console.WriteLine("- " + diagnostic.ToString());
-                        }
-                    }
-                }
-
-                // Every file in the project
-                foreach (var syntaxTree in compilation.SyntaxTrees)
-                {
-                    var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
-
-                    var visitor = new SourceAnalyzer(semanticModel, types);
-                    visitor.Visit(syntaxTree.GetRoot());
-                }
+                await AnalyzeProjectAsyc(types, project).ConfigureAwait(false);
             }
 
             workspace.Dispose();
+        }
+
+        private static async Task AnalyzeProjectFileAsync(List<TypeDescription> types, string projectFile)
+        {
+            var manager = new AnalyzerManager();
+            manager.GetProject(projectFile);
+            var workspace = manager.GetWorkspace();
+
+            var project = workspace.CurrentSolution.Projects.First();
+
+            await AnalyzeProjectAsyc(types, project).ConfigureAwait(false);
+
+            workspace.Dispose();
+        }
+
+        private static async Task AnalyzeProjectAsyc(List<TypeDescription> types, Project project)
+        {
+            var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
+            if (compilation is null)
+            {
+                return;
+            }
+
+            if (RuntimeOptions.VerboseOutput)
+            {
+                var diagnostics = compilation.GetDiagnostics();
+                if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+                {
+                    Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
+                    foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
+                    {
+                        Console.WriteLine("- " + diagnostic.ToString());
+                    }
+                }
+            }
+
+            // Every file in the project
+            foreach (var syntaxTree in compilation.SyntaxTrees)
+            {
+                var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
+
+                var visitor = new SourceAnalyzer(semanticModel, types);
+                visitor.Visit(syntaxTree.GetRoot());
+            }
         }
     }
 }

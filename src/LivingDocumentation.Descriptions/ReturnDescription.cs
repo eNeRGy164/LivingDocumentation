@@ -1,18 +1,12 @@
-﻿using System.Diagnostics;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+[DebuggerDisplay("Return {Expression}")]
+public class ReturnDescription : Statement
 {
-    [DebuggerDisplay("Return {Expression}")]
-    public class ReturnDescription : Statement
-    {
-        public string Expression
-        {
-            get;
-        }
+    public string Expression { get; }
 
-        public ReturnDescription(string expression)
-        {
-            this.Expression = expression;
-        }
+    public ReturnDescription(string expression)
+    {
+        this.Expression = expression;
     }
 }

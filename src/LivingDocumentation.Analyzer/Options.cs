@@ -1,19 +1,23 @@
-﻿using CommandLine;
-
 namespace LivingDocumentation
 {
     public partial class Program
     {
         public class Options
         {
-            [Option("solution", Required = true, HelpText = "The solution to analyze.")]
-            public string SolutionPath
+            [Option("solution", Required = true, SetName = "solution", HelpText = "The solution to analyze.")]
+            public string? SolutionPath
+            {
+                get; set;
+            }
+
+            [Option("project", Required = true, SetName = "project", HelpText = "The project to analyze.")]
+            public string? ProjectPath
             {
                 get; set;
             }
 
             [Option("output", Required = true, HelpText = "The location of the output.")]
-            public string OutputPath
+            public string? OutputPath
             {
                 get; set;
             }

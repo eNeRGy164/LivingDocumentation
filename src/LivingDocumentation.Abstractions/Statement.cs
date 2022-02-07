@@ -1,11 +1,22 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+public abstract class Statement
 {
-    public abstract class Statement
+    [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Objects)]
+    public virtual List<Statement> Statements { get; } = new();
+
+    [JsonIgnore]
+    public object? Parent
     {
-        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Objects)]
-        public virtual List<Statement> Statements { get; } = new List<Statement>();
+        get; internal set;
+    }
+
+    [OnDeserialized]
+    internal void OnDeserializedMethod(StreamingContext context)
+    {
+        foreach (var statement in this.Statements)
+        {
+            statement.Parent ??= this;
+        }
     }
 }

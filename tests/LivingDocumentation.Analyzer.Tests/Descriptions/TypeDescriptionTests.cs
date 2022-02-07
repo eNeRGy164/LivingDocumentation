@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -167,7 +167,7 @@ namespace LivingDocumentation.Analyzer.Tests
 
             // Assert
             bodies.Should().AllBeAssignableTo<IHaveAMethodBody>();
-            bodies.Should().BeEquivalentTo(c, m);
+            bodies.Should().BeEquivalentTo(new IHaveAMethodBody[] { c, m });
         }
 
         [TestMethod]

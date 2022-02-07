@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,7 +25,7 @@ namespace LivingDocumentation.eShopOnContainers
                 var aggregates = new List<string>();
                 var flowBuilder = new StringBuilder();
 
-                flowBuilder.Arrow("DQ", Arrow.AsyncRight.Color(messageType.Name.ArrowColor()), "H", label: messageType.Name.FormatForDiagram(), activateTarget: true);
+                flowBuilder.Arrow("DQ", Arrow.AsyncRight.Color(messageType.Name.ArrowColor()), "H", messageType.Name.FormatForDiagram(), LifeLineEvents.ActivateTarget);
 
                 var handlingMethod = eventHandler.HandlingMethod(message);
 
@@ -167,11 +167,11 @@ namespace LivingDocumentation.eShopOnContainers
                             {
                                 aggregates.Add(containingType.Name);
                                 var prefix = (containingType.Name == invokedMethod.Name) ? "new " : string.Empty;
-                                stringBuilder.Arrow("H", Arrow.AsyncRight, containingType.Name, label: prefix + invokedMethod.Name.FormatForDiagram(), activateTarget: true);
+                                stringBuilder.Arrow("H", Arrow.AsyncRight, containingType.Name, prefix + invokedMethod.Name.FormatForDiagram(), LifeLineEvents.ActivateTarget);
                             }
                             else
                             {
-                                stringBuilder.Arrow("H", Arrow.AsyncRight, containingType.Name, label: invokedMethod.Name.FormatForDiagram());
+                                stringBuilder.Arrow("H", Arrow.AsyncRight, containingType.Name, invokedMethod.Name.FormatForDiagram());
                             }
 
                             foreach (var call in Program.Types.GetInvocationConsequenceStatements(invokedMethod).Where(s => s != invokedMethod))
@@ -184,7 +184,7 @@ namespace LivingDocumentation.eShopOnContainers
                             foreach (var call in Program.Types.GetInvocationConsequences(invokedMethod).Where(c => c.IsDomainEventCreation()))
                             {
                                 var eventType = Program.Types.FirstOrDefault(call.Arguments.First().Type);
-                                stringBuilder.Arrow("H", Arrow.AsyncRight.Color(eventType.Name.ArrowColor()), "DQ", label: eventType.Name.FormatForDiagram());
+                                stringBuilder.Arrow("H", Arrow.AsyncRight.Color(eventType.Name.ArrowColor()), "DQ", eventType.Name.FormatForDiagram());
                             }
                         }
                     }

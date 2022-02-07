@@ -1,11 +1,7 @@
-﻿using System;
-using System.Diagnostics;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+[DebuggerDisplay("IfElse {Condition}")]
+public class IfElseSection : Statement
 {
-    [DebuggerDisplay("IfElse {Condition}")]
-    public class IfElseSection : Statement
-    {
-        public string Condition { get; set; }
-    }
+    public string? Condition { get; set; }
 }

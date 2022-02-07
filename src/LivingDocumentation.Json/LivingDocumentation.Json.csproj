@@ -2,19 +2,40 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    
-    <Version>0.1.0</Version>
+
+    <RootNamespace>LivingDocumentation</RootNamespace>
+
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>true</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
     <Authors>Michaël Hompus</Authors>
-    <Copyright>Copyright Michaël Hompus 2019</Copyright>
     <PackageProjectUrl>https://github.com/eNeRGy164/LivingDocumentation</PackageProjectUrl>
+    <Copyright>Copyright Michaël Hompus 2019</Copyright>
     <RepositoryUrl>https://github.com/eNeRGy164/LivingDocumentation</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Living Documentation LivingDocumentation Roslyn UML Generation</PackageTags>
-    <NeutralLanguage>English (United States)</NeutralLanguage>
+    <PackageTags>Living Documentation; LivingDocumentation; Roslyn; UML; Generation;</PackageTags>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Version>0.1.0</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="System.Collections" />
+    <Using Include="System.Reflection"/>
+    <Using Include="Newtonsoft.Json" />
+    <Using Include="Newtonsoft.Json.Serialization" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

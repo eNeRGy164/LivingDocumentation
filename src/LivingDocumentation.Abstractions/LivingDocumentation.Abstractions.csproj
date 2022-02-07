@@ -2,21 +2,52 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
+    
     <RootNamespace>LivingDocumentation</RootNamespace>
+    
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>true</ImplicitUsings>
+    <Nullable>enable</Nullable>
 
-    <Version>0.1.0</Version>
     <Authors>Michaël Hompus</Authors>
-    <Company></Company>
-    <Copyright>Copyright Michaël Hompus 2019</Copyright>
     <PackageProjectUrl>https://github.com/eNeRGy164/LivingDocumentation</PackageProjectUrl>
-    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright Michaël Hompus 2019</Copyright>
     <RepositoryUrl>https://github.com/eNeRGy164/LivingDocumentation</RepositoryUrl>
-    <PackageTags>Living Documentation LivingDocumentation Roslyn UML Generation</PackageTags>
-    <NeutralLanguage>English (United States)</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Living Documentation; LivingDocumentation; Roslyn; UML; Generation;</PackageTags>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Version>0.1.0</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="System.Runtime.Serialization"/>
+    <Using Include="Newtonsoft.Json" />
+    <Using Remove="System.IO" />
+    <Using Remove="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>LivingDocumentation.Analyzer</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>LivingDocumentation.Descriptions</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>LivingDocumentation.Statements</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
 </Project>

@@ -1,16 +1,19 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+[DebuggerDisplay("If")]
+public class If : Statement
 {
-    [DebuggerDisplay("If")]
-    public class If : Statement
-    {
-        public List<IfElseSection> Sections { get; } = new List<IfElseSection>();
+    public List<IfElseSection> Sections { get; } = new();
 
-        [JsonIgnore]
-        public override List<Statement> Statements => this.Sections.SelectMany(s => s.Statements).ToList();
+    [JsonIgnore]
+    public override List<Statement> Statements => this.Sections.SelectMany(s => s.Statements).ToList();
+
+    [OnDeserialized]
+    internal new void OnDeserializedMethod(StreamingContext context)
+    {
+        foreach (var section in this.Sections)
+        {
+            section.Parent ??= this;
+        }
     }
 }

@@ -7,11 +7,14 @@
 [*] 
 indent_style = space
 
+[*.{csproj,xml}] 
+indent_size = 2
+
 # Code files 
 [*.{cs,csx,vb,vbx}] 
 indent_size = 4
 insert_final_newline = true
-charset = utf-8-bom
+charset = utf-8
 
 ###############################
 # .NET Coding Conventions     #

@@ -1,18 +1,21 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+[DebuggerDisplay("Switch {Expression}")]
+public class Switch : Statement
 {
-    [DebuggerDisplay("Switch {Expression}")]
-    public class Switch : Statement
+    public List<SwitchSection> Sections { get; } = new();
+
+    public string? Expression { get; set; }
+
+    [JsonIgnore]
+    public override List<Statement> Statements => this.Sections.SelectMany(s => s.Statements).ToList();
+
+    [OnDeserialized]
+    internal new void OnDeserializedMethod(StreamingContext context)
     {
-        public List<SwitchSection> Sections { get; } = new List<SwitchSection>();
-
-        public string Expression { get; set; }
-
-        [JsonIgnore]
-        public override List<Statement> Statements => this.Sections.SelectMany(s => s.Statements).ToList();
+        foreach (var section in this.Sections)
+        {
+            section.Parent ??= this;
+        }
     }
 }

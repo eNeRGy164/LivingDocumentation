@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+public interface IParameterDescription
 {
-    public interface IParameterDescription
-    {
-        string Type { get; }
+    string Type { get; }
 
-        string Name { get; }
+    string Name { get; }
 
-        bool HasDefaultValue { get; }
+    bool HasDefaultValue { get; }
 
-        List<IAttributeDescription> Attributes { get; }
-    }
+    List<IAttributeDescription> Attributes { get; }
 }

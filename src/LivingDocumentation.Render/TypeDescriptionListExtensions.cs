@@ -1,4 +1,4 @@
-﻿using LivingDocumentation;
+using LivingDocumentation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,30 +9,21 @@ namespace LivingDocumentation
     {
         public static TypeDescription First(this IEnumerable<TypeDescription> types, string typeName)
         {
-            if (types == null)
-            {
-                throw new ArgumentNullException(nameof(types));
-            }
+            if (types == null) throw new ArgumentNullException(nameof(types));
 
             return types.First(t => string.Equals(t.FullName, typeName, StringComparison.Ordinal));
         }
 
         public static TypeDescription FirstOrDefault(this IEnumerable<TypeDescription> types, string typeName)
         {
-            if (types == null)
-            {
-                throw new ArgumentNullException(nameof(types));
-            }
+            if (types == null) throw new ArgumentNullException(nameof(types));
 
             return types.FirstOrDefault(t => string.Equals(t.FullName, typeName, StringComparison.Ordinal));
         }
 
         public static IReadOnlyList<IHaveAMethodBody> GetInvokedMethod(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
-            if (types == null)
-            {
-                throw new ArgumentNullException(nameof(types));
-            }
+            if (types == null) throw new ArgumentNullException(nameof(types));
 
             var type = types.FirstOrDefault(invocation.ContainingType);
             if (type == null)
@@ -47,10 +38,7 @@ namespace LivingDocumentation
 
         public static IReadOnlyList<InvocationDescription> GetInvocationConsequences(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
-            if (types == null)
-            {
-                throw new ArgumentNullException(nameof(types));
-            }
+            if (types == null) throw new ArgumentNullException(nameof(types));
 
             var consequences = types.GetInvokedMethod(invocation)
                 .SelectMany(m => m.Statements.OfType<InvocationDescription>())
@@ -63,10 +51,7 @@ namespace LivingDocumentation
 
         public static IReadOnlyList<Statement> GetInvocationConsequenceStatements(this IEnumerable<TypeDescription> types, InvocationDescription invocation)
         {
-            if (types == null)
-            {
-                throw new ArgumentNullException(nameof(types));
-            }
+            if (types == null) throw new ArgumentNullException(nameof(types));
 
             var consequences = types.GetInvokedMethod(invocation)
                 .SelectMany(m => m.Statements)
@@ -79,10 +64,7 @@ namespace LivingDocumentation
 
         public static IReadOnlyList<Statement> TraverseStatement(this IEnumerable<TypeDescription> types, Statement sourceStatement)
         {
-            if (types == null)
-            {
-                throw new ArgumentNullException(nameof(types));
-            }
+            if (types == null) throw new ArgumentNullException(nameof(types));
 
             switch (sourceStatement)
             {
@@ -134,10 +116,7 @@ namespace LivingDocumentation
 
         public static void PopulateInheritedBaseTypes(this IEnumerable<TypeDescription> types)
         {
-            if (types == null)
-            {
-                throw new ArgumentNullException(nameof(types));
-            }
+            if (types == null) throw new ArgumentNullException(nameof(types));
 
             foreach (var type in types)
             {
@@ -171,10 +150,7 @@ namespace LivingDocumentation
 
         public static void PopulateInheritedMembers(this IEnumerable<TypeDescription> types)
         {
-            if (types == null)
-            {
-                throw new ArgumentNullException(nameof(types));
-            }
+            if (types == null) throw new ArgumentNullException(nameof(types));
 
             foreach (var type in types)
             {

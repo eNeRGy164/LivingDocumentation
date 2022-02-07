@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -60,12 +60,12 @@ namespace LivingDocumentation.eShopOnContainers
             {
                 if (type.IsAggregateRoot())
                 {
-                    stringBuilder.ClassStart(type.Name, isAbstract: type.IsAbstract(), stereotype: "root", customSpot: new CustomSpot('R', "LightBlue"));
+                    stringBuilder.ClassStart(type.Name, isAbstract: type.IsAbstract(), stereotype: "root", customSpot: new CustomSpot('R', NamedColor.LightBlue));
                 }
 
                 if (type.IsValueObject())
                 {
-                    stringBuilder.ClassStart(type.Name, isAbstract: type.IsAbstract(), stereotype: "value object", customSpot: new CustomSpot('O', "Wheat"));
+                    stringBuilder.ClassStart(type.Name, isAbstract: type.IsAbstract(), stereotype: "value object", customSpot: new CustomSpot('O', NamedColor.Wheat));
                 }
 
                 if (type.IsEntity())
