@@ -19,4 +19,13 @@ public class MethodDescription : MemberDescription, IHaveAMethodBody
     {
         this.ReturnType = returnType;
     }
+
+    [OnDeserialized]
+    internal void OnDeserializedMethod(StreamingContext context)
+    {
+        foreach (var statement in this.Statements)
+        {
+            statement.Parent = this;
+        }
+    }
 }

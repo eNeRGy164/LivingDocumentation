@@ -9,4 +9,13 @@ public class Switch : Statement
 
     [JsonIgnore]
     public override List<Statement> Statements => this.Sections.SelectMany(s => s.Statements).ToList();
+
+    [OnDeserialized]
+    internal new void OnDeserializedMethod(StreamingContext context)
+    {
+        foreach (var section in this.Sections)
+        {
+            section.Parent ??= this;
+        }
+    }
 }
