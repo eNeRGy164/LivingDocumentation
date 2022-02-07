@@ -26,6 +26,7 @@ namespace LivingDocumentation
             base.VisitClassDeclaration(node);
         }
 
+#if NET6_0_OR_GREATER
         public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
         {
             if (this.ProcessedEmbeddedType(node)) return;
@@ -40,6 +41,7 @@ namespace LivingDocumentation
 
             base.VisitRecordDeclaration(node);
         }
+#endif
 
         public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
         {
