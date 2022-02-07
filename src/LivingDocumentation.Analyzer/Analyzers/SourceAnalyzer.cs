@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,11 +7,11 @@ namespace LivingDocumentation
     public class SourceAnalyzer : CSharpSyntaxWalker
     {
         private readonly SemanticModel semanticModel;
-        private readonly IList<TypeDescription> types;
+        private readonly List<TypeDescription> types;
 
-        private TypeDescription currentType = null;
+        private TypeDescription? currentType = null;
 
-        public SourceAnalyzer(in SemanticModel semanticModel, IList<TypeDescription> types)
+        public SourceAnalyzer(in SemanticModel semanticModel, List<TypeDescription> types)
         {
             this.types = types;
             this.semanticModel = semanticModel;
@@ -145,7 +142,7 @@ namespace LivingDocumentation
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            var methodDescription = new MethodDescription(this.semanticModel.GetTypeInfo(node.ReturnType).Type.ToDisplayString(), node.Identifier.ToString());
+            var methodDescription = new MethodDescription(this.semanticModel.GetTypeInfo(node.ReturnType).Type?.ToDisplayString(), node.Identifier.ToString());
             this.currentType.AddMember(methodDescription);
 
             this.ExtractBaseMethodDeclaration(node, methodDescription);
@@ -155,7 +152,7 @@ namespace LivingDocumentation
 
         private void ExtractBaseTypeDeclaration(TypeType type, BaseTypeDeclarationSyntax node)
         {
-            var currentType = new TypeDescription(type, this.semanticModel.GetDeclaredSymbol(node).ToDisplayString());
+            var currentType = new TypeDescription(type, this.semanticModel.GetDeclaredSymbol(node)?.ToDisplayString());
             if (!this.types.Contains(currentType))
             {
                 this.types.Add(currentType);
@@ -250,7 +247,7 @@ namespace LivingDocumentation
             }
         }
 
-        private DocumentationCommentsDescription ExtractDocumentation(SyntaxNode node)
+        private DocumentationCommentsDescription? ExtractDocumentation(SyntaxNode node)
         {
             return DocumentationCommentsDescription.Parse(this.semanticModel.GetDeclaredSymbol(node)?.GetDocumentationCommentXml());
         }
@@ -273,7 +270,7 @@ namespace LivingDocumentation
             }
 
             var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, method.Statements);
-            invocationAnalyzer.Visit((SyntaxNode)node.Body ?? node.ExpressionBody);
+            invocationAnalyzer.Visit((SyntaxNode?)node.Body ?? node.ExpressionBody);
         }
 
         private static Modifier ParseModifiers(SyntaxTokenList modifiers)

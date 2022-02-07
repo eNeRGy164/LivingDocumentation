@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,9 +7,9 @@ namespace LivingDocumentation
     internal class InvocationsAnalyzer : CSharpSyntaxWalker
     {
         private readonly SemanticModel semanticModel;
-        private readonly IList<Statement> statements;
+        private readonly List<Statement> statements;
 
-        public InvocationsAnalyzer(in SemanticModel semanticModel, IList<Statement> statements)
+        public InvocationsAnalyzer(in SemanticModel semanticModel, List<Statement> statements)
         {
             this.semanticModel = semanticModel;
             this.statements = statements;
@@ -81,13 +78,13 @@ namespace LivingDocumentation
                 return;
             }
 
-            string containingType = this.semanticModel.GetSymbolInfo(expression).Symbol?.ContainingSymbol.ToDisplayString();
+            var containingType = this.semanticModel.GetSymbolInfo(expression).Symbol?.ContainingSymbol.ToDisplayString();
             if (containingType == null)
             {
                 containingType = this.semanticModel.GetSymbolInfo(expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
             }
 
-            string methodName = string.Empty;
+            var methodName = string.Empty;
 
             switch (node.Expression)
             {
@@ -120,7 +117,7 @@ namespace LivingDocumentation
                 // This might be part of a chain of extention methods (f.e. Fluent API's), the symbols are only available at the beginning of the chain.
                 var pNode = (SyntaxNode)node;
 
-                while (pNode != null && (!(pNode is InvocationExpressionSyntax) || (pNode is InvocationExpressionSyntax && (this.semanticModel.GetTypeInfo(pNode).Type.Kind == SymbolKind.ErrorType || this.semanticModel.GetSymbolInfo(expression).Symbol == null))))
+                while (pNode != null && (pNode is not InvocationExpressionSyntax || (pNode is InvocationExpressionSyntax && (this.semanticModel.GetTypeInfo(pNode).Type?.Kind == SymbolKind.ErrorType || this.semanticModel.GetSymbolInfo(expression).Symbol == null))))
                 {
                     pNode = pNode.Parent;
 
