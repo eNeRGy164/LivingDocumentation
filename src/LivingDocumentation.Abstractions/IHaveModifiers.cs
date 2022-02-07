@@ -1,10 +1,7 @@
-using Newtonsoft.Json;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+public interface IHaveModifiers
 {
-    public interface IHaveModifiers
-    {
-        [JsonProperty(Order = -2)]
-        Modifier Modifiers { get; set; }
-    }
+    [JsonProperty(Order = -2)]
+    Modifier Modifiers { get; set; }
 }

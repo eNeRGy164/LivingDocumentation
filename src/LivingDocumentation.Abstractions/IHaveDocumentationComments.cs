@@ -1,27 +1,24 @@
-﻿using System.Collections.Generic;
+namespace LivingDocumentation; 
 
-namespace LivingDocumentation
+public interface IHaveDocumentationComments
 {
-    public interface IHaveDocumentationComments
-    {
-        string Example { get; }
+    string Example { get; }
 
-        IDictionary<string, string> Exceptions { get; }
+    Dictionary<string, string> Exceptions { get; }
 
-        IDictionary<string, string> Params { get; }
+    Dictionary<string, string> Params { get; }
 
-        IDictionary<string, string> Permissions { get; }
+    Dictionary<string, string> Permissions { get; }
 
-        string Remarks { get; }
+    string Remarks { get; }
 
-        string Returns { get; }
+    string Returns { get; }
 
-        IDictionary<string, string> SeeAlsos { get; }
+    Dictionary<string, string> SeeAlsos { get; }
 
-        string Summary { get; }
+    string Summary { get; }
 
-        IDictionary<string, string> TypeParams { get; }
+    Dictionary<string, string> TypeParams { get; }
 
-        string Value { get; }
-    }
+    string Value { get; }
 }

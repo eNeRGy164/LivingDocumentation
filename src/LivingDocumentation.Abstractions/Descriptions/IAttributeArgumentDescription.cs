@@ -1,13 +1,10 @@
-﻿using System;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+public interface IAttributeArgumentDescription
 {
-    public interface IAttributeArgumentDescription
-    {
-        string Type { get; }
+    string Type { get; }
 
-        string Name { get; }
+    string Name { get; }
 
-        string Value { get; }
-    }
+    string Value { get; }
 }

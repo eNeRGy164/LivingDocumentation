@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+public interface IAttributeDescription
 {
-    public interface IAttributeDescription
-    {
-        string Type { get; }
+    string Type { get; }
 
-        string Name { get; }
+    string Name { get; }
 
-        List<IAttributeArgumentDescription> Arguments { get; }
-    }
+    List<IAttributeArgumentDescription> Arguments { get; }
 }

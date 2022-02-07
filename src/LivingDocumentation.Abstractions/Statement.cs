@@ -1,11 +1,7 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+public abstract class Statement
 {
-    public abstract class Statement
-    {
-        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Objects)]
-        public virtual List<Statement> Statements { get; } = new List<Statement>();
-    }
+    [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Objects)]
+    public virtual List<Statement> Statements { get; } = new();
 }

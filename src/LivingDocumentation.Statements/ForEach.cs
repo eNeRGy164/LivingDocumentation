@@ -1,10 +1,7 @@
-﻿using System.Diagnostics;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+[DebuggerDisplay("ForEach")]
+public class ForEach : Statement
 {
-    [DebuggerDisplay("ForEach")]
-    public class ForEach : Statement
-    {
-        public string Expression { get; set; }
-    }
+    public string? Expression { get; set; }
 }

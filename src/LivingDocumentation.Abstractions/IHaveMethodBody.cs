@@ -1,19 +1,15 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+public interface IHaveAMethodBody : IHaveModifiers
 {
-    public interface IHaveAMethodBody : IHaveModifiers
-    {
-        IHaveDocumentationComments DocumentationComments { get; set; }
+    IHaveDocumentationComments? DocumentationComments { get; set; }
 
-        string Name { get; }
+    string Name { get; }
 
-        List<IParameterDescription> Parameters { get; }
+    List<IParameterDescription> Parameters { get; }
 
-        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Objects)]
-        List<Statement> Statements { get; }
+    [JsonProperty(ItemTypeNameHandling = TypeNameHandling.Objects)]
+    List<Statement> Statements { get; }
 
-        List<IAttributeDescription> Attributes { get; }
-    }
+    List<IAttributeDescription> Attributes { get; }
 }

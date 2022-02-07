@@ -1,18 +1,15 @@
-﻿using System.Diagnostics;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+[DebuggerDisplay("EnumMember {Name,nq}")]
+public class EnumMemberDescription : MemberDescription
 {
-    [DebuggerDisplay("EnumMember {Name,nq}")]
-    public class EnumMemberDescription : MemberDescription
+    public string Value { get; }
+
+    public override MemberType MemberType => MemberType.EnumMember;
+
+    public EnumMemberDescription(string name, string value)
+        : base(name)
     {
-        public string Value { get; }
-
-        public override MemberType MemberType => MemberType.EnumMember;
-
-        public EnumMemberDescription(string name, string value)
-            : base(name)
-        {
-            this.Value = value;
-        }
+        this.Value = value;
     }
 }

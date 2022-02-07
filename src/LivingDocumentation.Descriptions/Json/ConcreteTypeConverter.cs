@@ -1,25 +1,21 @@
-﻿using Newtonsoft.Json;
-using System;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+internal class ConcreteTypeConverter<TConcrete> : JsonConverter
 {
-    internal class ConcreteTypeConverter<TConcrete> : JsonConverter
+    public override bool CanConvert(Type objectType)
     {
-        public override bool CanConvert(Type objectType)
-        {
-            return true;
-        }
+        return true;
+    }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            return serializer.Deserialize<TConcrete>(reader);
-        }
+    public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        return serializer.Deserialize<TConcrete>(reader);
+    }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            serializer.TypeNameHandling = TypeNameHandling.None;
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        serializer.TypeNameHandling = TypeNameHandling.None;
 
-            serializer.Serialize(writer, value);
-        }
+        serializer.Serialize(writer, value);
     }
 }

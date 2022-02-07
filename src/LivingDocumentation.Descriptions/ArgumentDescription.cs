@@ -1,18 +1,15 @@
-﻿using System.Diagnostics;
+namespace LivingDocumentation;
 
-namespace LivingDocumentation
+[DebuggerDisplay("Argument {Type} {Text}")]
+public class ArgumentDescription
 {
-    [DebuggerDisplay("Argument {Type} {Text}")]
-    public class ArgumentDescription
+    public string Type { get; }
+
+    public string Text { get; }
+
+    public ArgumentDescription(string type, string text)
     {
-        public string Type { get; }
-
-        public string Text { get; }
-
-        public ArgumentDescription(string type, string text)
-        {
-            this.Type = type;
-            this.Text = text;
-        }
+        this.Type = type;
+        this.Text = text;
     }
 }
