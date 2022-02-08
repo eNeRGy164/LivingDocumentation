@@ -2,11 +2,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace LivingDocumentation
+namespace LivingDocumentation;
+
+public class SourceAnalyzer : CSharpSyntaxWalker
 {
-    public class SourceAnalyzer : CSharpSyntaxWalker
-    {
-        private readonly SemanticModel semanticModel;
+    private readonly SemanticModel semanticModel;
         private readonly List<TypeDescription> types;
 
         private TypeDescription? currentType = null;
@@ -271,9 +271,8 @@ namespace LivingDocumentation
             invocationAnalyzer.Visit((SyntaxNode?)node.Body ?? node.ExpressionBody);
         }
 
-        private static Modifier ParseModifiers(SyntaxTokenList modifiers)
-        {
-            return (Modifier)modifiers.Select(m => Enum.TryParse(typeof(Modifier), m.ValueText, true, out var value) ? (int)value : 0).Sum();
-        }
+    private static Modifier ParseModifiers(SyntaxTokenList modifiers)
+    {
+        return (Modifier)modifiers.Select(m => Enum.TryParse(typeof(Modifier), m.ValueText, true, out var value) ? (int)value : 0).Sum();
     }
 }

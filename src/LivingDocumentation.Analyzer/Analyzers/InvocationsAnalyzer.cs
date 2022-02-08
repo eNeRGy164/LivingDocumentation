@@ -2,159 +2,158 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace LivingDocumentation
+namespace LivingDocumentation;
+
+internal class InvocationsAnalyzer : CSharpSyntaxWalker
 {
-    internal class InvocationsAnalyzer : CSharpSyntaxWalker
+    private readonly SemanticModel semanticModel;
+    private readonly List<Statement> statements;
+
+    public InvocationsAnalyzer(in SemanticModel semanticModel, List<Statement> statements)
     {
-        private readonly SemanticModel semanticModel;
-        private readonly List<Statement> statements;
+        this.semanticModel = semanticModel;
+        this.statements = statements;
+    }
 
-        public InvocationsAnalyzer(in SemanticModel semanticModel, List<Statement> statements)
+    public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
+    {
+        string containingType = this.semanticModel.GetTypeDisplayString(node);
+
+        var invocation = new InvocationDescription(containingType, node.Type.ToString());
+        this.statements.Add(invocation);
+
+        if (node.ArgumentList != null)
         {
-            this.semanticModel = semanticModel;
-            this.statements = statements;
+            foreach (var argument in node.ArgumentList.Arguments)
+            {
+                var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
+                invocation.Arguments.Add(argumentDescription);
+            }
         }
 
-        public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
+        if (node.Initializer != null)
         {
-            string containingType = this.semanticModel.GetTypeDisplayString(node);
-
-            var invocation = new InvocationDescription(containingType, node.Type.ToString());
-            this.statements.Add(invocation);
-
-            if (node.ArgumentList != null)
+            foreach (var expression in node.Initializer.Expressions)
             {
-                foreach (var argument in node.ArgumentList.Arguments)
-                {
-                    var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
-                    invocation.Arguments.Add(argumentDescription);
-                }
+                var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(expression), expression.ToString());
+                invocation.Arguments.Add(argumentDescription);
             }
-
-            if (node.Initializer != null)
-            {
-                foreach (var expression in node.Initializer.Expressions)
-                {
-                    var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(expression), expression.ToString());
-                    invocation.Arguments.Add(argumentDescription);
-                }
-            }
-
-            base.VisitObjectCreationExpression(node);
         }
 
-        public override void VisitSwitchStatement(SwitchStatementSyntax node)
+        base.VisitObjectCreationExpression(node);
+    }
+
+    public override void VisitSwitchStatement(SwitchStatementSyntax node)
+    {
+        var branchingAnalyzer = new BranchingAnalyzer(this.semanticModel, this.statements);
+        branchingAnalyzer.Visit(node);
+    }
+
+    public override void VisitIfStatement(IfStatementSyntax node)
+    {
+        var branchingAnalyzer = new BranchingAnalyzer(this.semanticModel, this.statements);
+        branchingAnalyzer.Visit(node);
+    }
+
+    public override void VisitForEachStatement(ForEachStatementSyntax node)
+    {
+        var loopingAnalyzer = new LoopingAnalyzer(this.semanticModel, this.statements);
+        loopingAnalyzer.Visit(node);
+    }
+
+    public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+    {
+        var expression = this.GetExpressionWithSymbol(node);
+
+        if (Program.RuntimeOptions.VerboseOutput && this.semanticModel.GetSymbolInfo(expression).Symbol == null)
         {
-            var branchingAnalyzer = new BranchingAnalyzer(this.semanticModel, this.statements);
-            branchingAnalyzer.Visit(node);
+            Console.WriteLine("WARN: Could not resolve type of invocation of the following block:");
+            Console.WriteLine(node.ToFullString());
+            return;
         }
 
-        public override void VisitIfStatement(IfStatementSyntax node)
+        if (this.semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof", StringComparison.Ordinal))
         {
-            var branchingAnalyzer = new BranchingAnalyzer(this.semanticModel, this.statements);
-            branchingAnalyzer.Visit(node);
+            // nameof is compiler sugar, and is actually a method we are not interrested in
+            return;
         }
 
-        public override void VisitForEachStatement(ForEachStatementSyntax node)
+        var containingType = this.semanticModel.GetSymbolInfo(expression).Symbol?.ContainingSymbol.ToDisplayString();
+        if (containingType == null)
         {
-            var loopingAnalyzer = new LoopingAnalyzer(this.semanticModel, this.statements);
-            loopingAnalyzer.Visit(node);
+            containingType = this.semanticModel.GetSymbolInfo(expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
         }
 
-        public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+        var methodName = string.Empty;
+
+        switch (node.Expression)
         {
-            var expression = this.GetExpressionWithSymbol(node);
+            case MemberAccessExpressionSyntax m:
+                methodName = m.Name.ToString();
+                break;
+            case IdentifierNameSyntax i:
+                methodName = i.Identifier.ValueText;
+                break;
+        }
 
-            if (Program.RuntimeOptions.VerboseOutput && this.semanticModel.GetSymbolInfo(expression).Symbol == null)
-            {
-                Console.WriteLine("WARN: Could not resolve type of invocation of the following block:");
-                Console.WriteLine(node.ToFullString());
-                return;
-            }
-
-            if (this.semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof", StringComparison.Ordinal))
-            {
-                // nameof is compiler sugar, and is actually a method we are not interrested in
-                return;
-            }
-
-            var containingType = this.semanticModel.GetSymbolInfo(expression).Symbol?.ContainingSymbol.ToDisplayString();
-            if (containingType == null)
-            {
-                containingType = this.semanticModel.GetSymbolInfo(expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
-            }
-
-            var methodName = string.Empty;
-
-            switch (node.Expression)
-            {
-                case MemberAccessExpressionSyntax m:
-                    methodName = m.Name.ToString();
-                    break;
-                case IdentifierNameSyntax i:
-                    methodName = i.Identifier.ValueText;
-                    break;
-            }
-
-            var invocation = new InvocationDescription(containingType, methodName);
-            this.statements.Add(invocation);
+        var invocation = new InvocationDescription(containingType, methodName);
+        this.statements.Add(invocation);
 
         foreach (var argument in node.ArgumentList.Arguments)
         {
-                var value = argument.Expression.ResolveValue(this.semanticModel);
+            var value = argument.Expression.ResolveValue(this.semanticModel);
 
-                var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), value);
+            var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), value);
             invocation.Arguments.Add(argumentDescription);
         }
 
-            base.VisitInvocationExpression(node);
-        }
+        base.VisitInvocationExpression(node);
+    }
 
-        private ExpressionSyntax GetExpressionWithSymbol(InvocationExpressionSyntax node)
+    private ExpressionSyntax GetExpressionWithSymbol(InvocationExpressionSyntax node)
+    {
+        var expression = node.Expression;
+
+        if (this.semanticModel.GetSymbolInfo(expression).Symbol == null)
         {
-            var expression = node.Expression;
+            // This might be part of a chain of extention methods (f.e. Fluent API's), the symbols are only available at the beginning of the chain.
+            var pNode = (SyntaxNode)node;
 
-            if (this.semanticModel.GetSymbolInfo(expression).Symbol == null)
+            while (pNode != null && (pNode is not InvocationExpressionSyntax || (pNode is InvocationExpressionSyntax && (this.semanticModel.GetTypeInfo(pNode).Type?.Kind == SymbolKind.ErrorType || this.semanticModel.GetSymbolInfo(expression).Symbol == null))))
             {
-                // This might be part of a chain of extention methods (f.e. Fluent API's), the symbols are only available at the beginning of the chain.
-                var pNode = (SyntaxNode)node;
+                pNode = pNode.Parent;
 
-                while (pNode != null && (pNode is not InvocationExpressionSyntax || (pNode is InvocationExpressionSyntax && (this.semanticModel.GetTypeInfo(pNode).Type?.Kind == SymbolKind.ErrorType || this.semanticModel.GetSymbolInfo(expression).Symbol == null))))
+                if (pNode is InvocationExpressionSyntax syntax)
                 {
-                    pNode = pNode.Parent;
-
-                    if (pNode is InvocationExpressionSyntax syntax)
-                    {
-                        expression = syntax.Expression;
-                    }
+                    expression = syntax.Expression;
                 }
             }
-
-            return expression;
         }
 
-        public override void VisitReturnStatement(ReturnStatementSyntax node)
-        {
-            var returnDescription = new ReturnDescription(node.Expression?.ToString() ?? string.Empty);
-            this.statements.Add(returnDescription);
+        return expression;
+    }
 
-            base.VisitReturnStatement(node);
-        }
+    public override void VisitReturnStatement(ReturnStatementSyntax node)
+    {
+        var returnDescription = new ReturnDescription(node.Expression?.ToString() ?? string.Empty);
+        this.statements.Add(returnDescription);
 
-        public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
-        {
-            var returnDescription = new ReturnDescription(node.Expression.ToString());
-            this.statements.Add(returnDescription);
+        base.VisitReturnStatement(node);
+    }
 
-            base.VisitArrowExpressionClause(node);
-        }
+    public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
+    {
+        var returnDescription = new ReturnDescription(node.Expression.ToString());
+        this.statements.Add(returnDescription);
 
-        public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
-        {
-            var assignmentDescription = new AssignmentDescription(node.Left.ToString(), node.OperatorToken.Text, node.Right.ToString());
-            this.statements.Add(assignmentDescription);
+        base.VisitArrowExpressionClause(node);
+    }
 
-            base.VisitAssignmentExpression(node);
-        }
+    public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
+    {
+        var assignmentDescription = new AssignmentDescription(node.Left.ToString(), node.OperatorToken.Text, node.Right.ToString());
+        this.statements.Add(assignmentDescription);
+
+        base.VisitAssignmentExpression(node);
     }
 }
