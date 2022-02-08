@@ -99,11 +99,13 @@ namespace LivingDocumentation
             var invocation = new InvocationDescription(containingType, methodName);
             this.statements.Add(invocation);
 
-            foreach (var argument in node.ArgumentList.Arguments)
-            {
-                var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
-                invocation.Arguments.Add(argumentDescription);
-            }
+        foreach (var argument in node.ArgumentList.Arguments)
+        {
+                var value = argument.Expression.ResolveValue(this.semanticModel);
+
+                var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), value);
+            invocation.Arguments.Add(argumentDescription);
+        }
 
             base.VisitInvocationExpression(node);
         }

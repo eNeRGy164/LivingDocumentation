@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -119,7 +119,7 @@ namespace LivingDocumentation.Analyzer.Tests
             var result = JsonConvert.SerializeObject(types, JsonDefaults.SerializerSettings());
 
             // Assert
-            result.Should().Match(@"[{""FullName"":""Test"",""Attributes"":[{""Type"":""System.ObsoleteAttribute"",""Name"":""System.Obsolete"",""Arguments"":[{""Name"":""\""Reason\"""",""Type"":""string"",""Value"":""Reason""}]}]}]");
+            result.Should().Match(@"[{""FullName"":""Test"",""Attributes"":[{""Type"":""System.ObsoleteAttribute"",""Name"":""System.Obsolete"",""Arguments"":[{""Name"":""Reason"",""Type"":""string"",""Value"":""Reason""}]}]}]");
         }
     }
 }

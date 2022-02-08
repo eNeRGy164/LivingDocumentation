@@ -78,12 +78,12 @@ namespace LivingDocumentation
                 this.currentType.AddMember(fieldDescription);
 
                 fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
-                this.EnsureMemberDefaultAccessModifier(fieldDescription);
-                this.ExtractAttributes(node.AttributeLists, fieldDescription.Attributes);
+            this.EnsureMemberDefaultAccessModifier(fieldDescription);
+            this.ExtractAttributes(node.AttributeLists, fieldDescription.Attributes);
 
-                fieldDescription.Initializer = variable.Initializer?.Value.ToString();
-                fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
-            }
+                fieldDescription.Initializer = variable.Initializer?.Value.ResolveValue(this.semanticModel);
+            fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
+        }
 
             base.VisitFieldDeclaration(node);
         }
@@ -96,12 +96,12 @@ namespace LivingDocumentation
                 this.currentType.AddMember(eventDescription);
 
                 eventDescription.Modifiers |= ParseModifiers(node.Modifiers);
-                this.EnsureMemberDefaultAccessModifier(eventDescription);
-                this.ExtractAttributes(node.AttributeLists, eventDescription.Attributes);
+            this.EnsureMemberDefaultAccessModifier(eventDescription);
+            this.ExtractAttributes(node.AttributeLists, eventDescription.Attributes);
 
-                eventDescription.Initializer = variable.Initializer?.Value.ToString();
-                eventDescription.DocumentationComments = this.ExtractDocumentation(variable);
-            }
+                eventDescription.Initializer = variable.Initializer?.Value.ResolveValue(this.semanticModel);
+            eventDescription.DocumentationComments = this.ExtractDocumentation(variable);
+        }
 
             base.VisitEventFieldDeclaration(node);
         }
@@ -112,13 +112,13 @@ namespace LivingDocumentation
             this.currentType.AddMember(propertyDescription);
 
             propertyDescription.Modifiers |= ParseModifiers(node.Modifiers);
-            this.EnsureMemberDefaultAccessModifier(propertyDescription);
-            this.ExtractAttributes(node.AttributeLists, propertyDescription.Attributes);
+        this.EnsureMemberDefaultAccessModifier(propertyDescription);
+        this.ExtractAttributes(node.AttributeLists, propertyDescription.Attributes);
 
-            propertyDescription.Initializer = node.Initializer?.Value.ToString();
-            propertyDescription.DocumentationComments = this.ExtractDocumentation(node);
+            propertyDescription.Initializer = node.Initializer?.Value.ResolveValue(this.semanticModel);
+        propertyDescription.DocumentationComments = this.ExtractDocumentation(node);
 
-            base.VisitPropertyDeclaration(node);
+        base.VisitPropertyDeclaration(node);
         }
 
         public override void VisitEnumMemberDeclaration(EnumMemberDeclarationSyntax node)
@@ -233,17 +233,13 @@ namespace LivingDocumentation
                 attributeDescriptions.Add(attributeDescription);
 
                 if (attribute.ArgumentList != null)
+            {
+                foreach (var argument in attribute.ArgumentList.Arguments)
                 {
-                    foreach (var argument in attribute.ArgumentList.Arguments)
-                    {
-                        var value = argument.Expression switch
-                        {
-                            LiteralExpressionSyntax literalExpression => literalExpression.Token.ValueText,
-                            _ => argument.Expression?.ToString(),
-                        };
+                        var value = argument.Expression.ResolveValue(this.semanticModel);
 
-                        var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression?.ToString(), this.semanticModel.GetTypeDisplayString(argument.Expression), value);
-                        attributeDescription.Arguments.Add(argumentDescription);
+                    var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression?.ToString(), this.semanticModel.GetTypeDisplayString(argument.Expression), value);
+                    attributeDescription.Arguments.Add(argumentDescription);
                     }
                 }
             }
