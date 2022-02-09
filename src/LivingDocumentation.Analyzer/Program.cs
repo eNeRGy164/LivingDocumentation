@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
-using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 
 namespace LivingDocumentation;

@@ -11,9 +11,9 @@ public class AttributeDescription : IAttributeDescription
     [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeArgumentDescription>>))]
     public List<IAttributeArgumentDescription> Arguments { get; } = new();
 
-    public AttributeDescription(string type, string name)
+    public AttributeDescription(string? type, string? name)
     {
-        this.Type = type;
-        this.Name = name;
+        this.Type = type ?? throw new ArgumentNullException(nameof(type));
+        this.Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 }

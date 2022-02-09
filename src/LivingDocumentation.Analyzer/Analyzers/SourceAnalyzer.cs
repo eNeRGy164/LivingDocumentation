@@ -1,7 +1,3 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace LivingDocumentation;
 
 public class SourceAnalyzer : CSharpSyntaxWalker
@@ -117,6 +113,8 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
     {
+        if (this.currentType is null) return;
+
         foreach (var variable in node.Declaration.Variables)
         {
             var fieldDescription = new FieldDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
@@ -135,6 +133,8 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     public override void VisitEventFieldDeclaration(EventFieldDeclarationSyntax node)
     {
+        if (this.currentType is null) return;
+
         foreach (var variable in node.Declaration.Variables)
         {
             var eventDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
@@ -153,6 +153,8 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
     {
+        if (this.currentType is null) return;
+
         var propertyDescription = new PropertyDescription(this.semanticModel.GetTypeDisplayString(node.Type), node.Identifier.ToString());
         this.currentType.AddMember(propertyDescription);
 
@@ -168,6 +170,8 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     public override void VisitEnumMemberDeclaration(EnumMemberDeclarationSyntax node)
     {
+        if (this.currentType is null) return;
+
         var enumMemberDescription = new EnumMemberDescription(node.Identifier.ToString(), node.EqualsValue?.Value.ToString());
         this.currentType.AddMember(enumMemberDescription);
 
@@ -179,6 +183,8 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
     {
+        if (this.currentType is null) return;
+
         var constructorDescription = new ConstructorDescription(node.Identifier.ToString());
         this.currentType.AddMember(constructorDescription);
 
@@ -189,6 +195,8 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
     {
+        if (this.currentType is null) return;
+
         var methodDescription = new MethodDescription(this.semanticModel.GetTypeInfo(node.ReturnType).Type?.ToDisplayString(), node.Identifier.ToString());
         this.currentType.AddMember(methodDescription);
 
@@ -225,6 +233,8 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     private void EnsureTypeDefaultAccessModifier(BaseTypeDeclarationSyntax node)
     {
+        if (this.currentType is null) return;
+
         if (!node.Ancestors().Any(a => a.IsKind(SyntaxKind.ClassDeclaration) || a.IsKind(SyntaxKind.StructDeclaration)))
         {
             // Not nested, default is internal
@@ -281,7 +291,7 @@ public class SourceAnalyzer : CSharpSyntaxWalker
             {
                 foreach (var argument in attribute.ArgumentList.Arguments)
                 {
-                    var value = argument.Expression.ResolveValue(this.semanticModel);
+                    var value = argument.Expression!.ResolveValue(this.semanticModel);
 
                     var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression?.ToString(), this.semanticModel.GetTypeDisplayString(argument.Expression), value);
                     attributeDescription.Arguments.Add(argumentDescription);
@@ -305,7 +315,7 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
         foreach (var parameter in node.ParameterList.Parameters)
         {
-            var parameterDescription = new ParameterDescription(this.semanticModel.GetTypeDisplayString(parameter.Type), parameter.Identifier.ToString());
+            var parameterDescription = new ParameterDescription(this.semanticModel.GetTypeDisplayString(parameter.Type!), parameter.Identifier.ToString());
             method.Parameters.Add(parameterDescription);
 
             parameterDescription.HasDefaultValue = parameter.Default != null;

@@ -1,6 +1,3 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace LivingDocumentation;
 
 public static class ExpressionSyntaxExtensions

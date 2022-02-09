@@ -1,7 +1,3 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace LivingDocumentation;
 
 internal class BranchingAnalyzer : CSharpSyntaxWalker
