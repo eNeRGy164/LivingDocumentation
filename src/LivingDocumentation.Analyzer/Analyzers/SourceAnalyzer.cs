@@ -293,7 +293,7 @@ public class SourceAnalyzer : CSharpSyntaxWalker
                 {
                     var value = argument.Expression!.ResolveValue(this.semanticModel);
 
-                    var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression?.ToString(), this.semanticModel.GetTypeDisplayString(argument.Expression), value);
+                    var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression.ResolveValue(this.semanticModel), this.semanticModel.GetTypeDisplayString(argument.Expression!), value);
                     attributeDescription.Arguments.Add(argumentDescription);
                 }
             }

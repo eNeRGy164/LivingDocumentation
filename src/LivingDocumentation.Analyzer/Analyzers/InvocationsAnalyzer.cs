@@ -131,7 +131,7 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
 
     public override void VisitReturnStatement(ReturnStatementSyntax node)
     {
-        var returnDescription = new ReturnDescription(node.Expression?.ToString() ?? string.Empty);
+        var returnDescription = new ReturnDescription(node.Expression?.ResolveValue(this.semanticModel) ?? string.Empty);
         this.statements.Add(returnDescription);
 
         base.VisitReturnStatement(node);
@@ -139,7 +139,7 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
 
     public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
     {
-        var returnDescription = new ReturnDescription(node.Expression.ToString());
+        var returnDescription = new ReturnDescription(node.Expression.ResolveValue(this.semanticModel));
         this.statements.Add(returnDescription);
 
         base.VisitArrowExpressionClause(node);
