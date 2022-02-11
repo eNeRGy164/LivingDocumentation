@@ -22,7 +22,7 @@ public abstract class MemberDescription : IMemberable
 
     public MemberDescription(string name)
     {
-        this.Name = name;
+        this.Name = name ?? throw new ArgumentNullException("name");
     }
 
     public override bool Equals(object obj)

@@ -1,33 +1,29 @@
-﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+namespace LivingDocumentation.Analyzer.Tests;
 
-namespace LivingDocumentation.Analyzer.Tests
+[TestClass]
+public class ConstructorDescriptionTests
 {
-    [TestClass]
-    public class ConstructorDescriptionTests
+    [TestMethod]
+    public void ConstructorDescription_Constructor_Should_SetName()
     {
-        [TestMethod]
-        public void ConstructorDescription_Constructor_Should_SetName()
-        {
-            var description = new ConstructorDescription("TestConstructor");
+        var description = new ConstructorDescription("TestConstructor");
 
-            description.Name.Should().Be("TestConstructor");
-        }
+        description.Name.Should().Be("TestConstructor");
+    }
 
-        [TestMethod]
-        public void ConstructorDescription_MemberType_Should_BeConstructor()
-        {
-            var description = new ConstructorDescription(null);
+    [TestMethod]
+    public void ConstructorDescription_MemberType_Should_BeConstructor()
+    {
+        var description = new ConstructorDescription("");
 
-            description.MemberType.Should().Be(MemberType.Constructor);
-        }
+        description.MemberType.Should().Be(MemberType.Constructor);
+    }
 
-        [TestMethod]
-        public void ConstructorDescription_Parameters_Should_BeEmpty()
-        {
-            var description = new ConstructorDescription(null);
+    [TestMethod]
+    public void ConstructorDescription_Parameters_Should_BeEmpty()
+    {
+        var description = new ConstructorDescription("");
 
-            description.Parameters.Should().BeEmpty();
-        }
+        description.Parameters.Should().BeEmpty();
     }
 }

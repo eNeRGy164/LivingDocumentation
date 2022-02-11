@@ -1,117 +1,115 @@
 using System.Diagnostics;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
-using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 
-namespace LivingDocumentation
+namespace LivingDocumentation;
+
+public static partial class Program
 {
-    public static partial class Program
+    private static ParserResult<Options>? ParsedResults;
+
+    public static Options RuntimeOptions { get; private set; } = new Options();
+
+    public static async Task Main(string[] args)
     {
-        private static ParserResult<Options>? ParsedResults;
+        ParsedResults = Parser.Default.ParseArguments<Options>(args);
 
-        public static Options RuntimeOptions { get; private set; } = new Options();
+        await ParsedResults.MapResult(
+            options => RunApplicationAsync(options),
+            errors => Task.FromResult(1)
+        ).ConfigureAwait(false);
+    }
 
-        public static async Task Main(string[] args)
+    private static async Task RunApplicationAsync(Options options)
+    {
+        RuntimeOptions = options;
+
+        var types = new List<TypeDescription>();
+
+        var stopwatch = Stopwatch.StartNew();
+        if (options.SolutionPath is not null)
         {
-            ParsedResults = Parser.Default.ParseArguments<Options>(args);
-
-            await ParsedResults.MapResult(
-                options => RunApplicationAsync(options),
-                errors => Task.FromResult(1)
-            ).ConfigureAwait(false);
+            await AnalyzeSolutionFileAsync(types, options.SolutionPath).ConfigureAwait(false);
+        } else
+        {
+            await AnalyzeProjectFileAsync(types, options.ProjectPath!).ConfigureAwait(false);
         }
+        stopwatch.Stop();
 
-        private static async Task RunApplicationAsync(Options options)
+        // Write analysis 
+        var serializerSettings = JsonDefaults.SerializerSettings();
+        serializerSettings.Formatting = options.PrettyPrint ? Formatting.Indented : Formatting.None;
+
+        var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
+
+        await File.WriteAllTextAsync(options.OutputPath!, result).ConfigureAwait(false);
+
+        if (!options.Quiet)
         {
-            RuntimeOptions = options;
-
-            var types = new List<TypeDescription>();
-
-            var stopwatch = Stopwatch.StartNew();
-            if (options.SolutionPath is not null)
-            {
-                await AnalyzeSolutionFileAsync(types, options.SolutionPath).ConfigureAwait(false);
-            } else
-            {
-                await AnalyzeProjectFileAsync(types, options.ProjectPath!).ConfigureAwait(false);
-            }
-            stopwatch.Stop();
-
-            // Write analysis 
-            var serializerSettings = JsonDefaults.SerializerSettings();
-            serializerSettings.Formatting = options.PrettyPrint ? Formatting.Indented : Formatting.None;
-
-            var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
-
-            await File.WriteAllTextAsync(options.OutputPath!, result).ConfigureAwait(false);
-
-            if (!options.Quiet)
-            {
-                Console.WriteLine($"Living Documentation Analysis output generated in {stopwatch.ElapsedMilliseconds}ms at {options.OutputPath}");
-            }
+            Console.WriteLine($"Living Documentation Analysis output generated in {stopwatch.ElapsedMilliseconds}ms at {options.OutputPath}");
         }
+    }
 
-        private static async Task AnalyzeSolutionFileAsync(List<TypeDescription> types, string solutionFile)
+    private static async Task AnalyzeSolutionFileAsync(List<TypeDescription> types, string solutionFile)
+    {
+        var manager = new AnalyzerManager(solutionFile);
+        var workspace = manager.GetWorkspace();
+        var assembliesInSolution = workspace.CurrentSolution.Projects.Select(p => p.AssemblyName).ToList();
+
+        // Every project in the solution, except unit test projects
+        var projects = workspace.CurrentSolution.Projects
+            .Where(p => !manager.Projects.First(mp => p.Id.Id == mp.Value.ProjectGuid).Value.ProjectFile.PackageReferences.Any(pr => pr.Name.Contains("Test", StringComparison.Ordinal)));
+
+        foreach (var project in projects)
         {
-            var manager = new AnalyzerManager(solutionFile);
-            var workspace = manager.GetWorkspace();
-            var assembliesInSolution = workspace.CurrentSolution.Projects.Select(p => p.AssemblyName).ToList();
-
-            // Every project in the solution, except unit test projects
-            var projects = workspace.CurrentSolution.Projects
-                .Where(p => !manager.Projects.First(mp => p.Id.Id == mp.Value.ProjectGuid).Value.ProjectFile.PackageReferences.Any(pr => pr.Name.Contains("Test", StringComparison.Ordinal)));
-
-            foreach (var project in projects)
-            {
-                await AnalyzeProjectAsyc(types, project).ConfigureAwait(false);
-            }
-
-            workspace.Dispose();
-        }
-
-        private static async Task AnalyzeProjectFileAsync(List<TypeDescription> types, string projectFile)
-        {
-            var manager = new AnalyzerManager();
-            manager.GetProject(projectFile);
-            var workspace = manager.GetWorkspace();
-
-            var project = workspace.CurrentSolution.Projects.First();
-
             await AnalyzeProjectAsyc(types, project).ConfigureAwait(false);
-
-            workspace.Dispose();
         }
 
-        private static async Task AnalyzeProjectAsyc(List<TypeDescription> types, Project project)
-        {
-            var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
-            if (compilation is null)
-            {
-                return;
-            }
+        workspace.Dispose();
+    }
 
-            if (RuntimeOptions.VerboseOutput)
+    private static async Task AnalyzeProjectFileAsync(List<TypeDescription> types, string projectFile)
+    {
+        var manager = new AnalyzerManager();
+        manager.GetProject(projectFile);
+        var workspace = manager.GetWorkspace();
+
+        var project = workspace.CurrentSolution.Projects.First();
+
+        await AnalyzeProjectAsyc(types, project).ConfigureAwait(false);
+
+        workspace.Dispose();
+    }
+
+    private static async Task AnalyzeProjectAsyc(List<TypeDescription> types, Project project)
+    {
+        var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
+        if (compilation is null)
+        {
+            return;
+        }
+
+        if (RuntimeOptions.VerboseOutput)
+        {
+            var diagnostics = compilation.GetDiagnostics();
+            if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
             {
-                var diagnostics = compilation.GetDiagnostics();
-                if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+                Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
+                foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
                 {
-                    Console.WriteLine($"The following errors occured during compilation of project '{project.FilePath}'");
-                    foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
-                    {
-                        Console.WriteLine("- " + diagnostic.ToString());
-                    }
+                    Console.WriteLine("- " + diagnostic.ToString());
                 }
             }
+        }
 
-            // Every file in the project
-            foreach (var syntaxTree in compilation.SyntaxTrees)
-            {
-                var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
+        // Every file in the project
+        foreach (var syntaxTree in compilation.SyntaxTrees)
+        {
+            var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
-                var visitor = new SourceAnalyzer(semanticModel, types);
-                visitor.Visit(syntaxTree.GetRoot());
-            }
+            var visitor = new SourceAnalyzer(semanticModel, types);
+            visitor.Visit(syntaxTree.GetRoot());
         }
     }
 }

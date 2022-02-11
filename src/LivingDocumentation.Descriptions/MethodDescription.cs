@@ -14,10 +14,10 @@ public class MethodDescription : MemberDescription, IHaveAMethodBody
 
     public override MemberType MemberType => MemberType.Method;
         
-    public MethodDescription(string returnType, string name)
+    public MethodDescription(string? returnType, string name)
         : base(name)
     {
-        this.ReturnType = returnType;
+        this.ReturnType = returnType ?? "void";
     }
 
     [OnDeserialized]

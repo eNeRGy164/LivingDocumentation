@@ -21,7 +21,7 @@ public class TypeDescription : IHaveModifiers
     [JsonProperty(Order = 6, PropertyName = nameof(Events))]
     private readonly List<EventDescription> events = new();
 
-    public TypeDescription(TypeType type, string fullName)
+    public TypeDescription(TypeType type, string? fullName)
     {
         this.Type = type;
         this.FullName = fullName ?? string.Empty;

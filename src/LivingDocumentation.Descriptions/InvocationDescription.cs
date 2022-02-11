@@ -9,9 +9,9 @@ public class InvocationDescription : Statement
 
     public List<ArgumentDescription> Arguments { get; } = new();
 
-    public InvocationDescription(string containingType, string name)
+    public InvocationDescription(string? containingType, string? name)
     {
-        this.ContainingType = containingType;
-        this.Name = name;
+        this.ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
+        this.Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 }
