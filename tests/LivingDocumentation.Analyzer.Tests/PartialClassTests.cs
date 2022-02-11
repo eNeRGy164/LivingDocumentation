@@ -4,16 +4,18 @@ namespace LivingDocumentation.Analyzer.Tests;
 public class PartialClassTests
 {
     [TestMethod]
-    public void ClassWithParts_Should_HaveSingleEntry()
+    public void PartialClassesShouldBecomeASingleType()
     {
         // Assign
         var source = @"
         partial class Test
         {
+            public string Property1 { get; }
         }
 
         partial class Test
         {
+            public string Property2 { get; }
         }
         ";
 
@@ -25,7 +27,7 @@ public class PartialClassTests
     }
 
     [TestMethod]
-    public void ClassWithParts_Should_HaveCombinedProperties()
+    public void MembersOfPartialClassesShouldBeCombined()
     {
         // Assign
         var source = @"
@@ -46,5 +48,4 @@ public class PartialClassTests
         // Assert
         types[0].Properties.Should().HaveCount(2);
     }
-
 }
