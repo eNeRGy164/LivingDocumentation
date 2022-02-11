@@ -11,7 +11,10 @@ internal class TestHelper
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source.Trim());
         var compilation = CSharpCompilation.Create("Test")
-                                            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                            .WithOptions(
+                                                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                                                    .WithAllowUnsafe(true)
+                                            )
                                             .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
                                             .AddSyntaxTrees(syntaxTree);
 
