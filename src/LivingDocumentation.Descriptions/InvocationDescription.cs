@@ -1,6 +1,6 @@
 namespace LivingDocumentation;
 
-[DebuggerDisplay("Invocation {Name} {ContainingType}")]
+[DebuggerDisplay("Invocation \"{ContainingType,nq}.{Name,nq}\"")]
 public class InvocationDescription : Statement
 {
     public string ContainingType { get; }
@@ -9,7 +9,7 @@ public class InvocationDescription : Statement
 
     public List<ArgumentDescription> Arguments { get; } = new();
 
-    public InvocationDescription(string? containingType, string? name)
+    public InvocationDescription(string containingType, string name)
     {
         this.ContainingType = containingType ?? throw new ArgumentNullException(nameof(containingType));
         this.Name = name ?? throw new ArgumentNullException(nameof(name));

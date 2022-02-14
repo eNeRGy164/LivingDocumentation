@@ -15,6 +15,6 @@ public class EventDescription : MemberDescription
     public EventDescription(string type, string name)
         : base(name)
     {
-        this.Type = type;
+        this.Type = type ?? throw new ArgumentNullException(nameof(type));
     }
 }

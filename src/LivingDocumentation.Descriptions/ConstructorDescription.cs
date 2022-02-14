@@ -1,6 +1,6 @@
 namespace LivingDocumentation;
 
-[DebuggerDisplay("Constructor {Name,nq}")]
+[DebuggerDisplay("Constructor {Name}")]
 public class ConstructorDescription : MemberDescription, IHaveAMethodBody
 {
     [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]

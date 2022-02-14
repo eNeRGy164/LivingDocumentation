@@ -15,6 +15,6 @@ public class FieldDescription : MemberDescription
     public FieldDescription(string type, string name)
         : base(name)
     {
-        this.Type = type;
+        this.Type = type ?? throw new ArgumentNullException(nameof(type));
     }
 }

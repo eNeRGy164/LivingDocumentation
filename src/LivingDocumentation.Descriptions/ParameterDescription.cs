@@ -15,7 +15,7 @@ public class ParameterDescription : IParameterDescription
 
     public ParameterDescription(string type, string name)
     {
-        this.Type = type;
-        this.Name = name;
+        this.Type = type ?? throw new ArgumentNullException(nameof(type));
+        this.Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 }
