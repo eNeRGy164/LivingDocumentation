@@ -30,6 +30,8 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'netcoreapp2.1'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

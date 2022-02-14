@@ -7,6 +7,8 @@
     <LangVersion>latest</LangVersion>
 
     <IsPackable>false</IsPackable>
+
+    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'netcoreapp2.1'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

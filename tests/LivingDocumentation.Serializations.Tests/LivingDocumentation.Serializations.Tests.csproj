@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net6.0</TargetFrameworks>
@@ -7,12 +7,15 @@
     <LangVersion>latest</LangVersion>
 
     <IsPackable>false</IsPackable>
+
+    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'netcoreapp2.1'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <Using Include="FluentAssertions" />
     <Using Include="FluentAssertions.Execution" />
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+    <Using Include="Newtonsoft.Json" />
   </ItemGroup>
 
   <ItemGroup>
