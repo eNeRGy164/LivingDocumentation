@@ -4,6 +4,8 @@ public static class StringExtensions
 {
     public static bool IsEnumerable(this string type)
     {
+        if (type is null) throw new ArgumentNullException(nameof(type));
+
         if (!type.StartsWith("System.Collections.", StringComparison.Ordinal))
         {
             return false;
@@ -22,15 +24,21 @@ public static class StringExtensions
 
     public static bool IsGeneric(this string type)
     {
-        return type.IndexOf('>') > -1 && type.EndsWith(">");
+        if (type is null) throw new ArgumentNullException(nameof(type));
+
+        return type.IndexOf('>') > -1 && type.TrimEnd().EndsWith(">");
     }
 
     public static IReadOnlyList<string> GenericTypes(this string type)
     {
+        if (type is null) throw new ArgumentNullException(nameof(type));
+
         if (!type.IsGeneric())
         {
             return new List<string>(0);
         }
+
+        type = type.Trim();
 
         var typeParts = type.Substring(type.IndexOf('<') + 1, type.Length - type.IndexOf('<') - 2).Split(',');
         var types = new List<string>();
@@ -52,6 +60,8 @@ public static class StringExtensions
 
     public static string ForDiagram(this string type)
     {
+        if (type is null) throw new ArgumentNullException(nameof(type));
+
         if (type.IsGeneric())
         {
             var a = type.Substring(0, type.IndexOf('<')).ForDiagram();
@@ -68,25 +78,25 @@ public static class StringExtensions
         }
     }
 
-    public static string ToSentenceCase(this string input)
+    public static string ToSentenceCase(this string type)
     {
-        if (string.IsNullOrEmpty(input))
+        if (string.IsNullOrEmpty(type))
         {
-            return input;
+            return type;
         }
 
         var stringBuilder = new StringBuilder();
 
-        stringBuilder.Append(char.ToUpper(input[0]));
+        stringBuilder.Append(char.ToUpper(type[0]));
 
-        for (var i = 1; i < input.Length; i++)
+        for (var i = 1; i < type.Length; i++)
         {
-            if ((char.IsUpper(input[i]) && (!char.IsUpper(input[i - 1]) || ((i + 1 < input.Length) && !char.IsUpper(input[i + 1])))) || (char.IsDigit(input[i]) && !char.IsDigit(input[i - 1])))
+            if ((char.IsUpper(type[i]) && (!char.IsUpper(type[i - 1]) || ((i + 1 < type.Length) && !char.IsUpper(type[i + 1])))) || (char.IsDigit(type[i]) && !char.IsDigit(type[i - 1])))
             {
                 stringBuilder.Append(' ');
             }
 
-            stringBuilder.Append(input[i]);
+            stringBuilder.Append(type[i]);
         }
 
         return stringBuilder.ToString();

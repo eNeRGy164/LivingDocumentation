@@ -1,82 +1,77 @@
-﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+namespace LivingDocumentation.RenderExtensions.Tests;
 
-namespace LivingDocumentation.RenderExtensions.Tests
+public partial class InvocationDescriptionExtensionsTests
 {
-    public partial class InvocationDescriptionExtensionsTests
+    [TestMethod]
+    public void MatchesMethod_NullMethod_Should_Throw()
     {
-        [TestMethod]
-        public void MatchesMethod_NullMethod_Should_Throw()
-        {
-            // Assign
-            var invocation = new InvocationDescription("System.Object", "Method");
+        // Assign
+        var invocation = new InvocationDescription("System.Object", "Method");
 
-            // Act
-            Action action = () => invocation.MatchesMethod(null);
+        // Act
+        Action action = () => invocation.MatchesMethod(default);
 
-            // Assert
-            action.Should().Throw<ArgumentNullException>()
-                .And.ParamName.Should().Be("method");
-        }
+        // Assert
+        action.Should().Throw<ArgumentNullException>()
+            .And.ParamName.Should().Be("method");
+    }
 
-        [TestMethod]
-        public void MatchesMethod_NullInvocation_Should_Throw()
-        {
-            // Assign
-            var method = new MethodDescription("void", "Method");
+    [TestMethod]
+    public void MatchesMethod_NullInvocation_Should_Throw()
+    {
+        // Assign
+        var method = new MethodDescription("void", "Method");
 
-            // Act
-            Action action = () => ((InvocationDescription)null).MatchesMethod(method);
+        // Act
+        Action action = () => ((InvocationDescription)default).MatchesMethod(method);
 
-            // Assert
-            action.Should().Throw<ArgumentNullException>()
-                .And.ParamName.Should().Be("invocation");
-        }
+        // Assert
+        action.Should().Throw<ArgumentNullException>()
+            .And.ParamName.Should().Be("invocation");
+    }
 
-        [TestMethod]
-        public void MatchesMethod_InvocationWithoutArguments_And_MethodWithoutParameters_Should_Match()
-        {
-            // Assign
-            var method = new MethodDescription("void", "Method");
+    [TestMethod]
+    public void MatchesMethod_InvocationWithoutArguments_And_MethodWithoutParameters_Should_Match()
+    {
+        // Assign
+        var method = new MethodDescription("void", "Method");
 
-            var invocation = new InvocationDescription("System.Object", "Method");
+        var invocation = new InvocationDescription("System.Object", "Method");
 
-            // Act
-            var result = invocation.MatchesMethod(method);
+        // Act
+        var result = invocation.MatchesMethod(method);
 
-            // Assert
-            result.Should().BeTrue();
-        }
+        // Assert
+        result.Should().BeTrue();
+    }
 
-        [TestMethod]
-        public void MatchesMethod_InvocationNameEqualsMethodName_Should_Match()
-        {
-            // Assign
-            var method = new MethodDescription("void", "Method");
+    [TestMethod]
+    public void MatchesMethod_InvocationNameEqualsMethodName_Should_Match()
+    {
+        // Assign
+        var method = new MethodDescription("void", "Method");
 
-            var invocation = new InvocationDescription("System.Object", "Method");
+        var invocation = new InvocationDescription("System.Object", "Method");
 
-            // Act
-            var result = invocation.MatchesMethod(method);
+        // Act
+        var result = invocation.MatchesMethod(method);
 
-            // Assert
-            result.Should().BeTrue();
-        }
+        // Assert
+        result.Should().BeTrue();
+    }
 
-        [TestMethod]
-        public void MatchesMethod_InvocationNameNotEqualsMethodName_Should_NotMatch()
-        {
-            // Assign
-            var method = new MethodDescription("void", "method");
+    [TestMethod]
+    public void MatchesMethod_InvocationNameNotEqualsMethodName_Should_NotMatch()
+    {
+        // Assign
+        var method = new MethodDescription("void", "method");
 
-            var invocation = new InvocationDescription("System.Object", "Method");
+        var invocation = new InvocationDescription("System.Object", "Method");
 
-            // Act
-            var result = invocation.MatchesMethod(method);
+        // Act
+        var result = invocation.MatchesMethod(method);
 
-            // Assert
-            result.Should().BeFalse();
-        }
+        // Assert
+        result.Should().BeFalse();
     }
 }
