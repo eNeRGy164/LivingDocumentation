@@ -68,25 +68,13 @@ internal class BranchingAnalyzer : CSharpSyntaxWalker
 
     private static string Label(SwitchLabelSyntax label)
     {
-        switch (label)
+        return label switch
         {
-            case CasePatternSwitchLabelSyntax casePatternLabel:
-                var condition = casePatternLabel.WhenClause?.Condition?.ToString();
-                if (condition == null)
-                {
-                    return casePatternLabel.Pattern?.ToString();
-                }
-
-                return $"{casePatternLabel.Pattern} when {condition}";
-
-            case CaseSwitchLabelSyntax caseLabel:
-                return caseLabel.Value.ToString();
-
-            case DefaultSwitchLabelSyntax defaultLabel:
-                return defaultLabel.Keyword.ToString();
-
-            default:
-                return label.ToString();
-        }
+            CasePatternSwitchLabelSyntax casePattern when casePattern.WhenClause?.Condition is not null => $"{casePattern.Pattern} when {casePattern.WhenClause.Condition}",
+            CasePatternSwitchLabelSyntax casePattern => casePattern.Pattern.ToString(),
+            CaseSwitchLabelSyntax @case => @case.Value.ToString(),
+            DefaultSwitchLabelSyntax @default => @default.Keyword.ToString(),
+            _ => throw new ArgumentOutOfRangeException(nameof(label)),
+        };
     }
 }
