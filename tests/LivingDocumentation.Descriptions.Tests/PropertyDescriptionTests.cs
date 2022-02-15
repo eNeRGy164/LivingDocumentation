@@ -11,6 +11,7 @@ public class PropertyDescriptionTests
 
         // Assert
         description.MemberType.Should().Be(MemberType.Property);
+        description.IsInherited.Should().BeFalse();
         description.Type.Should().Be("Type");
         description.Name.Should().Be("Name");
         description.HasInitializer.Should().BeFalse();

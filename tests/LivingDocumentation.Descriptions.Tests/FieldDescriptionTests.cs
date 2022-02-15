@@ -11,6 +11,7 @@ public class FieldDescriptionTests
 
         // Assert
         description.MemberType.Should().Be(MemberType.Field);
+        description.IsInherited.Should().BeFalse();
         description.Type.Should().Be("Type");
         description.Name.Should().Be("Name");
         description.HasInitializer.Should().BeFalse();

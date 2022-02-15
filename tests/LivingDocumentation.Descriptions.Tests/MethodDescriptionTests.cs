@@ -11,6 +11,7 @@ public class MethodDescriptionTests
 
         // Assert
         description.MemberType.Should().Be(MemberType.Method);
+        description.IsInherited.Should().BeFalse();
         description.ReturnType.Should().Be("Type");
         description.Name.Should().Be("Name");
         description.Parameters.Should().BeEmpty();

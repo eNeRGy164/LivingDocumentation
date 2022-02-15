@@ -11,6 +11,7 @@ public class EnumMemberDescriptionTests
 
         // Assert
         description.MemberType.Should().Be(MemberType.EnumMember);
+        description.IsInherited.Should().BeFalse();
         description.Name.Should().Be("Name");
         description.Value.Should().Be("Value");
     }

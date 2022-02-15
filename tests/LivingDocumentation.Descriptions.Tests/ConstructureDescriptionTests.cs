@@ -11,6 +11,7 @@ public class ConstructorDescriptionTests
 
         // Assert
         description.MemberType.Should().Be(MemberType.Constructor);
+        description.IsInherited.Should().BeFalse();
         description.Name.Should().Be("Name");
         description.Parameters.Should().BeEmpty();
         description.Statements.Should().BeEmpty();
