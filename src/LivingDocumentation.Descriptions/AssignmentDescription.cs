@@ -11,8 +11,8 @@ public class AssignmentDescription : Statement
 
     public AssignmentDescription(string left, string @operator, string right)
     {
-        this.Left = left;
-        this.Operator = @operator;
-        this.Right = right;
+        this.Left = left ?? throw new ArgumentNullException(nameof(left));
+        this.Operator = @operator ?? throw new ArgumentNullException(nameof(@operator));
+        this.Right = right ?? throw new ArgumentNullException(nameof(right));
     }
 }

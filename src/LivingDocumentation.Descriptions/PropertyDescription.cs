@@ -15,6 +15,6 @@ public class PropertyDescription : MemberDescription
     public PropertyDescription(string type, string name)
         : base(name)
     {
-        this.Type = type;
+        this.Type = type ?? throw new ArgumentNullException(nameof(type));
     }
 }
