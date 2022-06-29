@@ -28,13 +28,13 @@
 
   <ItemGroup>
     <Using Include="System.Collections" />
-    <Using Include="System.Reflection"/>
+    <Using Include="System.Reflection" />
     <Using Include="Newtonsoft.Json" />
     <Using Include="Newtonsoft.Json.Serialization" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 

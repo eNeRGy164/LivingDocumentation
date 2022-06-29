@@ -27,12 +27,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System.Runtime.Serialization"/>
+    <Using Include="System.Runtime.Serialization" />
     <Using Include="Newtonsoft.Json" />
     <Using Remove="System.IO" />
     <Using Remove="System.Net.Http" />
