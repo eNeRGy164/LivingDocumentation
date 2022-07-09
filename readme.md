@@ -1,6 +1,6 @@
 # Living Documentation
 
-![Azure DevOps builds](https://img.shields.io/azure-devops/build/hompus/dccc1034-d776-48ea-8a70-8822a02987f9/6?style=plastic) ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/hompus/LivingDocumentation/6?style=plastic)
+[![Build, Test and Package](https://github.com/eNeRGy164/LivingDocumentation/actions/workflows/ci.yaml/badge.svg)](https://github.com/eNeRGy164/LivingDocumentation/actions/workflows/ci.yaml)
 
 | Package | Type | Status
 |-|-|-|

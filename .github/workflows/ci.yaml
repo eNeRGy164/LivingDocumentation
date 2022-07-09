@@ -34,6 +34,9 @@ jobs:
         dotnet-version: |
           2.1.x
           6.0.x
+        source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
     - name: Restore dependencies
       run: dotnet restore -property:CheckEolTargetFramework=false
@@ -76,8 +79,9 @@ jobs:
     - name: Pack
       run: dotnet pack --configuration Release --no-restore --no-build --verbosity minimal -property:PackageVersion=${{ steps.gitversion.outputs.NuGetVersion }} --output ${{ github.workspace }}/packages
 
-    - name: Upload Artifact
+    - name: Upload Pull Request artifact
       uses: actions/upload-artifact@v2
+      if: github.event_name == 'pull_request'
       with:
-        name: nupkg
+        name: NuGet Files
         path: packages/*
