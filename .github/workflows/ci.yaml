@@ -28,21 +28,20 @@ jobs:
       id: gitversion
       uses: gittools/actions/gitversion/execute@v0.9.11
 
-    - name: Setup .NET Core 2.1.x and 6.0.x
-      uses: actions/setup-dotnet@v1
+    - name: Setup .NET 7.0.x
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
-          2.1.x
-          6.0.x
+          7.0.x
 
     - name: Restore dependencies
-      run: dotnet restore -property:CheckEolTargetFramework=false
+      run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore -property:CheckEolTargetFramework=false
+      run: dotnet build --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test --configuration Release --no-restore --no-build --nologo --verbosity minimal -property:CheckEolTargetFramework=false --settings LivingDocumentation.runsettings --collect:"XPlat Code Coverage" --results-directory ${{ github.workspace }}/coverage
+      run: dotnet test --configuration Release --no-restore --no-build --nologo --verbosity minimal --settings LivingDocumentation.runsettings --collect:"XPlat Code Coverage" --results-directory ${{ github.workspace }}/coverage
 
     - name: ReportGenerator to merge coverage files
       uses: danielpalme/ReportGenerator-GitHub-Action@5.0.0
