@@ -1,14 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net6.0</TargetFrameworks>
+    <TargetFramework>net7.0</TargetFramework>
 
     <ImplicitUsings>true</ImplicitUsings>
     <LangVersion>latest</LangVersion>
 
     <IsPackable>false</IsPackable>
-
-    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'netcoreapp2.1'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,11 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.7.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
-    <PackageReference Include="coverlet.collector" Version="3.1.2" PrivateAssets="all">
+    <PackageReference Include="FluentAssertions" Version="6.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.0.2" />
+    <PackageReference Include="coverlet.collector" Version="3.2.0" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
