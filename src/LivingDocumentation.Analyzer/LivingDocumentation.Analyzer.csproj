@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net6.0</TargetFrameworks>
+    <TargetFramework>net7.0</TargetFramework>
     
     <RootNamespace>LivingDocumentation.Analyzer</RootNamespace>
     <AssemblyName>LivingDocumentation.Analyzer</AssemblyName>
@@ -30,8 +30,6 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'netcoreapp2.1'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,10 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Buildalyzer.Workspaces" Version="3.2.2" Condition="'$(TargetFramework)' != 'net6.0'" />
-    <PackageReference Include="Buildalyzer.Workspaces" Version="4.1.4" Condition="'$(TargetFramework)' == 'net6.0'" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" Condition="'$(TargetFramework)' != 'net6.0'" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="3.11.0" Condition="'$(TargetFramework)' != 'net6.0'" />
+    <PackageReference Include="Buildalyzer.Workspaces" Version="4.1.4" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />

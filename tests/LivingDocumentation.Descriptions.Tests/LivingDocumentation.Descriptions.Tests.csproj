@@ -1,14 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net6.0</TargetFrameworks>
+    <TargetFramework>net7.0</TargetFramework>
 
     <ImplicitUsings>true</ImplicitUsings>
     <LangVersion>latest</LangVersion>
 
     <IsPackable>false</IsPackable>
-
-    <CheckEolTargetFramework Condition="'$(TargetFramework)' == 'netcoreapp2.1'">false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
