@@ -31,7 +31,8 @@ public static partial class Program
         if (options.SolutionPath is not null)
         {
             await AnalyzeSolutionFileAsync(types, options.SolutionPath).ConfigureAwait(false);
-        } else
+        }
+        else
         {
             await AnalyzeProjectFileAsync(types, options.ProjectPath!).ConfigureAwait(false);
         }

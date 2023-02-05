@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
@@ -31,9 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System.ComponentModel"/>
-    <Using Include="System.Diagnostics"/>
-    <Using Include="System.Runtime.Serialization"/>
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Runtime.Serialization" />
     <Using Include="Newtonsoft.Json" />
   </ItemGroup>
 
