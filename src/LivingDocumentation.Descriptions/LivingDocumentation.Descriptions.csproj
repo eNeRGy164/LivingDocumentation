@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     
     <RootNamespace>LivingDocumentation</RootNamespace>
 
@@ -31,9 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System.ComponentModel"/>
-    <Using Include="System.Diagnostics"/>
-    <Using Include="System.Runtime.Serialization"/>
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Runtime.Serialization" />
     <Using Include="Newtonsoft.Json" />
   </ItemGroup>
 
