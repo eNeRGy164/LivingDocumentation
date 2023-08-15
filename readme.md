@@ -2,108 +2,84 @@
 
 ![Azure DevOps builds](https://img.shields.io/azure-devops/build/hompus/dccc1034-d776-48ea-8a70-8822a02987f9/6?style=plastic) ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/hompus/LivingDocumentation/6?style=plastic)
 
-| Package | Type | Status
-|-|-|-|
-| Analyzer Tool | Released | [![Nuget](https://img.shields.io/nuget/v/LivingDocumentation.Analyzer?color=0071C8&label=NuGet&logo=NuGet)](https://www.nuget.org/packages/LivingDocumentation.Analyzer)
-| Analyzer Tool | Preview | [![LivingDocumentation.Analyzer package in Preview feed in Azure Artifacts](https://feeds.dev.azure.com/hompus/dccc1034-d776-48ea-8a70-8822a02987f9/_apis/public/Packaging/Feeds/030d64ca-8fad-4972-b7b7-8b1679c95e25/Packages/f3b0fbae-213f-412b-a98c-4d339e7a09e7/Badge)](https://dev.azure.com/hompus/LivingDocumentation/_packaging?_a=package&feed=030d64ca-8fad-4972-b7b7-8b1679c95e25&package=f3b0fbae-213f-412b-a98c-4d339e7a09e7&preferRelease=false)
+Living Documentation allows you to analyze your dotnet source code and generate comprehensive documentation for your stakeholders.
+It's a powerful tool that bridges the gap between code and documentation, ensuring that your documentation is always up-to-date with your source code.
 
----
+## Features
 
-> Use your source code to document your application
+* **Analyzer**: A tool to analyze dotnet projects or solutions.
+* **Libraries**: Assists in generating applications that can create plain text files such as MarkDown, AsciiDoc, PlantUML, Mermaid, and more.
 
-// TODO: Write more explaination
+## Packages
 
-Session given at NDC London 2023 that covers examples using this tool
+| Package       | Type     | Status                                            |
+| ------------- | -------- | ------------------------------------------------- |
+| Analyzer Tool | Released | [![Nuget][NUGET_BADGE]][NUGET_FEED]               |
+| Analyzer Tool | Preview  | [![Azure Artifacts][PREVIEW_BADGE]][PREVIEW_FEED] |
 
-[![Use your source code to document your application - Michaël Hompus - NDC London 2023](http://img.youtube.com/vi/hf8hzGb2C6E/0.jpg)](http://www.youtube.com/watch?v=hf8hzGb2C6E)
+## Presentation
 
-## Install the analyzer
+Watch the session given at NDC London 2023 that covers examples using this tool:
 
-The analyzer is a dotnet global tool.
+[![Use your source code to document your application - Michaël Hompus - NDC London 2023](https://img.youtube.com/vi/hf8hzGb2C6E/0.jpg)](https://www.youtube.com/watch?v=hf8hzGb2C6E)
 
-```sh
+## Getting Started
+
+### Prerequisites
+
+* Dotnet 6.0 SDK or newer.
+
+## Installation
+
+Install the analyzer as a dotnet global tool:
+
+```shell
 dotnet tool install --global LivingDocumentation.Analyzer
 ```
 
-## Generating documentation
+## Generating Documentation
 
-Using LivingDocumentation to generate documentation follows the following process flow:
-![LivingDocumentation process flow](./docs/flow.png)
+Using LivingDocumentation to generate documentation involves a three-step process:
 
-1. Run the LivingDocumentation.Analyzer with your Visual Studio solution file as input. The tool will analyze all source code in the solution, and generate an intermediate JSON file as output containing all classes, interfaced, enums, etc.
-2. You create a "render application" where you use the JSON file as input, and you are able to create all kinds of views on your source code. Like aggregate class diagrams, event flow sequence diagrams, etc.
-3. Output your diagrams, text, etc. in text-based formats, like Markdown, AsciiDoc and PlantUML.
+1. **Analyze Source Code**: Run the LivingDocumentation.Analyzer with your Visual Studio solution file as input.
+   This will generate an intermediate JSON file containing detailed information about your source code.
+2. **Develop Renderers**: Create a custom "render application" to interpret the JSON file and generate various views on your source code, such as class diagrams or sequence diagrams.
+3. **Output Documentation**: Export your findings in text-based formats like Markdown, AsciiDoc, PlantUML, Mermaid, etc.
 
 Both during local development, as during your CI&CD pipeline, can follow the same flow.
 
-### Local development
+### Local Development
 
-The analysis of a solution might take quite "long" (30s - 90s). Therefore we create an intermediate JSON file, so you only need to do rerun the analysis if your source solution changes.
-Generating the documentation takes less than a second. So you can have a fast feedback loop when developing your _renderers_ as you don't need to recreate the JSON file every time.
+The analysis of a solution might take some time.
+Therefore, an intermediate JSON file is created to speed up the documentation generation process.
+This ensures a fast feedback loop when developing your renderers.
 
-## Develop your own renderers
+## Develop Your Own Renderers
 
 A renderer application can be as simple as a command line tool that takes in the generated JSON files, makes conclusions based on the type information and writes this to a plain text file format.
 
-To be able to quickly start your should make a dependency on the NuGet packages.
+To get started quickly, you should make a dependency on 2 NuGet packages in your project:
 
-### NuGet package overview
+* **LivingDocumentation.RenderExtensions**: Contains extension methods and dependencies for serialized analysis.
+* **LivingDocumentation.Json**: Contains JSON serializers and contract resolvers.
 
-This is a hierarchical list of all NuGet packages and their contents & purpose.
+## More details
 
-* **LivingDocumentation.RenderExtensions**
+More details can be found in the [Guide](docs/guide.md).
 
-  This package contains extension methods and dependencies on all types that describe the serialized analysis of the solution.
+## Dive Deeper
 
-  * **LivingDocumentation.Descriptions**
+For more detailed examples and advanced use cases, refer to the second chapter of the [LivingDocumentation.Workshop](https://github.com/eNeRGy164/LivingDocumentation.Workshop/).
 
-    This package contains all classes that describe the analyzed solution, like types, methods, xml comments, etc.
+## Contributing
 
-    * **LivingDocumentation.Abstractions**
+You are welcome to contribute! Feel free to create [issues](https://github.com/eNeRGy164/LivingDocumentation/issues) or [pull requests](https://github.com/eNeRGy164/LivingDocumentation/pulls).
 
-      This package contains interfaces, base classes, and enums.
+## License
 
-    * **LivingDocumentation.Extensions**
+This project is licensed under the [MIT License](LICENSE).
 
-      This package contains extension methods.
-
-  * **LivingDocumentation.Statements**
-
-    This package contains all classes that describe the statements in the analyzed solution, like foreach, if/else, switch, etc.
-
-* **LivingDocumentation.Json**
-
-  This package contains the Json serializers and contract resolvers to deserialize the generated JSON file.
-
-* **LivingDocumentation.UML**
-
-  This package contains a lot of supporting methods to make it easier to build valid PlantUML output.
-
-## Running the sample
-
-These steps expect the **eShopOnContainers** and **LivingDocumentation** repos to be subdirectories of the location where you execute these commands:
-
-```plain
-|
-+-- eShopOnContainers
-+-- LivingDocumentation
-```
-
-1. Install the analyzer as a global tool
-2. Make sure you've build the solution you want to document
-
-   ```sh
-   dotnet build eShopOnContainers/eShopOnContainers-ServicesAndWebApps.sln -c Release
-   ```
-
-3. Run the analyzer and store the intermediate output
-
-   ```sh
-   livingdoc-analyze --solution eShopOnContainers/eShopOnContainers-ServicesAndWebApps.sln --output analysis.json
-   ```
-
-4. Run you project specific renderer
-
-   ```sh
-   dotnet run --project LivingDocumentation\samples\LivingDocumentation.eShopOnContainers -c Release
-   ```
+[NUGET_BADGE]: https://img.shields.io/nuget/v/LivingDocumentation.Analyzer.svg?style=plastic
+[NUGET_FEED]: https://www.nuget.org/packages/LivingDocumentation.Analyzer/
+[PREVIEW_BADGE]: https://feeds.dev.azure.com/hompus/dccc1034-d776-48ea-8a70-8822a02987f9/_apis/public/Packaging/Feeds/030d64ca-8fad-4972-b7b7-8b1679c95e25/Packages/f3b0fbae-213f-412b-a98c-4d339e7a09e7/Badge
+[PREVIEW_FEED]: https://dev.azure.com/hompus/LivingDocumentation/_packaging?_a=package&feed=030d64ca-8fad-4972-b7b7-8b1679c95e25&package=f3b0fbae-213f-412b-a98c-4d339e7a09e7&preferRelease=true
