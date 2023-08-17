@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using Buildalyzer;
-using Buildalyzer.Workspaces;
 using Newtonsoft.Json;
 
 namespace LivingDocumentation;
@@ -28,15 +26,14 @@ public static partial class Program
         var types = new List<TypeDescription>();
 
         var stopwatch = Stopwatch.StartNew();
-        if (options.SolutionPath is not null)
+
+        using (var analyzer = options.SolutionPath is not null
+            ? AnalyzerSetup.BuildSolutionAnalyzer(options.SolutionPath, options.ExcludedProjectPaths)
+            : AnalyzerSetup.BuildProjectAnalyzer(options.ProjectPath!))
         {
-            var excludedProjects = new HashSet<string>(options.ExcludedProjectPaths, StringComparer.OrdinalIgnoreCase);
-            await AnalyzeSolutionFileAsync(types, options.SolutionPath, excludedProjects).ConfigureAwait(false);
+            await AnalyzeWorkspace(types, analyzer).ConfigureAwait(false);
         }
-        else
-        {
-            await AnalyzeProjectFileAsync(types, options.ProjectPath!).ConfigureAwait(false);
-        }
+
         stopwatch.Stop();
 
         // Write analysis 
@@ -53,40 +50,12 @@ public static partial class Program
         }
     }
 
-    private static async Task AnalyzeSolutionFileAsync(List<TypeDescription> types, string solutionFile, HashSet<string> excludedProjects)
+    private static async Task AnalyzeWorkspace(List<TypeDescription> types, AnalyzerSetup analysis)
     {
-        var manager = new AnalyzerManager(solutionFile);
-        var workspace = manager.GetWorkspace();
-        var assembliesInSolution = workspace.CurrentSolution.Projects.Select(p => p.AssemblyName).ToList();
-
-        // Every project in the solution, except unit test projects
-        var projects = workspace.CurrentSolution.Projects
-            .Where(p => !manager.Projects.First(mp => p.Id.Id == mp.Value.ProjectGuid).Value.ProjectFile.PackageReferences.Any(pr => pr.Name.Contains("Test", StringComparison.Ordinal)));
-
-        foreach (var project in projects)
+        foreach (var project in analysis.Projects)
         {
-            if (!string.IsNullOrEmpty(project.FilePath) && excludedProjects.Contains(project.FilePath))
-            {
-                continue;
-            }
-            
             await AnalyzeProjectAsyc(types, project).ConfigureAwait(false);
         }
-
-        workspace.Dispose();
-    }
-
-    private static async Task AnalyzeProjectFileAsync(List<TypeDescription> types, string projectFile)
-    {
-        var manager = new AnalyzerManager();
-        manager.GetProject(projectFile);
-        var workspace = manager.GetWorkspace();
-
-        var project = workspace.CurrentSolution.Projects.First();
-
-        await AnalyzeProjectAsyc(types, project).ConfigureAwait(false);
-
-        workspace.Dispose();
     }
 
     private static async Task AnalyzeProjectAsyc(List<TypeDescription> types, Project project)
