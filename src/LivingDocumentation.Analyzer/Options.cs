@@ -10,6 +10,9 @@ public partial class Program
         [Option("project", Required = true, SetName = "project", HelpText = "The project to analyze.")]
         public string? ProjectPath { get; set; }
 
+        [Option("exclude", Required  = false, SetName = "solution", Separator = ',', HelpText = "Any projects to exclude from analysis.")]
+        public IEnumerable<string> ExcludedProjectPaths { get; set; } = Enumerable.Empty<string>();
+
         [Option("output", Required = true, HelpText = "The location of the output.")]
         public string? OutputPath { get; set; }
 
