@@ -30,7 +30,8 @@ public static partial class Program
         var stopwatch = Stopwatch.StartNew();
         if (options.SolutionPath is not null)
         {
-            await AnalyzeSolutionFileAsync(types, options.SolutionPath).ConfigureAwait(false);
+            var excludedProjects = new HashSet<string>(options.ExcludedProjectPaths, StringComparer.OrdinalIgnoreCase);
+            await AnalyzeSolutionFileAsync(types, options.SolutionPath, excludedProjects).ConfigureAwait(false);
         }
         else
         {
@@ -52,7 +53,7 @@ public static partial class Program
         }
     }
 
-    private static async Task AnalyzeSolutionFileAsync(List<TypeDescription> types, string solutionFile)
+    private static async Task AnalyzeSolutionFileAsync(List<TypeDescription> types, string solutionFile, HashSet<string> excludedProjects)
     {
         var manager = new AnalyzerManager(solutionFile);
         var workspace = manager.GetWorkspace();
@@ -64,6 +65,11 @@ public static partial class Program
 
         foreach (var project in projects)
         {
+            if (!string.IsNullOrEmpty(project.FilePath) && excludedProjects.Contains(project.FilePath))
+            {
+                continue;
+            }
+            
             await AnalyzeProjectAsyc(types, project).ConfigureAwait(false);
         }
 
