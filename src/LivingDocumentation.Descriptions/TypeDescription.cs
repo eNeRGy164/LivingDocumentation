@@ -94,7 +94,7 @@ public class TypeDescription(TypeType type, string? fullName) : IHaveModifiers
         }
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not TypeDescription other)
         {

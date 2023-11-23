@@ -20,7 +20,7 @@ public abstract class MemberDescription(string name) : IMemberable
     [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeDescription>>))]
     public List<IAttributeDescription> Attributes { get; } = [];
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not MemberDescription other)
         {
