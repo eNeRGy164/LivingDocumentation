@@ -1,24 +1,15 @@
 namespace LivingDocumentation;
 
-internal class LoopingAnalyzer : CSharpSyntaxWalker
+internal class LoopingAnalyzer(SemanticModel semanticModel, List<Statement> statements) : CSharpSyntaxWalker
 {
-    private readonly SemanticModel semanticModel;
-    private readonly List<Statement> statements;
-
-    public LoopingAnalyzer(in SemanticModel semanticModel, List<Statement> statements)
-    {
-        this.semanticModel = semanticModel;
-        this.statements = statements;
-    }
-
     public override void VisitForEachStatement(ForEachStatementSyntax node)
     {
         var forEachStatement = new ForEach();
-        this.statements.Add(forEachStatement);
+        statements.Add(forEachStatement);
 
         forEachStatement.Expression = $"{node.Identifier} in {node.Expression}";
 
-        var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, forEachStatement.Statements);
+        var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, forEachStatement.Statements);
         invocationAnalyzer.Visit(node.Statement);
     }
 }

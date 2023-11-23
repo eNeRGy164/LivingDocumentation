@@ -1,18 +1,11 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("AttributeArgument {Name} {Type} {Value}")]
-public class AttributeArgumentDescription : IAttributeArgumentDescription
+public class AttributeArgumentDescription(string? name, string? type, string? value) : IAttributeArgumentDescription
 {
-    public string Name { get; }
+    public string Name { get; } = name ?? throw new ArgumentNullException("name");
 
-    public string Type { get; }
+    public string Type { get; } = type ?? throw new ArgumentNullException("type");
 
-    public string Value { get; }
-
-    public AttributeArgumentDescription(string? name, string? type, string? value)
-    {
-        this.Name = name ?? throw new ArgumentNullException("name");
-        this.Type = type ?? throw new ArgumentNullException("type");
-        this.Value = value ?? throw new ArgumentNullException("value");
-    }
+    public string Value { get; } = value ?? throw new ArgumentNullException("value");
 }

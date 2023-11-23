@@ -1,18 +1,11 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("Assignment \"{Left,nq} {Operator,nq} {Right,nq}\"")]
-public class AssignmentDescription : Statement
+public class AssignmentDescription(string left, string @operator, string right) : Statement
 {
-    public string Left { get; }
+    public string Left { get; } = left ?? throw new ArgumentNullException(nameof(left));
 
-    public string Operator { get; }
+    public string Operator { get; } = @operator ?? throw new ArgumentNullException(nameof(@operator));
 
-    public string Right { get; }
-
-    public AssignmentDescription(string left, string @operator, string right)
-    {
-        this.Left = left ?? throw new ArgumentNullException(nameof(left));
-        this.Operator = @operator ?? throw new ArgumentNullException(nameof(@operator));
-        this.Right = right ?? throw new ArgumentNullException(nameof(right));
-    }
+    public string Right { get; } = right ?? throw new ArgumentNullException(nameof(right));
 }

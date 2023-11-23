@@ -1,27 +1,18 @@
 namespace LivingDocumentation;
 
-internal class BranchingAnalyzer : CSharpSyntaxWalker
+internal class BranchingAnalyzer(SemanticModel semanticModel, List<Statement> statements) : CSharpSyntaxWalker
 {
-    private readonly SemanticModel semanticModel;
-    private readonly List<Statement> statements;
-
-    public BranchingAnalyzer(in SemanticModel semanticModel, List<Statement> statements)
-    {
-        this.semanticModel = semanticModel;
-        this.statements = statements;
-    }
-
     public override void VisitIfStatement(IfStatementSyntax node)
     {
         var ifStatement = new If();
-        this.statements.Add(ifStatement);
+        statements.Add(ifStatement);
 
         var ifSection = new IfElseSection();
         ifStatement.Sections.Add(ifSection);
 
         ifSection.Condition = node.Condition.ToString();
 
-        var ifInvocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, ifSection.Statements);
+        var ifInvocationAnalyzer = new InvocationsAnalyzer(semanticModel, ifSection.Statements);
         ifInvocationAnalyzer.Visit(node.Statement);
 
         var elseNode = node.Else;
@@ -30,7 +21,7 @@ internal class BranchingAnalyzer : CSharpSyntaxWalker
             var section = new IfElseSection();
             ifStatement.Sections.Add(section);
 
-            var elseInvocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, section.Statements);
+            var elseInvocationAnalyzer = new InvocationsAnalyzer(semanticModel, section.Statements);
             elseInvocationAnalyzer.Visit(elseNode.Statement);
 
             if (elseNode.Statement.IsKind(SyntaxKind.IfStatement))
@@ -50,7 +41,7 @@ internal class BranchingAnalyzer : CSharpSyntaxWalker
     public override void VisitSwitchStatement(SwitchStatementSyntax node)
     {
         var switchStatement = new Switch();
-        this.statements.Add(switchStatement);
+        statements.Add(switchStatement);
 
         switchStatement.Expression = node.Expression.ToString();
 
@@ -61,7 +52,7 @@ internal class BranchingAnalyzer : CSharpSyntaxWalker
 
             switchSection.Labels.AddRange(section.Labels.Select(l => Label(l)));
 
-            var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, switchSection.Statements);
+            var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, switchSection.Statements);
             invocationAnalyzer.Visit(section);
         }
     }

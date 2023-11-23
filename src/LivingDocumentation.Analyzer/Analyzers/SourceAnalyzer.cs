@@ -1,17 +1,8 @@
 namespace LivingDocumentation;
 
-public class SourceAnalyzer : CSharpSyntaxWalker
+public class SourceAnalyzer(SemanticModel semanticModel, List<TypeDescription> types) : CSharpSyntaxWalker
 {
-    private readonly SemanticModel semanticModel;
-    private readonly List<TypeDescription> types;
-
     private TypeDescription? currentType = null;
-
-    public SourceAnalyzer(in SemanticModel semanticModel, List<TypeDescription> types)
-    {
-        this.types = types;
-        this.semanticModel = semanticModel;
-    }
 
     public override void VisitClassDeclaration(ClassDeclarationSyntax node)
     {
@@ -38,7 +29,7 @@ public class SourceAnalyzer : CSharpSyntaxWalker
         base.VisitRecordDeclaration(node);
 
         // Check for parts that are generated and not declared by the author
-        var symbol = this.semanticModel.GetDeclaredSymbol(node);
+        var symbol = semanticModel.GetDeclaredSymbol(node);
         if (symbol != null)
         {
             foreach (var constructor in symbol.Constructors)
@@ -117,14 +108,14 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
         foreach (var variable in node.Declaration.Variables)
         {
-            var fieldDescription = new FieldDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
+            var fieldDescription = new FieldDescription(semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
             this.currentType.AddMember(fieldDescription);
 
             fieldDescription.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureMemberDefaultAccessModifier(fieldDescription);
             this.ExtractAttributes(node.AttributeLists, fieldDescription.Attributes);
 
-            fieldDescription.Initializer = variable.Initializer?.Value.ResolveValue(this.semanticModel);
+            fieldDescription.Initializer = variable.Initializer?.Value.ResolveValue(semanticModel);
             fieldDescription.DocumentationComments = this.ExtractDocumentation(variable);
         }
 
@@ -137,14 +128,14 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
         foreach (var variable in node.Declaration.Variables)
         {
-            var eventDescription = new EventDescription(this.semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
+            var eventDescription = new EventDescription(semanticModel.GetTypeDisplayString(node.Declaration.Type), variable.Identifier.ValueText);
             this.currentType.AddMember(eventDescription);
 
             eventDescription.Modifiers |= ParseModifiers(node.Modifiers);
             this.EnsureMemberDefaultAccessModifier(eventDescription);
             this.ExtractAttributes(node.AttributeLists, eventDescription.Attributes);
 
-            eventDescription.Initializer = variable.Initializer?.Value.ResolveValue(this.semanticModel);
+            eventDescription.Initializer = variable.Initializer?.Value.ResolveValue(semanticModel);
             eventDescription.DocumentationComments = this.ExtractDocumentation(variable);
         }
 
@@ -155,14 +146,14 @@ public class SourceAnalyzer : CSharpSyntaxWalker
     {
         if (this.currentType is null) return;
 
-        var propertyDescription = new PropertyDescription(this.semanticModel.GetTypeDisplayString(node.Type), node.Identifier.ToString());
+        var propertyDescription = new PropertyDescription(semanticModel.GetTypeDisplayString(node.Type), node.Identifier.ToString());
         this.currentType.AddMember(propertyDescription);
 
         propertyDescription.Modifiers |= ParseModifiers(node.Modifiers);
         this.EnsureMemberDefaultAccessModifier(propertyDescription);
         this.ExtractAttributes(node.AttributeLists, propertyDescription.Attributes);
 
-        propertyDescription.Initializer = node.Initializer?.Value.ResolveValue(this.semanticModel);
+        propertyDescription.Initializer = node.Initializer?.Value.ResolveValue(semanticModel);
         propertyDescription.DocumentationComments = this.ExtractDocumentation(node);
 
         base.VisitPropertyDeclaration(node);
@@ -197,7 +188,7 @@ public class SourceAnalyzer : CSharpSyntaxWalker
     {
         if (this.currentType is null) return;
 
-        var methodDescription = new MethodDescription(this.semanticModel.GetTypeInfo(node.ReturnType).Type?.ToDisplayString(), node.Identifier.ToString());
+        var methodDescription = new MethodDescription(semanticModel.GetTypeInfo(node.ReturnType).Type?.ToDisplayString(), node.Identifier.ToString());
         this.currentType.AddMember(methodDescription);
 
         this.ExtractBaseMethodDeclaration(node, methodDescription);
@@ -207,20 +198,20 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     private void ExtractBaseTypeDeclaration(TypeType type, BaseTypeDeclarationSyntax node)
     {
-        var currentType = new TypeDescription(type, this.semanticModel.GetDeclaredSymbol(node)?.ToDisplayString());
-        if (!this.types.Contains(currentType))
+        var currentType = new TypeDescription(type, semanticModel.GetDeclaredSymbol(node)?.ToDisplayString());
+        if (!types.Contains(currentType))
         {
-            this.types.Add(currentType);
+            types.Add(currentType);
             this.currentType = currentType;
         }
         else
         {
-            this.currentType = this.types.First(t => string.Equals(t.FullName, currentType.FullName, StringComparison.Ordinal));
+            this.currentType = types.First(t => string.Equals(t.FullName, currentType.FullName, StringComparison.Ordinal));
         }
 
         if (node.BaseList != null)
         {
-            this.currentType.BaseTypes.AddRange(node.BaseList.Types.Select(t => this.semanticModel.GetTypeDisplayString(t.Type)));
+            this.currentType.BaseTypes.AddRange(node.BaseList.Types.Select(t => semanticModel.GetTypeDisplayString(t.Type)));
         }
 
         this.currentType.Modifiers |= ParseModifiers(node.Modifiers);
@@ -269,7 +260,7 @@ public class SourceAnalyzer : CSharpSyntaxWalker
             return false;
         }
 
-        var embeddedAnalyzer = new SourceAnalyzer(this.semanticModel, this.types);
+        var embeddedAnalyzer = new SourceAnalyzer(semanticModel, types);
         embeddedAnalyzer.Visit(node);
 
         return true;
@@ -284,16 +275,16 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
         foreach (var attribute in attributes.SelectMany(a => a.Attributes))
         {
-            var attributeDescription = new AttributeDescription(this.semanticModel.GetTypeDisplayString(attribute), attribute.Name.ToString());
+            var attributeDescription = new AttributeDescription(semanticModel.GetTypeDisplayString(attribute), attribute.Name.ToString());
             attributeDescriptions.Add(attributeDescription);
 
             if (attribute.ArgumentList != null)
             {
                 foreach (var argument in attribute.ArgumentList.Arguments)
                 {
-                    var value = argument.Expression!.ResolveValue(this.semanticModel);
+                    var value = argument.Expression!.ResolveValue(semanticModel);
 
-                    var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression.ResolveValue(this.semanticModel), this.semanticModel.GetTypeDisplayString(argument.Expression!), value);
+                    var argumentDescription = new AttributeArgumentDescription(argument.NameEquals?.Name.ToString() ?? argument.Expression.ResolveValue(semanticModel), semanticModel.GetTypeDisplayString(argument.Expression!), value);
                     attributeDescription.Arguments.Add(argumentDescription);
                 }
             }
@@ -302,7 +293,7 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
     private DocumentationCommentsDescription? ExtractDocumentation(SyntaxNode node)
     {
-        return DocumentationCommentsDescription.Parse(this.semanticModel.GetDeclaredSymbol(node)?.GetDocumentationCommentXml());
+        return DocumentationCommentsDescription.Parse(semanticModel.GetDeclaredSymbol(node)?.GetDocumentationCommentXml());
     }
 
     private void ExtractBaseMethodDeclaration(BaseMethodDeclarationSyntax node, IHaveAMethodBody method)
@@ -315,14 +306,14 @@ public class SourceAnalyzer : CSharpSyntaxWalker
 
         foreach (var parameter in node.ParameterList.Parameters)
         {
-            var parameterDescription = new ParameterDescription(this.semanticModel.GetTypeDisplayString(parameter.Type!), parameter.Identifier.ToString());
+            var parameterDescription = new ParameterDescription(semanticModel.GetTypeDisplayString(parameter.Type!), parameter.Identifier.ToString());
             method.Parameters.Add(parameterDescription);
 
             parameterDescription.HasDefaultValue = parameter.Default != null;
             this.ExtractAttributes(parameter.AttributeLists, parameterDescription.Attributes);
         }
 
-        var invocationAnalyzer = new InvocationsAnalyzer(this.semanticModel, method.Statements);
+        var invocationAnalyzer = new InvocationsAnalyzer(semanticModel, method.Statements);
         invocationAnalyzer.Visit((SyntaxNode?)node.Body ?? node.ExpressionBody);
     }
 

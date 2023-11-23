@@ -295,12 +295,8 @@ public class TypeDescriptionTests
         implementsType.Should().BeFalse();
     }
 
-    private class UnsupportedMemberDescription : MemberDescription
+    private class UnsupportedMemberDescription(string name) : MemberDescription(name)
     {
-        public UnsupportedMemberDescription(string name) : base(name)
-        {
-        }
-
         public override MemberType MemberType => throw new NotImplementedException();
     }
 }

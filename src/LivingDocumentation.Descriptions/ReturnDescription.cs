@@ -1,12 +1,7 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("Return {Expression}")]
-public class ReturnDescription : Statement
+public class ReturnDescription(string expression) : Statement
 {
-    public string Expression { get; }
-
-    public ReturnDescription(string expression)
-    {
-        this.Expression = expression;
-    }
+    public string Expression { get; } = expression;
 }

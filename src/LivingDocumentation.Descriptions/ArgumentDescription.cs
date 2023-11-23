@@ -1,15 +1,9 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("Argument {Text} ({Type,nq})")]
-public class ArgumentDescription
+public class ArgumentDescription(string type, string text)
 {
-    public string Type { get; }
+    public string Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
 
-    public string Text { get; }
-
-    public ArgumentDescription(string type, string text)
-    {
-        this.Type = type ?? throw new ArgumentNullException(nameof(type));
-        this.Text = text ?? throw new ArgumentNullException(nameof(text));
-    }
+    public string Text { get; } = text ?? throw new ArgumentNullException(nameof(text));
 }

@@ -1,10 +1,10 @@
 namespace LivingDocumentation;
 
-public abstract class MemberDescription : IMemberable
+public abstract class MemberDescription(string name) : IMemberable
 {
     public abstract MemberType MemberType { get; }
 
-    public string Name { get; }
+    public string Name { get; } = name ?? throw new ArgumentNullException("name");
 
     [DefaultValue(Modifier.Private)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -19,11 +19,6 @@ public abstract class MemberDescription : IMemberable
     [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
     [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeDescription>>))]
     public List<IAttributeDescription> Attributes { get; } = [];
-
-    public MemberDescription(string name)
-    {
-        this.Name = name ?? throw new ArgumentNullException("name");
-    }
 
     public override bool Equals(object obj)
     {

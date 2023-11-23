@@ -1,9 +1,9 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("Field {Type,nq} {Name,nq}")]
-public class FieldDescription : MemberDescription
+public class FieldDescription(string type, string name) : MemberDescription(name)
 {
-    public string Type { get; }
+    public string Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
 
     public string? Initializer { get; set; }
 
@@ -11,10 +11,4 @@ public class FieldDescription : MemberDescription
     public bool HasInitializer => this.Initializer is not null;
 
     public override MemberType MemberType => MemberType.Field;
-
-    public FieldDescription(string type, string name)
-        : base(name)
-    {
-        this.Type = type ?? throw new ArgumentNullException(nameof(type));
-    }
 }

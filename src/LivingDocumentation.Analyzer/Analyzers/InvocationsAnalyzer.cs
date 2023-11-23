@@ -1,28 +1,19 @@
 namespace LivingDocumentation;
 
-internal class InvocationsAnalyzer : CSharpSyntaxWalker
+internal class InvocationsAnalyzer(SemanticModel semanticModel, List<Statement> statements) : CSharpSyntaxWalker
 {
-    private readonly SemanticModel semanticModel;
-    private readonly List<Statement> statements;
-
-    public InvocationsAnalyzer(in SemanticModel semanticModel, List<Statement> statements)
-    {
-        this.semanticModel = semanticModel;
-        this.statements = statements;
-    }
-
     public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
     {
-        string containingType = this.semanticModel.GetTypeDisplayString(node);
+        string containingType = semanticModel.GetTypeDisplayString(node);
 
         var invocation = new InvocationDescription(containingType, node.Type.ToString());
-        this.statements.Add(invocation);
+        statements.Add(invocation);
 
         if (node.ArgumentList != null)
         {
             foreach (var argument in node.ArgumentList.Arguments)
             {
-                var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
+                var argumentDescription = new ArgumentDescription(semanticModel.GetTypeDisplayString(argument.Expression), argument.Expression.ToString());
                 invocation.Arguments.Add(argumentDescription);
             }
         }
@@ -31,7 +22,7 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
         {
             foreach (var expression in node.Initializer.Expressions)
             {
-                var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(expression), expression.ToString());
+                var argumentDescription = new ArgumentDescription(semanticModel.GetTypeDisplayString(expression), expression.ToString());
                 invocation.Arguments.Add(argumentDescription);
             }
         }
@@ -41,19 +32,19 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
 
     public override void VisitSwitchStatement(SwitchStatementSyntax node)
     {
-        var branchingAnalyzer = new BranchingAnalyzer(this.semanticModel, this.statements);
+        var branchingAnalyzer = new BranchingAnalyzer(semanticModel, statements);
         branchingAnalyzer.Visit(node);
     }
 
     public override void VisitIfStatement(IfStatementSyntax node)
     {
-        var branchingAnalyzer = new BranchingAnalyzer(this.semanticModel, this.statements);
+        var branchingAnalyzer = new BranchingAnalyzer(semanticModel, statements);
         branchingAnalyzer.Visit(node);
     }
 
     public override void VisitForEachStatement(ForEachStatementSyntax node)
     {
-        var loopingAnalyzer = new LoopingAnalyzer(this.semanticModel, this.statements);
+        var loopingAnalyzer = new LoopingAnalyzer(semanticModel, statements);
         loopingAnalyzer.Visit(node);
     }
 
@@ -61,23 +52,23 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
     {
         var expression = this.GetExpressionWithSymbol(node);
 
-        if (Program.RuntimeOptions.VerboseOutput && this.semanticModel.GetSymbolInfo(expression).Symbol == null)
+        if (Program.RuntimeOptions.VerboseOutput && semanticModel.GetSymbolInfo(expression).Symbol == null)
         {
             Console.WriteLine("WARN: Could not resolve type of invocation of the following block:");
             Console.WriteLine(node.ToFullString());
             return;
         }
 
-        if (this.semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof", StringComparison.Ordinal))
+        if (semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof", StringComparison.Ordinal))
         {
             // nameof is compiler sugar, and is actually a method we are not interrested in
             return;
         }
 
-        var containingType = this.semanticModel.GetSymbolInfo(expression).Symbol?.ContainingSymbol.ToDisplayString();
+        var containingType = semanticModel.GetSymbolInfo(expression).Symbol?.ContainingSymbol.ToDisplayString();
         if (containingType == null)
         {
-            containingType = this.semanticModel.GetSymbolInfo(expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
+            containingType = semanticModel.GetSymbolInfo(expression).CandidateSymbols.FirstOrDefault()?.ContainingSymbol.ToDisplayString();
         }
 
         var methodName = string.Empty;
@@ -93,13 +84,13 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
         }
 
         var invocation = new InvocationDescription(containingType, methodName);
-        this.statements.Add(invocation);
+        statements.Add(invocation);
 
         foreach (var argument in node.ArgumentList.Arguments)
         {
-            var value = argument.Expression.ResolveValue(this.semanticModel);
+            var value = argument.Expression.ResolveValue(semanticModel);
 
-            var argumentDescription = new ArgumentDescription(this.semanticModel.GetTypeDisplayString(argument.Expression), value);
+            var argumentDescription = new ArgumentDescription(semanticModel.GetTypeDisplayString(argument.Expression), value);
             invocation.Arguments.Add(argumentDescription);
         }
 
@@ -110,12 +101,12 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
     {
         var expression = node.Expression;
 
-        if (this.semanticModel.GetSymbolInfo(expression).Symbol == null)
+        if (semanticModel.GetSymbolInfo(expression).Symbol == null)
         {
             // This might be part of a chain of extention methods (f.e. Fluent API's), the symbols are only available at the beginning of the chain.
             var pNode = (SyntaxNode)node;
 
-            while (pNode != null && (pNode is not InvocationExpressionSyntax || (pNode is InvocationExpressionSyntax && (this.semanticModel.GetTypeInfo(pNode).Type?.Kind == SymbolKind.ErrorType || this.semanticModel.GetSymbolInfo(expression).Symbol == null))))
+            while (pNode != null && (pNode is not InvocationExpressionSyntax || (pNode is InvocationExpressionSyntax && (semanticModel.GetTypeInfo(pNode).Type?.Kind == SymbolKind.ErrorType || semanticModel.GetSymbolInfo(expression).Symbol == null))))
             {
                 pNode = pNode.Parent;
 
@@ -131,16 +122,16 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
 
     public override void VisitReturnStatement(ReturnStatementSyntax node)
     {
-        var returnDescription = new ReturnDescription(node.Expression?.ResolveValue(this.semanticModel) ?? string.Empty);
-        this.statements.Add(returnDescription);
+        var returnDescription = new ReturnDescription(node.Expression?.ResolveValue(semanticModel) ?? string.Empty);
+        statements.Add(returnDescription);
 
         base.VisitReturnStatement(node);
     }
 
     public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
     {
-        var returnDescription = new ReturnDescription(node.Expression.ResolveValue(this.semanticModel));
-        this.statements.Add(returnDescription);
+        var returnDescription = new ReturnDescription(node.Expression.ResolveValue(semanticModel));
+        statements.Add(returnDescription);
 
         base.VisitArrowExpressionClause(node);
     }
@@ -148,7 +139,7 @@ internal class InvocationsAnalyzer : CSharpSyntaxWalker
     public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
     {
         var assignmentDescription = new AssignmentDescription(node.Left.ToString(), node.OperatorToken.Text, node.Right.ToString());
-        this.statements.Add(assignmentDescription);
+        statements.Add(assignmentDescription);
 
         base.VisitAssignmentExpression(node);
     }

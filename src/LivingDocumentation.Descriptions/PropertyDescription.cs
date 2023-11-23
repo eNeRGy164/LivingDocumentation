@@ -1,9 +1,9 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("Property {Type,nq} {Name,nq}")]
-public class PropertyDescription : MemberDescription
+public class PropertyDescription(string type, string name) : MemberDescription(name)
 {
-    public string Type { get; }
+    public string Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
 
     public string? Initializer { get; set; }
         
@@ -11,10 +11,4 @@ public class PropertyDescription : MemberDescription
     public bool HasInitializer => !string.IsNullOrWhiteSpace(this.Initializer);
 
     public override MemberType MemberType => MemberType.Property;
-
-    public PropertyDescription(string type, string name)
-        : base(name)
-    {
-        this.Type = type ?? throw new ArgumentNullException(nameof(type));
-    }
 }

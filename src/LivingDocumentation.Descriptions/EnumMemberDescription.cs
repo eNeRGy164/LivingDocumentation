@@ -1,15 +1,9 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("EnumMember {Name,nq}")]
-public class EnumMemberDescription : MemberDescription
+public class EnumMemberDescription(string name, string? value) : MemberDescription(name)
 {
-    public string? Value { get; }
+    public string? Value { get; } = value;
 
     public override MemberType MemberType => MemberType.EnumMember;
-
-    public EnumMemberDescription(string name, string? value)
-        : base(name)
-    {
-        this.Value = value;
-    }
 }

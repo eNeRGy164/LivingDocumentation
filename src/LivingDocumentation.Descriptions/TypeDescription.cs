@@ -1,7 +1,7 @@
 namespace LivingDocumentation;
  
 [DebuggerDisplay("{Type} {Name,nq} ({Namespace,nq})")]
-public class TypeDescription : IHaveModifiers
+public class TypeDescription(TypeType type, string? fullName) : IHaveModifiers
 {
     [JsonProperty(Order = 1, PropertyName = nameof(Fields))]
     private readonly List<FieldDescription> fields = [];
@@ -21,15 +21,9 @@ public class TypeDescription : IHaveModifiers
     [JsonProperty(Order = 6, PropertyName = nameof(Events))]
     private readonly List<EventDescription> events = [];
 
-    public TypeDescription(TypeType type, string? fullName)
-    {
-        this.Type = type;
-        this.FullName = fullName ?? string.Empty;
-    }
+    public TypeType Type { get; } = type;
 
-    public TypeType Type { get; }
-
-    public string FullName { get; }
+    public string FullName { get; } = fullName ?? string.Empty;
 
     public DocumentationCommentsDescription? DocumentationComments { get; set; }
 
