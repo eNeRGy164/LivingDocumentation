@@ -18,7 +18,7 @@ public abstract class MemberDescription : IMemberable
 
     [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
     [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeDescription>>))]
-    public List<IAttributeDescription> Attributes { get; } = new();
+    public List<IAttributeDescription> Attributes { get; } = [];
 
     public MemberDescription(string name)
     {

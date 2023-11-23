@@ -5,7 +5,7 @@ namespace LivingDocumentation.Uml;
 /// </summary>
 public abstract class InteractionFragment
 {
-    private readonly List<InteractionFragment> interactionFragments = new();
+    private readonly List<InteractionFragment> interactionFragments = [];
 
     /// <summary>
     /// The parent of this fragment.

@@ -9,7 +9,7 @@ public class AttributeDescription : IAttributeDescription
 
     [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
     [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeArgumentDescription>>))]
-    public List<IAttributeArgumentDescription> Arguments { get; } = new();
+    public List<IAttributeArgumentDescription> Arguments { get; } = [];
 
     public AttributeDescription(string? type, string? name)
     {

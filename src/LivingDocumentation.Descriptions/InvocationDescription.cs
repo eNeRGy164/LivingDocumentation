@@ -7,7 +7,7 @@ public class InvocationDescription : Statement
 
     public string Name { get; }
 
-    public List<ArgumentDescription> Arguments { get; } = new();
+    public List<ArgumentDescription> Arguments { get; } = [];
 
     public InvocationDescription(string containingType, string name)
     {

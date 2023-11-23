@@ -11,7 +11,7 @@ public class ParameterDescription : IParameterDescription
 
     [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
     [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeDescription>>))]
-    public List<IAttributeDescription> Attributes { get; } = new();
+    public List<IAttributeDescription> Attributes { get; } = [];
 
     public ParameterDescription(string type, string name)
     {

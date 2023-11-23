@@ -4,22 +4,22 @@ namespace LivingDocumentation;
 public class TypeDescription : IHaveModifiers
 {
     [JsonProperty(Order = 1, PropertyName = nameof(Fields))]
-    private readonly List<FieldDescription> fields = new();
+    private readonly List<FieldDescription> fields = [];
 
     [JsonProperty(Order = 2, PropertyName = nameof(Constructors))]
-    private readonly List<ConstructorDescription> constructors = new();
+    private readonly List<ConstructorDescription> constructors = [];
 
     [JsonProperty(Order = 3, PropertyName = nameof(Properties))]
-    private readonly List<PropertyDescription> properties = new();
+    private readonly List<PropertyDescription> properties = [];
 
     [JsonProperty(Order = 4, PropertyName = nameof(Methods))]
-    private readonly List<MethodDescription> methods = new();
+    private readonly List<MethodDescription> methods = [];
 
     [JsonProperty(Order = 5, PropertyName = nameof(EnumMembers))]
-    private readonly List<EnumMemberDescription> enumMembers = new();
+    private readonly List<EnumMemberDescription> enumMembers = [];
 
     [JsonProperty(Order = 6, PropertyName = nameof(Events))]
-    private readonly List<EventDescription> events = new();
+    private readonly List<EventDescription> events = [];
 
     public TypeDescription(TypeType type, string? fullName)
     {
@@ -33,7 +33,7 @@ public class TypeDescription : IHaveModifiers
 
     public DocumentationCommentsDescription? DocumentationComments { get; set; }
 
-    public List<string> BaseTypes { get; } = new();
+    public List<string> BaseTypes { get; } = [];
 
     [DefaultValue(Modifier.Internal)]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
@@ -41,7 +41,7 @@ public class TypeDescription : IHaveModifiers
 
     [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
     [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeDescription>>))]
-    public List<IAttributeDescription> Attributes { get; } = new();
+    public List<IAttributeDescription> Attributes { get; } = [];
 
     [JsonIgnore]
     public string Name => this.FullName.ClassName();

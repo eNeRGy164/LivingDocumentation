@@ -8,9 +8,9 @@ public class MethodDescription : MemberDescription, IHaveAMethodBody
 
     [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
     [JsonConverter(typeof(ConcreteTypeConverter<List<ParameterDescription>>))]
-    public List<IParameterDescription> Parameters { get; } = new();
+    public List<IParameterDescription> Parameters { get; } = [];
 
-    public List<Statement> Statements { get; } = new();
+    public List<Statement> Statements { get; } = [];
 
     public override MemberType MemberType => MemberType.Method;
         
