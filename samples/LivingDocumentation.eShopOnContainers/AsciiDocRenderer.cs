@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,9 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace LivingDocumentation.eShopOnContainers
 {
-    public class AsciiDocRenderer(IReadOnlyList<TypeDescription> types, IReadOnlyDictionary<string, string> aggregateFiles, IReadOnlyDictionary<string, string> commandHandlerFiles, IReadOnlyDictionary<string, string> eventHandlerFiles)
+    public partial class AsciiDocRenderer(IReadOnlyList<TypeDescription> types, IReadOnlyDictionary<string, string> aggregateFiles, IReadOnlyDictionary<string, string> commandHandlerFiles, IReadOnlyDictionary<string, string> eventHandlerFiles)
     {
-        private static readonly Regex replaceTypeSuffix = new Regex("(?:(?:Command|(?:Domain|Integration)Event))(?:Handler)?$", RegexOptions.CultureInvariant);
+        [GeneratedRegex("(?:(?:Command|(?:Domain|Integration)Event))(?:Handler)?$", RegexOptions.CultureInvariant)]
+        private static partial Regex TypeSuffix();
 
         public void Render()
         {
@@ -242,7 +243,7 @@ namespace LivingDocumentation.eShopOnContainers
 
         private static string StripTypeSuffix(string name)
         {
-            return replaceTypeSuffix.Replace(name, string.Empty);
+            return TypeSuffix().Replace(name, string.Empty);
         }
 
         private static string FormatTechnicalName(string name)
