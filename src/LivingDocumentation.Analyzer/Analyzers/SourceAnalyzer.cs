@@ -13,7 +13,6 @@ public class SourceAnalyzer(SemanticModel semanticModel, List<TypeDescription> t
         base.VisitClassDeclaration(node);
     }
 
-#if NET6_0_OR_GREATER
     public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
     {
         if (this.ProcessedEmbeddedType(node)) return;
@@ -73,7 +72,6 @@ public class SourceAnalyzer(SemanticModel semanticModel, List<TypeDescription> t
             }
         }
     }
-#endif
 
     public override void VisitEnumDeclaration(EnumDeclarationSyntax node)
     {
