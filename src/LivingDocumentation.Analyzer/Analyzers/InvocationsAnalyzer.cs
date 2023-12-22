@@ -52,16 +52,16 @@ internal class InvocationsAnalyzer(SemanticModel semanticModel, List<Statement> 
     {
         var expression = this.GetExpressionWithSymbol(node);
 
+        if (semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof", StringComparison.Ordinal))
+        {
+            // nameof is compiler sugar, and is actually a method we are not interrested in
+            return;
+        }
+
         if (Program.RuntimeOptions.VerboseOutput && semanticModel.GetSymbolInfo(expression).Symbol == null)
         {
             Console.WriteLine("WARN: Could not resolve type of invocation of the following block:");
             Console.WriteLine(node.ToFullString());
-            return;
-        }
-
-        if (semanticModel.GetConstantValue(node).HasValue && string.Equals((node.Expression as IdentifierNameSyntax)?.Identifier.ValueText, "nameof", StringComparison.Ordinal))
-        {
-            // nameof is compiler sugar, and is actually a method we are not interrested in
             return;
         }
 
