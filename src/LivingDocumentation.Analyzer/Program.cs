@@ -47,6 +47,7 @@ public static partial class Program
         if (!options.Quiet)
         {
             Console.WriteLine($"Living Documentation Analysis output generated in {stopwatch.ElapsedMilliseconds}ms at {options.OutputPath}");
+            Console.WriteLine($"{types.Count} types found");
         }
     }
 
