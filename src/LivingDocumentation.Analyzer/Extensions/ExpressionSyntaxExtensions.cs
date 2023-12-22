@@ -25,7 +25,7 @@ public static class ExpressionSyntaxExtensions
         var initializer = objectCreation.Initializer;
         if (initializer is not null)
         {
-            var expressions = new SeparatedSyntaxList<SyntaxNode>();
+            var expressions = new SeparatedSyntaxList<ExpressionSyntax>();
 
             foreach (var expression in initializer.Expressions)
             {
@@ -46,7 +46,7 @@ public static class ExpressionSyntaxExtensions
         var initializer = arrayCreation.Initializer;
         if (initializer is not null)
         {
-            var expressions = new SeparatedSyntaxList<SyntaxNode>();
+            var expressions = new SeparatedSyntaxList<ExpressionSyntax>();
 
             foreach (var expression in initializer.Expressions)
             {
