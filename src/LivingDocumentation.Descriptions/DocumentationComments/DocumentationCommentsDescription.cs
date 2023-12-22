@@ -26,15 +26,15 @@ public partial class DocumentationCommentsDescription : IHaveDocumentationCommen
     [DefaultValue("")]
     public string Value { get; set; } = string.Empty;
 
-    public Dictionary<string, string> Exceptions { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> Exceptions { get; set; } = [];
 
-    public Dictionary<string, string> Permissions { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> Permissions { get; set; } = [];
 
-    public Dictionary<string, string> Params { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> Params { get; set; } = [];
 
-    public Dictionary<string, string> SeeAlsos { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> SeeAlsos { get; set; } = [];
 
-    public Dictionary<string, string> TypeParams { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> TypeParams { get; set; } = [];
 
     public static DocumentationCommentsDescription? Parse(string? documentationCommentXml)
     {

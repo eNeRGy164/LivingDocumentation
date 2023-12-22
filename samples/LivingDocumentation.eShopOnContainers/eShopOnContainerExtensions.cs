@@ -1,4 +1,4 @@
-﻿using PlantUml.Builder;
+using PlantUml.Builder;
 using System;
 using System.Linq;
 
@@ -36,27 +36,27 @@ namespace LivingDocumentation.eShopOnContainers
         {
             if (name.EndsWith(IntegrationEvent))
             {
-                return name.Substring(0, name.Length - IntegrationEvent.Length);
+                return name[..^IntegrationEvent.Length];
             }
 
             if (name.EndsWith(DomainEvent))
             {
-                return name.Substring(0, name.Length - DomainEvent.Length);
+                return name[..^DomainEvent.Length];
             }
 
             if (name.EndsWith(Command))
             {
-                return name.Substring(0, name.Length - Command.Length);
+                return name[..^Command.Length];
             }
 
             if (name.EndsWith(DomainEventHandler))
             {
-                return name.Substring(0, name.Length - DomainEventHandler.Length) + "\\n//<<DomainEventHandler>>//";
+                return name[..^DomainEventHandler.Length] + "\\n//<<DomainEventHandler>>//";
             }
 
             if (name.EndsWith(CommandHandler))
             {
-                return name.Substring(0, name.Length - CommandHandler.Length) + "\\n//<<CommandHandler>>//";
+                return name[..^CommandHandler.Length] + "\\n//<<CommandHandler>>//";
             }
 
             return name;

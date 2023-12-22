@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,21 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace LivingDocumentation.eShopOnContainers
 {
-    public class AsciiDocRenderer
+    public partial class AsciiDocRenderer(IReadOnlyList<TypeDescription> types, IReadOnlyDictionary<string, string> aggregateFiles, IReadOnlyDictionary<string, string> commandHandlerFiles, IReadOnlyDictionary<string, string> eventHandlerFiles)
     {
-        private readonly IReadOnlyList<TypeDescription> types;
-        private readonly IReadOnlyDictionary<string, string> aggregateFiles;
-        private readonly IReadOnlyDictionary<string, string> commandHandlerFiles;
-        private readonly IReadOnlyDictionary<string, string> eventHandlerFiles;
-        private static readonly Regex replaceTypeSuffix = new Regex("(?:(?:Command|(?:Domain|Integration)Event))(?:Handler)?$", RegexOptions.CultureInvariant);
-
-        public AsciiDocRenderer(IReadOnlyList<TypeDescription> types, IReadOnlyDictionary<string, string> aggregateFiles, IReadOnlyDictionary<string, string> commandHandlerFiles, IReadOnlyDictionary<string, string> eventHandlerFiles)
-        {
-            this.types = types;
-            this.aggregateFiles = aggregateFiles;
-            this.commandHandlerFiles = commandHandlerFiles;
-            this.eventHandlerFiles = eventHandlerFiles;
-        }
+        [GeneratedRegex("(?:(?:Command|(?:Domain|Integration)Event))(?:Handler)?$", RegexOptions.CultureInvariant)]
+        private static partial Regex TypeSuffix();
 
         public void Render()
         {
@@ -47,7 +36,7 @@ namespace LivingDocumentation.eShopOnContainers
             stringBuilder.AppendLine("== Aggregates");
             stringBuilder.AppendLine("Aggregates in the eShop application.");
 
-            foreach (var (type, path) in this.aggregateFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
+            foreach (var (type, path) in aggregateFiles.Select(kv => (Type: types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($"// tag::aggregate-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
@@ -72,7 +61,7 @@ namespace LivingDocumentation.eShopOnContainers
             stringBuilder.AppendLine("== Commands");
             stringBuilder.AppendLine("Commands in the eShop application.");
 
-            foreach (var type in this.types.Where(t => t.IsCommand() && !t.FullName.IsGeneric()).OrderBy(t => t.Name))
+            foreach (var type in types.Where(t => t.IsCommand() && !t.FullName.IsGeneric()).OrderBy(t => t.Name))
             {
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
@@ -108,7 +97,7 @@ namespace LivingDocumentation.eShopOnContainers
             stringBuilder.AppendLine("== Command Handlers");
             stringBuilder.AppendLine("Command handlers in the eShop application.");
 
-            foreach (var (type, path) in this.commandHandlerFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
+            foreach (var (type, path) in commandHandlerFiles.Select(kv => (Type: types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($"// tag::commandhandler-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
@@ -140,7 +129,7 @@ namespace LivingDocumentation.eShopOnContainers
             stringBuilder.AppendLine("== Domain Events");
             stringBuilder.AppendLine("Domain events in the eShop application.");
 
-            foreach (var type in this.types.Where(t => t.IsDomainEvent()).OrderBy(t => t.Name))
+            foreach (var type in types.Where(t => t.IsDomainEvent()).OrderBy(t => t.Name))
             {
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
@@ -176,7 +165,7 @@ namespace LivingDocumentation.eShopOnContainers
             stringBuilder.AppendLine("== Domain Event Handlers");
             stringBuilder.AppendLine("Domain event handlers in the eShop application.");
 
-            foreach (var (type, path) in this.eventHandlerFiles.Select(kv => (Type: this.types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
+            foreach (var (type, path) in eventHandlerFiles.Select(kv => (Type: types.FirstOrDefault(kv.Key), Path: kv.Value)).OrderBy(t => t.Type.Name))
             {
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($"// tag::domaineventhandler-{StripTypeSuffix(type.Name).ToLowerInvariant()}[]");
@@ -207,7 +196,7 @@ namespace LivingDocumentation.eShopOnContainers
             stringBuilder.AppendLine("== Integration Events");
             stringBuilder.AppendLine("Integration events in the eShop application.");
 
-            foreach (var type in this.types.Where(t => t.IsIntegrationEvent() && t.FullName.StartsWith("Ordering.API", StringComparison.Ordinal)).OrderBy(t => t.Name))
+            foreach (var type in types.Where(t => t.IsIntegrationEvent() && t.FullName.StartsWith("Ordering.API", StringComparison.Ordinal)).OrderBy(t => t.Name))
             {
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($"=== {FormatTechnicalName(type.Name)}");
@@ -254,7 +243,7 @@ namespace LivingDocumentation.eShopOnContainers
 
         private static string StripTypeSuffix(string name)
         {
-            return replaceTypeSuffix.Replace(name, string.Empty);
+            return TypeSuffix().Replace(name, string.Empty);
         }
 
         private static string FormatTechnicalName(string name)

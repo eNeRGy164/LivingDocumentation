@@ -1,19 +1,13 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("Attribute {Type} {Name}")]
-public class AttributeDescription : IAttributeDescription
+public class AttributeDescription(string? type, string? name) : IAttributeDescription
 {
-    public string Type { get; }
+    public string Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
 
-    public string Name { get; }
+    public string Name { get; } = name ?? throw new ArgumentNullException(nameof(name));
 
     [JsonProperty(ItemTypeNameHandling = TypeNameHandling.None)]
     [JsonConverter(typeof(ConcreteTypeConverter<List<AttributeArgumentDescription>>))]
-    public List<IAttributeArgumentDescription> Arguments { get; } = new();
-
-    public AttributeDescription(string? type, string? name)
-    {
-        this.Type = type ?? throw new ArgumentNullException(nameof(type));
-        this.Name = name ?? throw new ArgumentNullException(nameof(name));
-    }
+    public List<IAttributeArgumentDescription> Arguments { get; } = [];
 }

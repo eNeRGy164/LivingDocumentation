@@ -6,7 +6,7 @@ namespace LivingDocumentation.Uml;
 [DebuggerDisplay("Alt")]
 public class Alt : InteractionFragment
 {
-    private readonly List<AltSection> sections = new();
+    private readonly List<AltSection> sections = [];
 
     /// <summary>
     /// Gets all sections.

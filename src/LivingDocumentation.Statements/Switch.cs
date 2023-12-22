@@ -3,7 +3,7 @@ namespace LivingDocumentation;
 [DebuggerDisplay("Switch {Expression}")]
 public class Switch : Statement
 {
-    public List<SwitchSection> Sections { get; } = new();
+    public List<SwitchSection> Sections { get; } = [];
 
     public string? Expression { get; set; }
 

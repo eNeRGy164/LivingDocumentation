@@ -7,7 +7,7 @@
 [*] 
 indent_style = space
 
-[*.{csproj,xml}] 
+[*.{csproj,xml,runsettings}] 
 indent_size = 2
 
 # Code files 

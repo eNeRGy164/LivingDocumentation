@@ -1,9 +1,9 @@
 namespace LivingDocumentation;
 
 [DebuggerDisplay("Event {Type,nq} {Name,nq}")]
-public class EventDescription : MemberDescription
+public class EventDescription(string type, string name) : MemberDescription(name)
 {
-    public string Type { get; }
+    public string Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
 
     public string? Initializer { get; set; }
 
@@ -11,10 +11,4 @@ public class EventDescription : MemberDescription
     public bool HasInitializer => this.Initializer is not null;
 
     public override MemberType MemberType => MemberType.Event;
-
-    public EventDescription(string type, string name)
-        : base(name)
-    {
-        this.Type = type ?? throw new ArgumentNullException(nameof(type));
-    }
 }
