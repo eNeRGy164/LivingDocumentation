@@ -1,0 +1,554 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Intermediary JSON for LivingDocumentation",
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "FullName": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "Modifiers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "BaseTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Fields": {
+          "$ref": "#/$defs/fields"
+        },
+        "Constructors": {
+          "$ref": "#/$defs/constructors"
+        },
+        "Methods": {
+          "$ref": "#/$defs/methods"
+        },
+        "Properties": {
+          "$ref": "#/$defs/$properties"
+        },
+        "Attributes": {
+          "$ref": "#/$defs/attributes"
+        },
+        "EnumMembers": {
+          "$ref": "#/$defs/enumMembers"
+        },
+        "Events": {
+          "$ref": "#/$defs/events"
+        },
+        "DocumentationComments": {
+          "$ref": "#/$defs/documentationComments"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "FullName"
+      ]
+    },
+    "$defs": {
+      "statements": {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/forEach"
+            },
+            {
+              "$ref": "#/$defs/if"
+            },
+            {
+              "$ref": "#/$defs/switch"
+            },
+            {
+              "$ref": "#/$defs/invocation"
+            },
+            {
+              "$ref": "#/$defs/assignment"
+            },
+            {
+              "$ref": "#/$defs/return"
+            }
+          ]
+        }
+      },
+      "forEach": {
+        "type": "object",
+        "properties": {
+          "$type": {
+            "const": "LivingDocumentation.ForEach, LivingDocumentation.Statements"
+          },
+          "Expression": {
+            "type": "string"
+          },
+          "Statements": {
+            "$ref": "#/$defs/statements"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "Expression"
+        ]
+      },
+      "if": {
+        "type": "object",
+        "properties": {
+          "$type": {
+            "const": "LivingDocumentation.If, LivingDocumentation.Statements"
+          },
+          "Sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Condition": {
+                  "type": "string"
+                },
+                "Statements": {
+                  "$ref": "#/$defs/statements"
+                }
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "Sections"
+        ]
+      },
+      "switch": {
+        "type": "object",
+        "properties": {
+          "$type": {
+            "const": "LivingDocumentation.Switch, LivingDocumentation.Statements"
+          },
+          "Expression": {
+            "type": "string"
+          },
+          "Sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Labels": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "Statements": {
+                  "$ref": "#/$defs/statements"
+                }
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "Expression"
+        ]
+      },
+      "invocation": {
+        "type": "object",
+        "properties": {
+          "$type": {
+            "const": "LivingDocumentation.InvocationDescription, LivingDocumentation.Descriptions"
+          },
+          "ContainingType": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Arguments": {
+            "$ref": "#/$defs/arguments"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "Name"
+        ]
+      },
+      "assignment": {
+        "type": "object",
+        "properties": {
+          "$type": {
+            "const": "LivingDocumentation.AssignmentDescription, LivingDocumentation.Descriptions"
+          },
+          "Left": {
+            "type": "string"
+          },
+          "Operator": {
+            "type": "string"
+          },
+          "Right": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "Left",
+          "Right",
+          "Operator"
+        ]
+      },
+      "return": {
+        "type": "object",
+        "properties": {
+          "$type": {
+            "const": "LivingDocumentation.ReturnDescription, LivingDocumentation.Descriptions"
+          },
+          "Expression": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "Expression"
+        ]
+      },
+      "fields": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string"
+            },
+            "Type": {
+              "type": "string"
+            },
+            "Initializer": {
+              "type": "string"
+            },
+            "Modifiers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "Attributes": {
+              "$ref": "#/$defs/attributes"
+            },
+            "DocumentationComments": {
+              "$ref": "#/$defs/documentationComments"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Name",
+            "Type"
+          ]
+        }
+      },
+      "documentationComments": {
+        "type": "object",
+        "properties": {
+          "Example": {
+            "type": "string"
+          },
+          "Exceptions": {
+            "type": "object",
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            }
+          },
+          "Params": {
+            "type": "object",
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            }
+          },
+          "Permissions": {
+            "type": "object",
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            }
+          },
+          "Remarks": {
+            "type": "string"
+          },
+          "Returns": {
+            "type": "string"
+          },
+          "SeeAlsos": {
+            "type": "object",
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            }
+          },
+          "Summary": {
+            "type": "string"
+          },
+          "TypeParams": {
+            "type": "object",
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            }
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "attributes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string"
+            },
+            "Type": {
+              "type": "string"
+            },
+            "Arguments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string"
+                  },
+                  "Type": {
+                    "type": "string"
+                  },
+                  "Value": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "Name",
+                  "Type",
+                  "Value"
+                ]
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Name"
+          ]
+        }
+      },
+      "arguments": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Type": {
+              "type": "string"
+            },
+            "Text": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Text"
+          ]
+        }
+      },
+      "constructors": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string"
+            },
+            "Parameters": {
+              "$ref": "#/$defs/parameters"
+            },
+            "Statements": {
+              "$ref": "#/$defs/statements"
+            },
+            "Modifiers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "Attributes": {
+              "$ref": "#/$defs/attributes"
+            },
+            "DocumentationComments": {
+              "$ref": "#/$defs/documentationComments"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Name"
+          ]
+        }
+      },
+      "parameters": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Type": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "Attributes": {
+              "$ref": "#/$defs/attributes"
+            },
+            "HasDefaultValue": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Type",
+            "Name"
+          ]
+        }
+      },
+      "methods": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string"
+            },
+            "ReturnType": {
+              "type": "string"
+            },
+            "Parameters": {
+              "$ref": "#/$defs/parameters"
+            },
+            "Statements": {
+              "$ref": "#/$defs/statements"
+            },
+            "Attributes": {
+              "$ref": "#/$defs/attributes"
+            },
+            "Modifiers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "DocumentationComments": {
+              "$ref": "#/$defs/documentationComments"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Name"
+          ]
+        }
+      },
+      "$properties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string"
+            },
+            "Type": {
+              "type": "string"
+            },
+            "Modifiers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "DocumentationComments": {
+              "$ref": "#/$defs/documentationComments"
+            },
+            "Attributes": {
+              "$ref": "#/$defs/attributes"
+            },
+            "Initializer": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Name",
+            "Type"
+          ]
+        }
+      },
+      "enumMembers": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string"
+            },
+            "Value": {
+              "type": "string"
+            },
+            "Modifiers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "DocumentationComments": {
+              "$ref": "#/$defs/documentationComments"
+            },
+            "Attributes": {
+              "$ref": "#/$defs/attributes"
+            },
+            "Arguments": {
+              "$ref": "#/$defs/arguments"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Name"
+          ]
+        }
+      },
+      "events": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string"
+            },
+            "Type": {
+              "type": "string"
+            },
+            "Modifiers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "DocumentationComments": {
+              "$ref": "#/$defs/documentationComments"
+            },
+            "Attributes": {
+              "$ref": "#/$defs/attributes"
+            },
+            "Initializer": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "Name",
+            "Type"
+          ]
+        }
+      }
+    }
+  }

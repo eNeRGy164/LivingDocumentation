@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Newtonsoft.Json;
+using Json.Schema;
 
 namespace LivingDocumentation;
 
@@ -41,6 +42,12 @@ public static partial class Program
         serializerSettings.Formatting = options.PrettyPrint ? Formatting.Indented : Formatting.None;
 
         var result = JsonConvert.SerializeObject(types.OrderBy(t => t.FullName), serializerSettings);
+        var schema =  JsonSchema.FromFile("./Resources/schema.json");
+        var validate = schema.Evaluate(System.Text.Json.Nodes.JsonNode.Parse(result));
+        if (!validate.IsValid){
+            Console.WriteLine($"error when generating json");
+            return;
+        }
 
         await File.WriteAllTextAsync(options.OutputPath!, result).ConfigureAwait(false);
 
