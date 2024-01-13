@@ -45,7 +45,7 @@ public static partial class Program
         var schema =  JsonSchema.FromFile("./Resources/schema.json");
         var validate = schema.Evaluate(System.Text.Json.Nodes.JsonNode.Parse(result));
         if (!validate.IsValid){
-            Console.WriteLine($"error when generating json");
+            Console.WriteLine($"Error when generating json");
             return;
         }
 
